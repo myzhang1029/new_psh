@@ -9,7 +9,7 @@
  * =====================================================================================
  */
 //#include <sys/utsname.h>
-#include "wshell.h"
+#include "pshell.h"
 const int max_name_len = 256;
 const int max_path_len = 1024;
 
@@ -22,9 +22,9 @@ void type_prompt(char *prompt)
     pwd = getpwuid(getuid());
     getcwd(pathname,max_path_len);
     if(gethostname(hostname,max_name_len)==0)
-        sprintf(prompt,"[Wshell]%s@%s:",pwd->pw_name,hostname);
+        sprintf(prompt,"[psh]%s@%s:",pwd->pw_name,hostname);
     else
-        sprintf(prompt,"[Wshell]%s@unknown:",pwd->pw_name);
+        sprintf(prompt,"[psh]%s@unknown:",pwd->pw_name);
     //printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
     //pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
     length = strlen(prompt);
@@ -35,9 +35,9 @@ void type_prompt(char *prompt)
         sprintf(prompt+length,"~%s",pathname+strlen(pwd->pw_dir));
     length = strlen(prompt);
     if(geteuid()==0)
-        sprintf(prompt+length,"#");
+        sprintf(prompt+length,"# ");
     else
-        sprintf(prompt+length,"$");
+        sprintf(prompt+length,"$ ");
     return;
 }
 

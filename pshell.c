@@ -8,13 +8,13 @@
  *        Company:  UESTC
  * =====================================================================================
  */
-#include "wshell.h"
+#include "pshell.h"
 #define TRUE 1
 #define MAXPIDTABLE 1024
 
 pid_t BPTable[MAXPIDTABLE];
 
-void sig_handler(int sig)
+static void sigchld_handler(int sig)
 {
     pid_t pid;
     int i;
@@ -29,8 +29,8 @@ void sig_handler(int sig)
             }
             else if(pid < 0)
             {
-	if(errno != ECHILD)
-                    perror("waitpid error");
+                    if(errno != ECHILD)
+                        perror("waitpid error");
             }
             //else:do nothing.
             //Not background processses has their waitpid() in wshell.
@@ -56,8 +56,8 @@ void proc(void)
     }
 	//arg[0] is command
 	//arg[MAXARG+1] is NULL
-
-    if(signal(SIGCHLD,sig_handler) == SIG_ERR)
+    
+    if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
         perror("signal() error");
 
     while(TRUE)
@@ -164,7 +164,8 @@ void proc(void)
                 dup2(in_fd, fileno(stdin));
                 close(in_fd); 
             }
-            execvp(command,parameters);
+            if(execvp(command,parameters)==-1)
+                printf("psh: %s: %s\n", strerror(errno), command);
         }
     }
     free(parameters);

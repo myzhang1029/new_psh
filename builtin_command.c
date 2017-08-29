@@ -8,7 +8,7 @@
  *        Company:  UESTC
  * =====================================================================================
  */
-#include "wshell.h"
+#include "pshell.h"
 
 int builtin_command(char *command, char **parameters)
 {
@@ -25,11 +25,10 @@ int builtin_command(char *command, char **parameters)
         char *cd_path = NULL;
 
         if(parameters[1] == NULL)
-        //make "cd" to "cd .." as in bash
+        //make "cd" to "cd ~" as in bash
         {
             parameters[1] = malloc(3 * sizeof(char));
-            parameters[1][0]= '.';
-            parameters[1][1]= '.';
+            parameters[1][0]= '~';
             parameters[1][2]= '\0';
         }
         if(parameters[1][0] == '~')
@@ -38,7 +37,7 @@ int builtin_command(char *command, char **parameters)
             //'~' makes length 1 more,but instead of '\0'
             if(cd_path == NULL)
             {
-                printf("cd:malloc failed.\n");
+                printf("cd: malloc failed.\n");
             }
             strcpy(cd_path,pwd->pw_dir);
             strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
@@ -49,12 +48,12 @@ int builtin_command(char *command, char **parameters)
             cd_path = malloc(strlen(parameters[1]+1));
             if(cd_path == NULL)
             {
-                printf("cd:malloc failed.\n");
+                printf("cd: malloc failed.\n");
             }
             strcpy(cd_path,parameters[1]);
         }
         if(chdir(cd_path)!= 0)
-            printf("-wshell: cd: %s:%s\n",cd_path,strerror(errno));
+            printf("-psh: cd: %s:%s\n",cd_path,strerror(errno));
         free(cd_path);
     }
     return 0;

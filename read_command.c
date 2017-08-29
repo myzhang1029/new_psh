@@ -8,7 +8,7 @@
  *        Company:  UESTC
  * =====================================================================================
  */
-#include "wshell.h"
+#include "pshell.h"
 #ifdef READLINE_ON
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -19,23 +19,12 @@
 //-1 represents wrong input
 int read_command(char **command,char **parameters,char *prompt)
 {
-#ifdef READLINE_ON
     free(buffer);
     buffer = readline(prompt);
     if(feof(stdin)) {
         printf("\n");
         exit(0);
     }
-
-#else
-    printf("%s",prompt);
-    char* Res_fgets = fgets(buffer,MAXLINE,stdin);
-    if(Res_fgets == NULL)
-    {
-        printf("\n");
-        exit(0);
-    }		
-#endif
 
     if(buffer[0] == '\0')
         return -1;
