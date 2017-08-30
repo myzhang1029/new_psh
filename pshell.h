@@ -19,6 +19,8 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h> 
+#include <readline/readline.h>
+#include <readline/history.h>
 #define MAX_PROMPT 1024
 #define MAXLINE 4096 //the length of all args is ARG_MAX
 #define MAXARG 20

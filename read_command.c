@@ -9,10 +9,6 @@
  * =====================================================================================
  */
 #include "pshell.h"
-#ifdef READLINE_ON
-#include <readline/readline.h>
-#include <readline/history.h>
-#endif
 
 //return value: number of parameters
 //0 represents only command without any parameters

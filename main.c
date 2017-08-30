@@ -1,6 +1,6 @@
 /*
  * =====================================================================================
- *       Filename:  wshell.c
+ *       Filename:  main.c
  *    Description:  
  *        Version:  1.0
  *        Created:  2013.10.16 17h12min19s
@@ -9,7 +9,6 @@
  * =====================================================================================
  */
 #include "pshell.h"
-#define TRUE 1
 #define MAXPIDTABLE 1024
 
 pid_t BPTable[MAXPIDTABLE];
@@ -60,7 +59,7 @@ void proc(void)
     if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
         perror("signal() error");
 
-    while(TRUE)
+    while(1)
     {
         int pipe_fd[2],in_fd,out_fd;
         type_prompt(prompt);
