@@ -11,7 +11,7 @@
 #include "pshell.h"
 #define MAXPIDTABLE 1024
 
-pid_t BPTable[MAXPIDTABLE];
+pid_t BPTable[MAXPIDTABLE]={0};
 
 static void sigchld_handler(int sig)
 {
@@ -104,9 +104,12 @@ void proc(void)
                 int i;
                 for(i=0;i<MAXPIDTABLE;i++)
                     if(BPTable[i]==0)
+                    {
                         BPTable[i] = ChdPid; //register a background process
+                        break;
+                    }
                 if(i==MAXPIDTABLE)
-                    OUT2E("Too much background processes\n");
+                    OUT2E("psh: Too much background processes\n");
             }
             else
             {          
@@ -175,11 +178,8 @@ void proc(void)
 	free(buffer);
 }
 
-int main() {
-    int i;
-    //init the BPTable
-    for(i=0;i<MAXPIDTABLE;i++)
-        BPTable[i] = 0;
+int main()
+{
     proc();
     return 0;
 }
