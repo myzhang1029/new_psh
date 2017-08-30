@@ -9,7 +9,7 @@
  * =====================================================================================
  */
 #include "pshell.h"
-
+#define cmdif(cmd) if(strcmp(command,cmd) == 0)
 int builtin_command(char *command, char **parameters)
 {
 	extern struct passwd *pwd;
@@ -20,12 +20,12 @@ int builtin_command(char *command, char **parameters)
         else
             exit(atoi(parameters[1]));
     }
-    else if(strcmp(command,"about") == 0)
+    else cmdif("about")
     {
         OUT2E("This is a simulation of shell (bash) in Linux.\n");
         return 1;
     }
-    else if(strcmp(command,"cd")==0)
+    else cmdif("cd")
     {
         char *cd_path = NULL;
         
@@ -65,5 +65,56 @@ int builtin_command(char *command, char **parameters)
         free(cd_path);
         return 1;
     }
+    else cmdif("echo")
+    {
+        if(parameters[1] == NULL)
+        {
+            /* A blank line */
+            printf("\n");
+        }
+        else if(parameters[1][0] == '-')
+        {
+            switch(parameters[1][1])
+            {
+                case 0:
+                    /* Another blank line */
+                    puts("");
+                    break;
+                case 'n':
+                    if(parameters[2] == NULL)
+                    {
+                        /* No more blank line */
+                        break;
+                    }
+                    else
+                    {
+                        int cnt=2;
+                        while (parameters[cnt] != NULL)
+                        {
+                            printf("%s", parameters[cnt]);
+                            cnt++;
+                        }
+                        return 1;
+                    }
+            }
+        }
+        else
+        {
+            int cnt=1;
+            printf("%s", parameters[cnt]);
+            while (parameters[++cnt] != NULL)
+            {
+                printf(" %s", parameters[cnt]);
+                cnt++;
+            }
+            puts("");
+	    return 1;
+        }
+    }
+    else cmdif("export")
+    {
+        OUT2E("psh: export Not supported");
+    }
+    
     return 0;
 }
