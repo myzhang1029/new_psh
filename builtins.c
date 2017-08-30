@@ -9,23 +9,24 @@
  * =====================================================================================
  */
 #include "pshell.h"
-#define cmdif(cmd) if(strcmp(command,cmd) == 0)
+#define cmdis(cmd) (strcmp(command,cmd) == 0)
+
 int builtin_command(char *command, char **parameters)
 {
 	extern struct passwd *pwd;
-    if(strcmp(command,"exit")==0 || strcmp(command,"quit")==0)
+    if(cmdis("exit") || cmdis("quit"))
     {
         if(parameters[1]==NULL)
             exit(0);
         else
             exit(atoi(parameters[1]));
     }
-    else cmdif("about")
+    else if(cmdis("about"))
     {
-        OUT2E("This is a simulation of shell (bash) in Linux.\n");
+        printf("psh is a not fully implemented shell in UNIX.\n");
         return 1;
     }
-    else cmdif("cd")
+    else if(cmdis("cd")||cmdis("chdir"))
     {
         char *cd_path = NULL;
         
@@ -34,7 +35,7 @@ int builtin_command(char *command, char **parameters)
             cd_path=malloc(strlen(pwd->pw_dir)+1);
             if(cd_path == NULL)
             {
-                OUT2E("cd: malloc failed: %s\n", strerror(errno));
+                OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
                 return 2;
             }
             strcpy(cd_path, pwd->pw_dir);
@@ -44,7 +45,7 @@ int builtin_command(char *command, char **parameters)
             cd_path = malloc(strlen(pwd->pw_dir)+strlen(parameters[1])+1);
             if(cd_path == NULL)
             {
-                OUT2E("cd: malloc failed: %s\n", strerror(errno));
+                OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
                 return 2;
             }
             strcpy(cd_path, pwd->pw_dir);
@@ -55,17 +56,17 @@ int builtin_command(char *command, char **parameters)
             cd_path = malloc(strlen(parameters[1]+1));
             if(cd_path == NULL)
             {
-                OUT2E("cd: malloc failed: %s\n", strerror(errno));
+                OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
                 return 2;
             }
             strcpy(cd_path,parameters[1]);
         }
         if(chdir(cd_path)!= 0)
-            OUT2E("cd: %s: %s\n", strerror(errno), cd_path);
+            OUT2E("%s: %s: %s\n", command, strerror(errno), cd_path);
         free(cd_path);
         return 1;
     }
-    else cmdif("echo")
+    else if(cmdis("echo"))
     {
         if(parameters[1] == NULL)
         {
@@ -108,12 +109,13 @@ int builtin_command(char *command, char **parameters)
                 cnt++;
             }
             puts("");
-	    return 1;
+            return 1;
         }
     }
-    else cmdif("export")
+    else if(cmdis("export")||cmdis("alias"))
     {
         OUT2E("psh: export Not supported");
+        return 1;
     }
     
     return 0;
