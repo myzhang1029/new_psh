@@ -58,7 +58,13 @@ void proc(void)
     
     if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
         OUT2E("psh: signal error: %s", strerror(errno));
-
+    
+    if(signal(SIGINT,SIG_IGN) == SIG_ERR)
+        OUT2E("psh: signal error: %s", strerror(errno));
+    
+    if(signal(SIGABRT,SIG_IGN) == SIG_ERR)
+        OUT2E("psh: signal error: %s", strerror(errno));
+    
     while(1)
     {
         int pipe_fd[2],in_fd,out_fd;
