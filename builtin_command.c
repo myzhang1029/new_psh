@@ -29,15 +29,25 @@ int builtin_command(char *command, char **parameters)
     {
         char *cd_path = NULL;
         
-        if(parameters[1][0] == '~' || parameters[1] == NULL/* 'cd' */)
+        if(parameters[1] == NULL/* 'cd' */)
         {
-            cd_path = malloc(strlen(pwd->pw_dir)+2);
+            cd_path=malloc(strlen(pwd->pw_dir)+1);
             if(cd_path == NULL)
             {
                 printf("cd: malloc failed: %s\n", strerror(errno));
                 return 2;
             }
-            strcpy(cd_path,pwd->pw_dir);
+            strcpy(cd_path, pwd->pw_dir);
+        }
+        else if(parameters[1][0] == '~')
+        {
+            cd_path = malloc(strlen(pwd->pw_dir)+strlen(parameters[1])+1);
+            if(cd_path == NULL)
+            {
+                printf("cd: malloc failed: %s\n", strerror(errno));
+                return 2;
+            }
+            strcpy(cd_path, pwd->pw_dir);
             strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
         }
         else
