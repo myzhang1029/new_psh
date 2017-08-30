@@ -21,6 +21,9 @@ int read_command(char **command,char **parameters,char *prompt)
         printf("\n");
         exit(0);
     }
+    /* Add history if buffer isn't blank */
+    if(buffer && *buffer)
+        add_history(buffer);
 
     if(buffer[0] == '\0')
         return -1;
