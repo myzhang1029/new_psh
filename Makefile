@@ -1,6 +1,6 @@
 CC=gcc
-psh: pshell.h main.c type_prompt.c read_command.c builtin_command.c parsing.c test
-	$(CROSS_PREFIX)$(CC) $(CFLAGS) main.c type_prompt.c read_command.c builtin_command.c parsing.c -o $@ -lreadline 
+psh: pshell.h main.c show.c input.c builtins.c parser.c
+	$(CROSS_PREFIX)$(CC) $(CFLAGS) main.c show.c input.c builtins.c parser.c -o $@ -lreadline 
 
 test: test.c
 	$(CC) test.c -o test

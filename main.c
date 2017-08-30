@@ -29,7 +29,7 @@ static void sigchld_handler(int sig)
             else if(pid < 0)
             {
                     if(errno != ECHILD)
-                        perror("waitpid error");
+                        OUT2E("psh: waitpid error: %s", strerror(errno));
             }
             //else:do nothing.
             //Not background processses has their waitpid() in wshell.
@@ -50,14 +50,14 @@ void proc(void)
     buffer = malloc(sizeof(char) * MAXLINE);
     if(parameters == NULL || buffer == NULL)
     {
-        printf("Wshell error:malloc failed.\n");
+        OUT2E("psh: malloc failed: %s\n", strerror(errno));
         return;
     }
 	//arg[0] is command
 	//arg[MAXARG+1] is NULL
     
     if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
-        perror("signal() error");
+        OUT2E("psh: signal error: %s", strerror(errno));
 
     while(1)
     {
@@ -74,11 +74,11 @@ void proc(void)
         {                
             if(pipe(pipe_fd)<0)
             {
-                printf("Wshell error:pipe failed.\n");
+                OUT2E("psh: pipe failed: %s\n", strerror(errno));
                 exit(0);
             }
         }  
-        if((ChdPid = fork())!=0) //wshell
+        if((ChdPid = fork())!=0) //shell
         {
             if(info.flag & IS_PIPED)
             {
@@ -106,7 +106,7 @@ void proc(void)
                     if(BPTable[i]==0)
                         BPTable[i] = ChdPid; //register a background process
                 if(i==MAXPIDTABLE)
-                    perror("Too much background processes\nThere will be zombine process");                    
+                    OUT2E("Too much background processes\n");
             }
             else
             {          
@@ -165,7 +165,7 @@ void proc(void)
             }
             if(execvp(command,parameters)==-1)
             {
-                printf("psh: %s: %s\n", strerror(errno), command);
+                OUT2E("psh: %s: %s\n", strerror(errno), command);
                 /* Exit the failed command child process */
                 exit(1);
             }

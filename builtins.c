@@ -22,7 +22,7 @@ int builtin_command(char *command, char **parameters)
     }
     else if(strcmp(command,"about") == 0)
     {
-        printf("This is a simulation of shell (bash) in Linux.\n");
+        OUT2E("This is a simulation of shell (bash) in Linux.\n");
         return 1;
     }
     else if(strcmp(command,"cd")==0)
@@ -34,7 +34,7 @@ int builtin_command(char *command, char **parameters)
             cd_path=malloc(strlen(pwd->pw_dir)+1);
             if(cd_path == NULL)
             {
-                printf("cd: malloc failed: %s\n", strerror(errno));
+                OUT2E("cd: malloc failed: %s\n", strerror(errno));
                 return 2;
             }
             strcpy(cd_path, pwd->pw_dir);
@@ -44,7 +44,7 @@ int builtin_command(char *command, char **parameters)
             cd_path = malloc(strlen(pwd->pw_dir)+strlen(parameters[1])+1);
             if(cd_path == NULL)
             {
-                printf("cd: malloc failed: %s\n", strerror(errno));
+                OUT2E("cd: malloc failed: %s\n", strerror(errno));
                 return 2;
             }
             strcpy(cd_path, pwd->pw_dir);
@@ -55,13 +55,13 @@ int builtin_command(char *command, char **parameters)
             cd_path = malloc(strlen(parameters[1]+1));
             if(cd_path == NULL)
             {
-                printf("cd: malloc failed: %s\n", strerror(errno));
+                OUT2E("cd: malloc failed: %s\n", strerror(errno));
                 return 2;
             }
             strcpy(cd_path,parameters[1]);
         }
         if(chdir(cd_path)!= 0)
-            printf("cd: %s: %s\n", strerror(errno), cd_path);
+            OUT2E("cd: %s: %s\n", strerror(errno), cd_path);
         free(cd_path);
         return 1;
     }
