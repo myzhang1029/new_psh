@@ -34,6 +34,7 @@ void type_prompt(char*);
 int read_command(char **,char **,char*);
 int builtin_command(char *,char **);
 int parsing(char **,int,struct parse_info *);
+int parse_info_init(struct parse_info *info);
 void proc(void);
 void sig_handler(int sig);
 

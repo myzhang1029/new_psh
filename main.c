@@ -23,7 +23,7 @@ static void sigchld_handler(int sig)
             pid = waitpid(BPTable[i],NULL,WNOHANG);
             if(pid > 0)
             {
-                printf("process %d exited.\n",pid);
+                printf("[%d] %d done\n", i+1, pid);
                 BPTable[i] = 0; //clear
             }
             else if(pid < 0)
@@ -100,7 +100,6 @@ void proc(void)
 
             if(info.flag & BACKGROUND)
             {
-                printf("Child pid:%u\n",ChdPid);
                 int i;
                 for(i=0;i<MAXPIDTABLE;i++)
                     if(BPTable[i]==0)
@@ -108,8 +107,15 @@ void proc(void)
                         BPTable[i] = ChdPid; //register a background process
                         break;
                     }
+
+                printf("[%d] %u\n", i+1, ChdPid);
                 if(i==MAXPIDTABLE)
                     OUT2E("psh: Too much background processes\n");
+#ifdef WINDOWS
+                Sleep(5);
+#else
+                usleep(5000);
+#endif
             }
             else
             {          
