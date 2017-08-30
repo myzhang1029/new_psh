@@ -22,9 +22,9 @@ void type_prompt(char *prompt)
     pwd = getpwuid(getuid());
     getcwd(pathname,max_path_len);
     if(gethostname(hostname,max_name_len)==0)
-        sprintf(prompt,"[psh]%s@%s:",pwd->pw_name,hostname);
+        sprintf(prompt,"%s@%s:",pwd->pw_name,strtok(hostname,"."));
     else
-        sprintf(prompt,"[psh]%s@unknown:",pwd->pw_name);
+        sprintf(prompt,"%s@unknown:",pwd->pw_name);
     //printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
     //pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
     length = strlen(prompt);
