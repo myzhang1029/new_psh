@@ -164,7 +164,11 @@ void proc(void)
                 close(in_fd); 
             }
             if(execvp(command,parameters)==-1)
+            {
                 printf("psh: %s: %s\n", strerror(errno), command);
+                /* Exit the failed command child process */
+                exit(1);
+            }
         }
     }
     free(parameters);
