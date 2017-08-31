@@ -12,8 +12,9 @@
 #define MAXPIDTABLE 1024
 
 pid_t BPTable[MAXPIDTABLE]={0};
+int status=0;
 
-static void sigchld_handler(int sig)
+void sigchld_handler(int sig)
 {
     pid_t pid;
     int i;
@@ -37,9 +38,15 @@ static void sigchld_handler(int sig)
     return;
 }
 
+void sigintabrt_hadler(int sig)
+{
+    status=sig;
+    return;
+}
+
 void proc(void)
 {
-    int status,i;
+    int i;
     char *command = NULL;
     char **parameters;
     int ParaNum;
@@ -59,10 +66,10 @@ void proc(void)
     if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
         OUT2E("psh: signal error: %s", strerror(errno));
     
-    if(signal(SIGINT,SIG_IGN) == SIG_ERR)
+    if(signal(SIGINT,sigintabrt_hadler) == SIG_ERR)
         OUT2E("psh: signal error: %s", strerror(errno));
     
-    if(signal(SIGABRT,SIG_IGN) == SIG_ERR)
+    if(signal(SIGQUIT,sigintabrt_hadler) == SIG_ERR)
         OUT2E("psh: signal error: %s", strerror(errno));
     
     while(1)
