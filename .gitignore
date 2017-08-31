@@ -2,3 +2,5 @@ psh
 test
 *.[oa]
 *~
+.DS_Store
+
