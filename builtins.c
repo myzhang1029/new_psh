@@ -9,9 +9,10 @@
  * =====================================================================================
  */
 #include "pshell.h"
+#include "builtins/builtin.h"
 #define cmdis(cmd) (strcmp(command,cmd) == 0)
 
-int builtin_command(char *command, char **parameters)
+int run_builtin(char *command, char **parameters)
 {
 	extern struct passwd *pwd;
 	if(cmdis("exit") || cmdis("quit"))
@@ -27,117 +28,15 @@ int builtin_command(char *command, char **parameters)
 		return 1;
 	}
 	else if(cmdis("cd")||cmdis("chdir"))
-	{
-		char *cd_path = NULL;
-		
-		if(parameters[1] == NULL/* 'cd' */)
-		{
-			cd_path=malloc(strlen(pwd->pw_dir)+1);
-			if(cd_path == NULL)
-			{
-				OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
-				return 2;
-			}
-			strcpy(cd_path, pwd->pw_dir);
-		}
-		else if(parameters[1][0] == '~')
-		{
-			cd_path = malloc(strlen(pwd->pw_dir)+strlen(parameters[1])+1);
-			if(cd_path == NULL)
-			{
-				OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
-				return 2;
-			}
-			strcpy(cd_path, pwd->pw_dir);
-			strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
-		}
-		else
-		{
-			cd_path = malloc(strlen(parameters[1]+1));
-			if(cd_path == NULL)
-			{
-				OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
-				return 2;
-			}
-			strcpy(cd_path,parameters[1]);
-		}
-		if(chdir(cd_path)!= 0)
-			OUT2E("%s: %s: %s\n", command, strerror(errno), cd_path);
-		free(cd_path);
-		return 1;
-	}
+        return builtin_cd(command, parameters);
 	else if(cmdis("echo"))
-	{
-		if(parameters[1] == NULL)
-		{
-			/* A blank line */
-			printf("\n");
-		}
-		else if(parameters[1][0] == '-')
-		{
-			switch(parameters[1][1])
-			{
-				case 0:
-					/* Another blank line */
-					puts("");
-					break;
-				case 'n':
-					if(parameters[2] == NULL)
-					{
-						/* No more blank line */
-						break;
-					}
-					else
-					{
-						int cnt=2;
-						while (parameters[cnt] != NULL)
-						{
-							printf("%s", parameters[cnt]);
-							cnt++;
-						}
-						return 1;
-					}
-			}
-		}
-		else
-		{
-			int cnt=1;
-			printf("%s", parameters[cnt]);
-			while (parameters[++cnt] != NULL)
-			{
-				printf(" %s", parameters[cnt]);
-				cnt++;
-			}
-			puts("");
-			return 1;
-		}
-	}
+        return builtin_echo(command, parameters);
 	else if(cmdis("exec"))
-	{
-		if(parameters[1]==NULL)
-			return 1;/* Do nothing */
-		char **execargv = (char**) malloc(sizeof(char)*MAXLINE);
-		if(execargv == NULL)
-		{
-			OUT2E("exec: malloc failed: %s\n", strerror(errno));
-			return 2;
-		}
-		else
-		{
-			int i=0;
-            memmove(execargv, parameters[1], MAXLINE);
-			execargv[i]=NULL;
-		}
-		if(execv(parameters[1],execargv)==-1)
-			OUT2E("exec: %s: %s\n", parameters[1], strerror(errno));
-		return 2;
-
-	}
+        return builtin_exec(command, parameters);
 	else if(cmdis("export")||cmdis("alias"))
 	{
 		OUT2E("psh: %s: Not supported\n", command);
 		return 1;
 	}
-	
 	return 0;
 }

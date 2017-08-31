@@ -81,7 +81,7 @@ void proc(void)
 			continue;
 		ParaNum--;//count of units in buffer
 		parsing(parameters,ParaNum,&info);
-		switch(builtin_command(command,parameters))
+		switch(run_builtin(command,parameters))
 	{
 		case 1:
 				continue;
