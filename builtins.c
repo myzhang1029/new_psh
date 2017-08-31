@@ -135,7 +135,7 @@ int builtin_command(char *command, char **parameters)
 	}
 	else if(cmdis("export")||cmdis("alias"))
 	{
-		OUT2E("psh: export Not supported");
+		OUT2E("psh: %s: Not supported\n", command);
 		return 1;
 	}
 	
