@@ -82,15 +82,15 @@ void proc(void)
 		ParaNum--;//count of units in buffer
 		parsing(parameters,ParaNum,&info);
 		switch(run_builtin(command,parameters))
-	{
-		case 1:
+		{
+			case 1:
 				continue;
-		case 2:
-			status=1;
-			continue;
-		default:
-			break;
-	}
+			case 2:
+				status=1;
+				continue;
+			default:
+				break;
+		}
 		if(info.flag & IS_PIPED) //command2 is not null
 		{				
 			if(pipe(pipe_fd)<0)
