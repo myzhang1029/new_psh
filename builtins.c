@@ -28,11 +28,11 @@ int run_builtin(char *command, char **parameters)
 		return 1;
 	}
 	else if(cmdis("cd")||cmdis("chdir"))
-        return builtin_cd(command, parameters);
+		return builtin_cd(command, parameters);
 	else if(cmdis("echo"))
-        return builtin_echo(command, parameters);
+		return builtin_echo(command, parameters);
 	else if(cmdis("exec"))
-        return builtin_exec(command, parameters);
+		return builtin_exec(command, parameters);
 	else if(cmdis("export")||cmdis("alias"))
 	{
 		OUT2E("psh: %s: Not supported\n", command);

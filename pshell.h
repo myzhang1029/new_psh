@@ -1,11 +1,11 @@
 /*
  * =====================================================================================
- *       Filename:  wshell.h
- *    Description:  
- *        Version:  1.0
- *        Created:  2013.10.16 20h15min26s
- *         Author:  wuyue (wy), vvuyve@gmail.com
- *        Company:  UESTC
+ *	   Filename:  wshell.h
+ *	Description:  
+ *		Version:  1.0
+ *		Created:  2013.10.16 20h15min26s
+ *		 Author:  wuyue (wy), vvuyve@gmail.com
+ *		Company:  UESTC
  * =====================================================================================
  */
 #include <unistd.h>
@@ -47,10 +47,10 @@ int run_builtin(char *command, char **parameters);
 #define IS_PIPED 			16
 struct parse_info 
 {
-    int flag;
-    char* in_file;
-    char* out_file;
-    char* command2;
+	int flag;
+	char* in_file;
+	char* out_file;
+	char* command2;
 	char** parameters2;
 };
 #endif
