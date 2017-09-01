@@ -30,6 +30,7 @@ struct parse_info;
 struct passwd *pwd;
 char *buffer;
 
+char *preprocess_cmdline(char *buffer);
 void type_prompt(char*);
 int read_command(char **,char **,char*);
 int parsing(char **,int,struct parse_info *);
@@ -40,11 +41,13 @@ int run_builtin(char *command, char **parameters);
 
 #ifndef STRUCT_PARSE_INFO
 #define STRUCT_PARSE_INFO
-#define BACKGROUND 			1
-#define IN_REDIRECT 		2
-#define OUT_REDIRECT 		4
-#define OUT_REDIRECT_APPEND	8
-#define IS_PIPED 			16
+#define BACKGROUND		0x01
+#define IN_REDIRECT		0x02
+#define OUT_REDIRECT		0x04
+#define OUT_REDIRECT_APPEND	0x08
+#define IS_PIPED		0x10
+#define RUN_AND			0x20
+#define RUN_OR			0x40
 struct parse_info 
 {
 	int flag;
