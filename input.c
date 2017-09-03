@@ -25,6 +25,8 @@ int read_command(char **command,char **parameters,char *prompt)
 	if(buffer && *buffer)
 		add_history(buffer);
 
+	buffer=preprocess_cmdline(buffer);
+
 	if(buffer[0] == '\0')
 		return -1;
 	char *pStart,*pEnd;
