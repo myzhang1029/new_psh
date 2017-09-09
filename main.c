@@ -197,7 +197,7 @@ void proc(void)
 			{
 				OUT2E("psh: %s: %s\n", strerror(errno), command);
 				/* Exit the failed command child process */
-				exit(1);
+				_Exit(1);
 			}
 		}
 	}
