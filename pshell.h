@@ -22,7 +22,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #define MAX_PROMPT 1024
-#define MAXLINE 4096 //the length of all args is ARG_MAX
+#define MAXLINE 262144 //the length of all args is ARG_MAX
 #define MAXARG 20
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
 
@@ -53,7 +53,8 @@ struct parse_info
 	int flag;
 	char* in_file;
 	char* out_file;
-	char* command2;
-	char** parameters2;
+	char* command;
+	char** parameters;
+	struct parse_info *next;
 };
 #endif

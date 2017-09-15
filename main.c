@@ -91,7 +91,7 @@ void proc(void)
 			default:
 				break;
 		}
-		if(info.flag & IS_PIPED) //command2 is not null
+		if(info.flag & IS_PIPED) //command is not null
 		{				
 			if(pipe(pipe_fd)<0)
 			{
@@ -103,19 +103,19 @@ void proc(void)
 		{
 			if(info.flag & IS_PIPED)
 			{
-				if((ChdPid2=fork()) == 0) //command2
+				if((ChdPid2=fork()) == 0) //command
 				{
 					close(pipe_fd[1]);
 					close(fileno(stdin)); 
 					dup2(pipe_fd[0], fileno(stdin));
 					close(pipe_fd[0]); 
-					execvp(info.command2,info.parameters2);
+					execvp(info.command,info.parameters);
 				}
 				else
 				{
 					close(pipe_fd[0]);
 					close(pipe_fd[1]);
-					waitpid(ChdPid2,&status,0); //wait command2
+					waitpid(ChdPid2,&status,0); //wait command
 				}
 			}
 
@@ -146,7 +146,7 @@ void proc(void)
 		else //command1
 		{
 			
-			if(info.flag & IS_PIPED) //command2 is not null
+			if(info.flag & IS_PIPED) //command is not null
 			{				
 				if(!(info.flag & OUT_REDIRECT) && !(info.flag & OUT_REDIRECT_APPEND)) // ONLY PIPED
 			   {
@@ -158,7 +158,7 @@ void proc(void)
 				else //OUT_REDIRECT and PIPED
 			   {
 					close(pipe_fd[0]);
-					close(pipe_fd[1]);//send a EOF to command2
+					close(pipe_fd[1]);//send a EOF to command
 					if(info.flag & OUT_REDIRECT)
 					   out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 					else

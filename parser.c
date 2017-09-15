@@ -15,8 +15,8 @@ int parse_info_init(struct parse_info *info)
 	info->flag = 0;
 	info->in_file = NULL;
 	info->out_file = NULL;
-	info->command2 = NULL;
-	info->parameters2 = NULL;
+	info->command = NULL;
+	info->parameters = NULL;
 	return 0;
 }
 
@@ -59,14 +59,14 @@ int parsing(char **parameters,int ParaNum,struct parse_info *info)
 			char* pCh;
 			info->flag |= IS_PIPED;
 			parameters[i] = NULL;
-			info->command2 = parameters[i+1];
-			info->parameters2 = &parameters[i+1];
-			for(pCh = info->parameters2[0]+strlen(info->parameters2[0]);
-					pCh!=&(info->parameters2[0][0]) && *pCh!='/';pCh--)
+			info->command = parameters[i+1];
+			info->parameters = &parameters[i+1];
+			for(pCh = info->parameters[0]+strlen(info->parameters[0]);
+					pCh!=&(info->parameters[0][0]) && *pCh!='/';pCh--)
 				;
 			if(*pCh == '/')
 				pCh++;
-			info->parameters2[0] = pCh;
+			info->parameters[0] = pCh;
 			break;
 		}
 		else
@@ -79,7 +79,7 @@ int parsing(char **parameters,int ParaNum,struct parse_info *info)
 	printf("out redirect:");
 	info->flag&OUT_REDIRECT?printf("yes,file:%s\n",info->out_file):printf("no\n");
 	printf("pipe:");
-	info->flag&IS_PIPED?printf("yes,command:%s %s %s\n",info->command2,info->parameters2[0],info->parameters2[1]):printf("no\n");
+	info->flag&IS_PIPED?printf("yes,command:%s %s %s\n",info->command,info->parameters[0],info->parameters[1]):printf("no\n");
 #endif
 	return 1;
 }
