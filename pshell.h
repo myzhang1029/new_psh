@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *	   Filename:  wshell.h
- *	Description:  
+ *	Description:
  *		Version:  1.0
  *		Created:  2013.10.16 20h15min26s
  *		 Author:  wuyue (wy), vvuyve@gmail.com
@@ -12,13 +12,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h> 
+#include <fcntl.h>
 #include <errno.h>
 #include <pwd.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #define MAX_PROMPT 1024
@@ -48,13 +48,14 @@ int run_builtin(char *command, char **parameters);
 #define IS_PIPED		0x10
 #define RUN_AND			0x20
 #define RUN_OR			0x40
-struct parse_info 
+struct parse_info
 {
 	int flag;
-	char* in_file;
-	char* out_file;
-	char* command;
-	char** parameters;
+	char *in_file;
+	char *out_file;
+	char *buffer;
+	char *command;
+	char **parameters;
 	struct parse_info *next;
 };
 #endif

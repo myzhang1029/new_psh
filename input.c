@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *	   Filename:  read_command.c
- *	Description:  
+ *	Description:
  *		Version:  1.0
  *		Created:  2013.10.21 14h12min24s
  *		 Author:  wuyue (wy), vvuyve@gmail.com
@@ -17,7 +17,8 @@ int read_command(char **command,char **parameters,char *prompt)
 {
 	free(buffer);
 	buffer = readline(prompt);
-	if(feof(stdin)) {
+	if(feof(stdin))
+	{
 		printf("\n");
 		exit(0);
 	}
@@ -97,7 +98,7 @@ int read_command(char **command,char **parameters,char *prompt)
 	printf("input analysis:\n");
 	printf("pathname:[%s]\ncommand:[%s]\nparameters:\n",*command,parameters[0]);
 	int i;
-	for(i=0;i<count-1;i++)
+	for(i=0; i<count-1; i++)
 		printf("[%s]\n",parameters[i]);
 #endif
 

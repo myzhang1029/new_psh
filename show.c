@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *	   Filename:  type_prompt.c
- *	Description:  
+ *	Description:
  *		Version:  1.0
  *		Created:  2013.10.16 20h18min28s
  *		 Author:  wuyue (wy), vvuyve@gmail.com
@@ -28,8 +28,8 @@ void type_prompt(char *prompt)
 	//printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
 	//pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
 	length = strlen(prompt);
-	if(strlen(pathname) < strlen(pwd->pw_dir) || 
-			strncmp(pathname,pwd->pw_dir,strlen(pwd->pw_dir))!=0)
+	if(strlen(pathname) < strlen(pwd->pw_dir) ||
+	        strncmp(pathname,pwd->pw_dir,strlen(pwd->pw_dir))!=0)
 		sprintf(prompt+length,"%s",pathname);
 	else
 		sprintf(prompt+length,"~%s",pathname+strlen(pwd->pw_dir));

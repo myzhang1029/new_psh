@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *	   Filename:  parsing.c
- *	Description:  
+ *	Description:
  *		Version:  1.0
  *		Created:  2013.11.02 15h44min23s
  *		 Author:  wuyue (wy), vvuyve@gmail.com
@@ -30,8 +30,8 @@ int parsing(char **parameters,int ParaNum,struct parse_info *info)
 		parameters[ParaNum-1] = NULL;
 		ParaNum--;
 	}
-	
-	for(i=0;i<ParaNum;)
+
+	for(i=0; i<ParaNum;)
 	{
 		if(strcmp(parameters[i],"<<")==0 || strcmp(parameters[i],"<")==0)
 		{
@@ -62,7 +62,7 @@ int parsing(char **parameters,int ParaNum,struct parse_info *info)
 			info->command = parameters[i+1];
 			info->parameters = &parameters[i+1];
 			for(pCh = info->parameters[0]+strlen(info->parameters[0]);
-					pCh!=&(info->parameters[0][0]) && *pCh!='/';pCh--)
+			        pCh!=&(info->parameters[0][0]) && *pCh!='/'; pCh--)
 				;
 			if(*pCh == '/')
 				pCh++;

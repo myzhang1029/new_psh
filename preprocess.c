@@ -4,7 +4,7 @@ char *preprocess_cmdline(char *buffer)
 {
 	char *new_buffer=malloc(sizeof(char) * MAXLINE);
 	int count=0,ncount=0;
-	for(;buffer[count]!=0;count++,ncount++)
+	for(; buffer[count]!=0; count++,ncount++)
 	{
 		if(buffer[count]=='>'&&buffer[count+1]=='>'&&buffer[count-1]!='\\')
 		{
