@@ -12,7 +12,10 @@
 #define MAXPIDTABLE 1024
 
 pid_t BPTable[MAXPIDTABLE]={0};
-int status=0;
+int status=0, pipe_fd[2], in_fd, out_fd;
+pid_t ChdPid, ChdPid2;
+struct parse_info info;	
+
 
 void sigchld_handler(int sig)
 {
@@ -51,8 +54,6 @@ void proc(void)
 	char **parameters;
 	int ParaNum;
 	char prompt[MAX_PROMPT];
-	struct parse_info info;
-	pid_t ChdPid,ChdPid2;
 	parameters = malloc(sizeof(char *)*(MAXARG+2));
 	buffer = malloc(sizeof(char) * MAXLINE);
 	if(parameters == NULL || buffer == NULL)
@@ -74,31 +75,38 @@ void proc(void)
 	
 	while(1)
 	{
-		int pipe_fd[2],in_fd,out_fd;
 		type_prompt(prompt);
 		ParaNum = read_command(&command,parameters,prompt);
 		if(-1 == ParaNum)
 			continue;
 		ParaNum--;//count of units in buffer
 		parsing(parameters,ParaNum,&info);
-		switch(run_builtin(command,parameters))
+		do_run(command, parameters);
+	}
+	free(parameters);
+	free(buffer);
+}
+
+int do_run(char *command, char **parameters)
+{
+	switch(run_builtin(command,parameters))
+	{
+		case 1:
+			return 1;
+		case 2:
+			status=1;
+			return 1;
+		default:
+			break;
+	}
+	if(info.flag & IS_PIPED) //command is not null
+	{				
+		if(pipe(pipe_fd)<0)
 		{
-			case 1:
-				continue;
-			case 2:
-				status=1;
-				continue;
-			default:
-				break;
+			OUT2E("psh: pipe failed: %s\n", strerror(errno));
+			exit(0);
 		}
-		if(info.flag & IS_PIPED) //command is not null
-		{				
-			if(pipe(pipe_fd)<0)
-			{
-				OUT2E("psh: pipe failed: %s\n", strerror(errno));
-				exit(0);
-			}
-		}  
+	}  
 		if((ChdPid = fork())!=0) //shell
 		{
 			if(info.flag & IS_PIPED)
@@ -200,9 +208,7 @@ void proc(void)
 				_Exit(1);
 			}
 		}
-	}
-	free(parameters);
-	free(buffer);
+		return 0;
 }
 
 int main()

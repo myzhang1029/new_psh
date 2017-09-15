@@ -32,11 +32,11 @@ char *buffer;
 
 char *preprocess_cmdline(char *buffer);
 void type_prompt(char*);
+int do_run(char *command, char **parameters);
 int read_command(char **,char **,char*);
 int parsing(char **,int,struct parse_info *);
 int parse_info_init(struct parse_info *info);
 int run_builtin(char *command, char **parameters);
-
 
 
 #ifndef STRUCT_PARSE_INFO
