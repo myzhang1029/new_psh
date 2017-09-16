@@ -14,7 +14,6 @@
 pid_t BPTable[MAXPIDTABLE]= {0};
 int status=0, pipe_fd[2], in_fd, out_fd;
 pid_t ChdPid, ChdPid2;
-struct parse_info info;
 
 
 void sigchld_handler(int sig)
@@ -54,6 +53,7 @@ void proc(void)
 	char **parameters;
 	int ParaNum;
 	char prompt[MAX_PROMPT];
+	struct parse_info info;
 	parameters = malloc(sizeof(char *)*(MAXARG+2));
 	buffer = malloc(sizeof(char) * MAXLINE);
 	if(parameters == NULL || buffer == NULL)
@@ -81,13 +81,13 @@ void proc(void)
 			continue;
 		ParaNum--;//count of units in buffer
 		parsing(parameters,ParaNum,&info);
-		do_run(command, parameters);
+		do_run(command, parameters, info);
 	}
 	free(parameters);
 	free(buffer);
 }
 
-int do_run(char *command, char **parameters)
+int do_run(char *command, char **parameters, struct parse_info info)
 {
 	switch(run_builtin(command,parameters))
 	{
