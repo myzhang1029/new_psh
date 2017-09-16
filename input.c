@@ -15,7 +15,7 @@
 //-1 represents wrong input
 int read_command(char **command,char **parameters,char *prompt)
 {
-	free(buffer);
+	memset(buffer, 0, sizeof(buffer));
 	buffer = readline(prompt);
 	if(feof(stdin))
 	{

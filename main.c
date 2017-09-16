@@ -59,6 +59,8 @@ void proc(void)
 	if(parameters == NULL || buffer == NULL)
 	{
 		OUT2E("psh: malloc failed: %s\n", strerror(errno));
+		if(parameters!=NULL)
+			free(parameters);
 		return;
 	}
 	//arg[0] is command
@@ -83,8 +85,6 @@ void proc(void)
 		parsing(parameters,ParaNum,&info);
 		do_run(command, parameters, info);
 	}
-	free(parameters);
-	free(buffer);
 }
 
 int do_run(char *command, char **parameters, struct parse_info info)

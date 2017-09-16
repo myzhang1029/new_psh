@@ -17,6 +17,8 @@ int run_builtin(char *command, char **parameters)
 	extern struct passwd *pwd;
 	if(cmdis("exit") || cmdis("quit"))
 	{
+		free(parameters);
+		free(buffer);
 		if(parameters[1]==NULL)
 			exit(0);
 		else
