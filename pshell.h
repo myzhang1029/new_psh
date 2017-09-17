@@ -37,6 +37,7 @@ int read_command(char **,char **,char*);
 int parsing(char **,int,struct parse_info *);
 int parse_info_init(struct parse_info *info);
 int run_builtin(char *command, char **parameters);
+int split_buffer(char **command, char **parameters);
 
 
 #ifndef STRUCT_PARSE_INFO
