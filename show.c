@@ -17,10 +17,10 @@ void type_prompt(char *prompt)
 {
 	extern struct passwd *pwd;
 	char hostname[max_name_len];
-	char pathname[max_path_len];
+	char *pathname=NULL;
 	int length;
 	pwd = getpwuid(getuid());
-	getcwd(pathname,max_path_len);
+	pathname=getcwd(NULL,0);
 	if(gethostname(hostname,max_name_len)==0)
 		sprintf(prompt,"%s@%s:",pwd->pw_name,strtok(hostname,"."));
 	else
@@ -38,6 +38,7 @@ void type_prompt(char *prompt)
 		sprintf(prompt+length,"# ");
 	else
 		sprintf(prompt+length,"$ ");
+	free(pathname);
 	return;
 }
 
