@@ -75,6 +75,8 @@ void proc(void)
 	while(1)
 	{
 		int pipe_fd[2],in_fd,out_fd;
+		memset(parameters, 0, sizeof(char *)*(MAXARG+2));
+		memset(buffer, 0, sizeof(char) * MAXLINE);
 		type_prompt(prompt);
 		ParaNum = read_command(&command,parameters,prompt);
 		if(-1 == ParaNum)
