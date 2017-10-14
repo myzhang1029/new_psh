@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *	   Filename:  read_command.c
- *	Description:  
+ *	Description:
  *		Version:  1.0
  *		Created:  2013.10.21 14h12min24s
  *		 Author:  wuyue (wy), vvuyve@gmail.com
@@ -15,9 +15,10 @@
 //-1 represents wrong input
 int read_command(char **command,char **parameters,char *prompt)
 {
-	free(buffer);
+	memset(buffer, 0, sizeof(buffer));
 	buffer = readline(prompt);
-	if(feof(stdin)) {
+	if(feof(stdin))
+	{
 		printf("\n");
 		exit(0);
 	}
@@ -50,75 +51,13 @@ int read_command(char **command,char **parameters,char *prompt)
 #endif
 	if(buffer[0] == '\0')
 		return -1;
-	char *pStart,*pEnd;
-	int count = 0;
-	int isFinished = 0;
-	pStart = pEnd = buffer;
-	while(isFinished == 0)
-	{
-		while((*pEnd == ' ' && *pStart == ' ') || (*pEnd == '\t' && *pStart == '\t'))
-		{
-			pStart++;
-			pEnd++;
-		}
-
-		if(*pEnd == '\0' || *pEnd == '\n')
-		{
-			if(count == 0)
-				return -1;
-			break;
-		}
-
-		while(*pEnd != ' ' && *pEnd != '\0' && *pEnd != '\n')
-			pEnd++;
-
-
-		if(count == 0)
-		{
-			char *p = pEnd;
-			*command = pStart;
-			while(p!=pStart && *p !='/')
-				p--;
-			if(*p == '/')
-				p++;
-			//else //p==pStart
-			parameters[0] = p;
-			count += 2;
-#ifdef DEBUG
-			printf("\ncommand:%s\n",*command);
-#endif
-		}
-		else if(count <= MAXARG)
-		{
-			parameters[count-1] = pStart;
-			count++;
-		}
-		else
-		{
-			break;
-		}
-
-		if(*pEnd == '\0' || *pEnd == '\n')
-		{
-			*pEnd = '\0';
-			isFinished = 1;
-		}
-		else
-		{
-			*pEnd = '\0';
-			pEnd++;
-			pStart = pEnd;
-		}
-	}
-
-	parameters[count-1] = NULL;
-
+	int count=split_buffer(command, parameters);
 #ifdef DEBUG
 	/*input analysis*/
 	printf("input analysis:\n");
 	printf("pathname:[%s]\ncommand:[%s]\nparameters:\n",*command,parameters[0]);
 	int i;
-	for(i=0;i<count-1;i++)
+	for(i=0; i<count-1; i++)
 		printf("[%s]\n",parameters[i]);
 #endif
 
