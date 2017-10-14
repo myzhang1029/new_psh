@@ -71,7 +71,7 @@ void proc(void)
 	
 	if(signal(SIGQUIT,sigintabrt_hadler) == SIG_ERR)
 		OUT2E("psh: signal error: %s", strerror(errno));
-	
+	using_history();	
 	while(1)
 	{
 		int pipe_fd[2],in_fd,out_fd;
@@ -79,7 +79,7 @@ void proc(void)
 		memset(buffer, 0, sizeof(char) * MAXLINE);
 		type_prompt(prompt);
 		ParaNum = read_command(&command,parameters,prompt);
-		if(-1 == ParaNum)
+		if(ParaNum<0)
 			continue;
 		ParaNum--;//count of units in buffer
 		parsing(parameters,ParaNum,&info);
