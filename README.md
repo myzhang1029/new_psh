@@ -6,7 +6,7 @@ type
 
 	make
 
-for psh with readline lib.It need to install libreadline first.
+for psh with readline library. It will require libreadline.
 
 
 ## Attention
@@ -24,9 +24,6 @@ typing file's names such as "example.[oa]" are not supported.
 
 ### builtins.c builtins/
 	part of the builtins
-
-### test.c
-	an example program which can be used for debug
 
 ### parser.c
 	translates input
