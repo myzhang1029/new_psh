@@ -23,7 +23,8 @@
 #include <readline/history.h>
 #define MAX_PROMPT 1024
 #define MAXLINE 262144 //the length of all args is ARG_MAX
-#define MAXARG 20
+#define MAXARG 64
+#define MAXEACHARG 4096
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
 
 struct parse_info;
