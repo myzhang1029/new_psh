@@ -28,7 +28,6 @@
 
 struct parse_info;
 struct passwd *pwd;
-char *buffer;
 
 char *preprocess_cmdline(char *buffer);
 void type_prompt(char*);
@@ -37,7 +36,7 @@ int read_command(char **,char **,char*);
 int parsing(char **,int,struct parse_info *);
 int parse_info_init(struct parse_info *info);
 int run_builtin(char *command, char **parameters);
-int split_buffer(char **command, char **parameters);
+int split_buffer(char **command, char **parameters, char *buffer);
 
 
 #ifndef STRUCT_PARSE_INFO

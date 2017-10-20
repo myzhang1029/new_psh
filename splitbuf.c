@@ -1,5 +1,5 @@
 #include "pshell.h"
-int split_buffer(char **command, char **parameters)
+int split_buffer(char **command, char **parameters, char *buffer)
 {
 	char *pStart,*pEnd;
 	int count = 0;

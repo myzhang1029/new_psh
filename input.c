@@ -15,7 +15,8 @@
 //-1 represents wrong input
 int read_command(char **command,char **parameters,char *prompt)
 {
-	memset(buffer, 0, sizeof(buffer));
+	char *buffer=malloc(sizeof(char)*MAXLINE);
+	memset(buffer, 0, sizeof(char)*MAXLINE);
 	buffer = readline(prompt);
 	if(feof(stdin))
 	{
@@ -51,7 +52,7 @@ int read_command(char **command,char **parameters,char *prompt)
 #endif
 	if(buffer[0] == '\0')
 		return -1;
-	int count=split_buffer(command, parameters);
+	int count=split_buffer(command, parameters, buffer);
 #ifdef DEBUG
 	/*input analysis*/
 	printf("input analysis:\n");
@@ -60,6 +61,6 @@ int read_command(char **command,char **parameters,char *prompt)
 	for(i=0; i<count-1; i++)
 		printf("[%s]\n",parameters[i]);
 #endif
-
+	free(buffer);
 	return count;
 }

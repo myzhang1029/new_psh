@@ -50,17 +50,13 @@ void proc(void)
 {
 	int i;
 	char *command = NULL;
-	char **parameters;
 	int ParaNum;
 	char prompt[MAX_PROMPT];
 	struct parse_info info;
-	parameters = malloc(sizeof(char *)*(MAXARG+2));
-	buffer = malloc(sizeof(char) * MAXLINE);
-	if(parameters == NULL || buffer == NULL)
+	char **parameters = malloc(sizeof(char *)*(MAXARG+2));
+	if(parameters == NULL)
 	{
 		OUT2E("psh: malloc failed: %s\n", strerror(errno));
-		if(parameters!=NULL)
-			free(parameters);
 		return;
 	}
 	//arg[0] is command
@@ -79,7 +75,6 @@ void proc(void)
 	{
 		int pipe_fd[2],in_fd,out_fd;
 		memset(parameters, 0, sizeof(char *)*(MAXARG+2));
-		memset(buffer, 0, sizeof(char) * MAXLINE);
 		type_prompt(prompt);
 		ParaNum = read_command(&command,parameters,prompt);
 		if(ParaNum<0)
