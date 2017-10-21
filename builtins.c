@@ -42,6 +42,8 @@ int run_builtin(char *command, char **parameters)
 		return builtin_exec(command, parameters);
 	else if(cmdis("pwd"))
 		return builtin_pwd(command, parameters);
+	else if(cmdis("history"))
+		return builtin_history(command, parameters);
 	else if(cmdis("export")||cmdis("alias"))
 	{
 		OUT2E("psh: %s: Not supported\n", command);
