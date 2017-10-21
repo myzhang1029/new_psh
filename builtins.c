@@ -17,11 +17,17 @@ int run_builtin(char *command, char **parameters)
 	extern struct passwd *pwd;
 	if(cmdis("exit") || cmdis("quit"))
 	{
-		free(parameters);
 		if(parameters[1]==NULL)
+		{
+			free(parameters);
 			exit(0);
+		}
 		else
-			exit(atoi(parameters[1]));
+		{
+			int i=atoi(parameters[1]);
+			free(parameters);
+			exit(i);
+		}
 	}
 	else if(cmdis("about"))
 	{

@@ -52,5 +52,12 @@ char *preprocess_cmdline(char *buffer)
 		else
 			new_buffer[ncount]=buffer[count];
 	}
+	while(ncount--)
+	{
+		if(isspace(new_buffer[ncount]))
+			new_buffer[ncount]=0;
+		else
+			break;
+	}
 	return new_buffer;
 }
