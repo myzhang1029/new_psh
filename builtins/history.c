@@ -17,56 +17,46 @@ int builtin_history(char *command, char **parameters)
 	OUT2E("%s: libhistory not compiled!\n", command);
 	return 2;
 #else
-	if(parameters!=NULL)
+	if(parameters[1]!=NULL)
 	{
 		int count, ch, flags=0, n;
-		char *optstr="a::w::r::n::p::s::cd:", **newparam=malloc(sizeof(char*)*(MAXARG+1)+2), filename[MAXEACHARG]="Init";
-		struct option longopts[2]={
-			{"help",0,NULL,'h'},
+		char *filename=malloc(sizeof(char)*MAXEACHARG);
+		struct option longopts[]={
+			{"help",no_argument,NULL,'h'},
 			{NULL,0,NULL,0}
 		};
-		if(newparam==NULL)
-		{
-			OUT2E("psh: %s: malloc failed\n",command);
-			return 2;
-		}
-
-		/*Make argv[0] command*/ 
-		memmove(newparam[1],parameters,sizeof(char*)*MAXARG+2);
-		newparam[0]=command;
+		
 		/*Get argc for getopt*/
-		for(count=0; newparam[count-1];count++);
-		while((ch=getopt_long(count, newparam, optstr, longopts, NULL))!=-1)
+		for(count=0; parameters[count];count++);
+		while((ch=getopt_long(count, parameters, ":a::w::r::n::p::s::cd:", longopts, NULL))!=-1)
 		{
 			switch(ch)
 			{
 				case 'a':
 					flags|=AFLAG;
 					if(optarg)
-						strcpy(filename,optarg);
+						strncpy(filename,optarg,sizeof(char)*MAXEACHARG-1);
 					break;
 				case 'r':
 					if(flags&AFLAG)
 					{
 						OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
 						USAGE();
-						free(newparam);
 						return 2;
 					}
 					flags|=RFLAG;
 					if(optarg)
-						strcpy(filename,optarg);
+						strncpy(filename,optarg,sizeof(char)*MAXEACHARG-1);
 					break;
 				case 'w':
 					if(flags&AFLAG||flags&RFLAG)
 					{
 						OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
 						USAGE();
-						free(newparam);
 						return 2;
 					}
 					if(optarg)
-						strcpy(filename,optarg);
+						strncpy(filename,optarg,sizeof(char)*MAXEACHARG-1);
 					flags|=WFLAG;
 					break;
 				case 'n':
@@ -74,11 +64,10 @@ int builtin_history(char *command, char **parameters)
 					{
 						OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
 						USAGE();
-						free(newparam);
 						return 2;
 					}
 					if(optarg)
-						strcpy(filename,optarg);
+						strncpy(filename,optarg,sizeof(char)*MAXEACHARG-1);
 					flags|=NFLAG;
 					break;
 				case 's':
@@ -93,154 +82,32 @@ int builtin_history(char *command, char **parameters)
 				case 'd':
 					flags|=DFLAG;
 					n=atoi(parameters[count]);
-				if(n<0)
-				{
-					OUT2E("psh: %s: %d: invalid option\n", command, n);
-					free(newparam);
-					return 2;
-				}
-				if(!n)
-				{
-					int count2;
-					for(count2=0; parameters[count][count2]; ++count2)
-						if(parameters[count][count2]!='0'&&(!isspace(parameters[count][count2])))
-						{
-							OUT2E("psh: %s: %s: numeric argument required\n", command, parameters[count]);
-							free(newparam);
-							return 2;
-						}
-			}
+					if(n<0)
+					{
+						OUT2E("psh: %s: %d: invalid option\n", command, n);
+						return 2;
+					}
+					if(!n)
+					{
+						int count2;
+						for(count2=0; parameters[count][count2]; ++count2)
+							if(parameters[count][count2]!='0'&&(!isspace(parameters[count][count2])))
+							{
+								OUT2E("psh: %s: %s: numeric argument required\n", command, parameters[count]);
+								return 2;
+							}
+					}
 					break;
 				case '?':
 					OUT2E("psh: %s: invalid option '-%c'\n",command, optopt);
 					return 2;
 				case ':':
-					OUT2E("bash: %s: -d: option requires an argument\n", command);
+					OUT2E("psh: %s: -d: option requires an argument\n", command);
 					return 2;
 			}
 		}
-#if 0
-		int count, flags=0, first=0, n=-1;
-		char args[MAXEACHARG][MAXARG];
-		for(count=0; parameters[count]!=NULL; ++count)
-		if(parameters[count][0]=='-')
-		{
-			int count2;
-			for(count2=1;parameters[count][count2]!=' '&&parameters[count][count2]!=0;++count2)
-			{
-				switch(parameters[count][count2])
-				{
-					case 'a':
-						flags|=AFLAG;
-						break;
-					case 'r':
-						if(flags&AFLAG)
-						{
-							OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
-							USAGE();
-							return 2;
-						}
-						flags|=RFLAG;
-						break;
-					case 'w':
-						if(flags&AFLAG||flags&RFLAG)
-						{
-							OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
-							USAGE();
-							return 2;
-						}
-						flags|=WFLAG;
-						break;
-					case 'n':
-						if(flags&AFLAG||flags&RFLAG||flags&WFLAG)
-						{
-							OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
-							USAGE();
-							return 2;
-						}
-						flags|=NFLAG;
-						break;
-					case 's':
-						flags|=SFLAG;
-						break;
-					case 'p':
-						flags|=PFLAG;
-						break;
-					case 'c':
-						flags|=CFLAG;
-						break;
-					case 'd':
-						flags|=DFLAG;
-						break;
-					case '-':
-						if(parameters[count][count2+1]==' '||parameters[count][count2+1]=='\0')
-							goto noopts;
-						else if(strcmp(parameters[count], "--help")==0)
-						{
-							USAGE();
-							return 1;
-						}
-						else
-						{
-							OUT2E("psh: %s: --: invalid option\n", command);
-							USAGE();
-							return 2;
-						}
-						break;
-					default:
-						OUT2E("psh: %s: -%c: invalid option\n", command,  parameters[count][count2]);
-						USAGE();
-						return 2;
-				}
-			}
-		}
-		else
-		{
-			if(first==0)
-				first=1;
-			else
-			{
-				OUT2E("psh: %s: too many arguments\n", command);
-				return 2;
-			}
-			n=atoi(parameters[count]);
-			if(n<0)
-			{
-				OUT2E("psh: %s: %d: invalid option\n", command, n);
-				return 2;
-			}
-			if(!n)
-			{
-				int count2;
-				for(count2=0; parameters[count][count2]; ++count2)
-					if(parameters[count][count2]!='0'&&(!isspace(parameters[count][count2])))
-					{
-						OUT2E("psh: %s: %s: numeric argument required\n", command, parameters[count]);
-						return 2;
-					}
-				return 1;
-			}
-		}
-		if(!flags&&n==-1)
+		if(flags==0)
 			goto noopts;
-		if(flags&WFLAG)
-			write_history(/*extern*/histfile);
-		if(flags&RFLAG)
-			read_history(histfile);
-		if(flags&AFLAG)
-			;
-		if(flags&NFLAG)
-			;
-		if(flags&CFLAG)
-			clear_history();
-		if(flags&DFLAG)
-			;
-		if(flags&PFLAG)
-			;
-		if(flags&SFLAG)
-			;
-
-#endif
 	}
 	else
 noopts:
