@@ -1,6 +1,6 @@
 CC=gcc
 PREFIX=/usr/local
-FILES=main.o show.o splitbuf.o input.o preprocess.o parser.o builtins.o builtins/exec.o builtins/echo.o builtins/cd.o builtins/pwd.o builtins/history.o
+FILES=run_backend.o main.o show.o splitbuf.o input.o preprocess.o parser.o builtins.o builtins/exec.o builtins/echo.o builtins/cd.o builtins/pwd.o builtins/history.o
 
 psh: pshell.h builtins/builtin.h $(FILES) 
 	$(CROSS_PREFIX)$(CC) $(LDFLAGS) $(FILES) -o $@ -lreadline -lhistory

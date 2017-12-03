@@ -30,6 +30,7 @@
 #define MAXLINE 262144 //the length of all args is ARG_MAX
 #define MAXARG 64
 #define MAXEACHARG 4096
+#define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
 
 struct parse_info;
