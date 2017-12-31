@@ -17,7 +17,12 @@ int read_command(char **command,char **parameters,char *prompt)
 {
 	char *buffer=malloc(sizeof(char)*MAXLINE);
 	memset(buffer, 0, sizeof(char)*MAXLINE);
+#ifndef NO_HISTORY
 	buffer = readline(prompt);
+#else
+	printf(prompt);
+	fgets(buffer, MAXLINE, stdin);
+#endif
 	if(feof(stdin))
 	{
 		printf("\n");
