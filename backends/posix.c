@@ -1,5 +1,22 @@
 #include "backend.h"
+#include <pwd.h>
 int pipe_fd[2], in_fd, out_fd;
+
+char *gethd(void)
+{
+	struct passwd *pwd=getpwuid(getuid());
+	if(pwd==NULL)
+		return NULL;
+	return pwd->pw_dir;
+}
+
+char *getun(void)
+{
+	struct passwd *pwd=getpwuid(getuid());
+	if(pwd==NULL)
+		return NULL;
+	return pwd->pw_name;
+}
 
 int do_run(char *command, char **parameters, struct parse_info info)
 {

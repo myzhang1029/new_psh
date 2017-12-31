@@ -15,24 +15,23 @@ const int max_path_len = 1024;
 
 void type_prompt(char *prompt)
 {
-	extern struct passwd *pwd;
 	char hostname[max_name_len];
-	char *pathname=NULL;
+	char *pathname=getcwd(NULL,0);
 	int length;
-	pwd = getpwuid(getuid());
-	pathname=getcwd(NULL,0);
+	char *hdir=gethd(), username=getun();
+
 	if(gethostname(hostname,max_name_len)==0)
-		sprintf(prompt,"%s@%s:",pwd->pw_name,strtok(hostname,"."));
+		sprintf(prompt,"%s@%s:",username,strtok(hostname,"."));
 	else
-		sprintf(prompt,"%s@unknown:",pwd->pw_name);
+		sprintf(prompt,"%s@unknown:",username);
 	//printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
 	//pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
 	length = strlen(prompt);
-	if(strlen(pathname) < strlen(pwd->pw_dir) ||
-	        strncmp(pathname,pwd->pw_dir,strlen(pwd->pw_dir))!=0)
+	if(strlen(pathname) < strlen(hdir) ||
+	        strncmp(pathname,hdir,strlen(hdir))!=0)
 		sprintf(prompt+length,"%s",pathname);
 	else
-		sprintf(prompt+length,"~%s",pathname+strlen(pwd->pw_dir));
+		sprintf(prompt+length,"~%s",pathname+strlen(hdir));
 	length = strlen(prompt);
 	if(geteuid()==0)
 		sprintf(prompt+length,"# ");

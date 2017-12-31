@@ -2,28 +2,28 @@
 
 int builtin_cd(char *command, char **parameters)
 {
-	char *cd_path = NULL;
+	char *cd_path = NULL, hdir=gethd();
 
 	if(parameters[1] == NULL/* 'cd' */)
 	{
-		cd_path=malloc(strlen(pwd->pw_dir)+1);
+		cd_path=malloc(strlen(hdir)+1);
 		if(cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
 			return 2;
 		}
-		strcpy(cd_path, pwd->pw_dir);
+		strcpy(cd_path, hdir);
 	}
 	else if(parameters[1][0] == '~')
 	{
-		cd_path = malloc(strlen(pwd->pw_dir)+strlen(parameters[1])+1);
+		cd_path = malloc(strlen(hdir)+strlen(parameters[1])+1);
 		if(cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", command, strerror(errno));
 			return 2;
 		}
-		strcpy(cd_path, pwd->pw_dir);
-		strncpy(cd_path+strlen(pwd->pw_dir),parameters[1]+1,strlen(parameters[1]));
+		strcpy(cd_path, hdir);
+		strncpy(cd_path+strlen(hdir),parameters[1]+1,strlen(parameters[1]));
 	}
 	else
 	{

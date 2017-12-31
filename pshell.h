@@ -14,7 +14,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <pwd.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -34,7 +33,6 @@
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
 
 struct parse_info;
-struct passwd *pwd;
 
 char *preprocess_cmdline(char *buffer);
 void type_prompt(char*);
