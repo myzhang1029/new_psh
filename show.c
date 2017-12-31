@@ -10,6 +10,8 @@
  */
 //#include <sys/utsname.h>
 #include "pshell.h"
+#include "backends/backend.h"
+
 const int max_name_len = 256;
 const int max_path_len = 1024;
 
@@ -18,7 +20,7 @@ void type_prompt(char *prompt)
 	char hostname[max_name_len];
 	char *pathname=getcwd(NULL,0);
 	int length;
-	char *hdir=gethd(), username=getun();
+	char *hdir=gethd(), *username=getun();
 
 	if(gethostname(hostname,max_name_len)==0)
 		sprintf(prompt,"%s@%s:",username,strtok(hostname,"."));

@@ -9,6 +9,7 @@
  * =====================================================================================
  */
 #include "pshell.h"
+#include "backends/backend.h"
 
 pid_t BPTable[MAXPIDTABLE]= {0};
 int status=0;

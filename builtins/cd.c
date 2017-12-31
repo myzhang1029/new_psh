@@ -1,8 +1,9 @@
 #include "builtin.h"
+#include "backends/backend.h"
 
 int builtin_cd(char *command, char **parameters)
 {
-	char *cd_path = NULL, hdir=gethd();
+	char *cd_path = NULL, *hdir=gethd();
 
 	if(parameters[1] == NULL/* 'cd' */)
 	{
