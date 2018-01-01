@@ -31,7 +31,7 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
-#define PSH_VERSION "0.7.27"
+#define PSH_VERSION "0.7.28"
 
 struct parse_info;
 
