@@ -33,6 +33,7 @@
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
 
 struct parse_info;
+const char *version_string="0.7.27";
 
 char *preprocess_cmdline(char *buffer);
 void type_prompt(char*);
