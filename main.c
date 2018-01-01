@@ -30,21 +30,21 @@ void sigchld_handler(int sig)
 	pid_t pid;
 	int i;
 	for(i=0; i<MAXPIDTABLE; i++)
-		if(BPTable[i] != 0) //only handler the background processes
+		if(BPTable[i] != 0) /*only handler the background processes*/
 		{
 			pid = waitpid(BPTable[i],NULL,WNOHANG);
 			if(pid > 0)
 			{
 				printf("[%d] %d done\n", i+1, pid);
-				BPTable[i] = 0; //clear
+				BPTable[i] = 0; /*clear*/
 			}
 			else if(pid < 0)
 			{
 				if(errno != ECHILD)
 					OUT2E("psh: waitpid error: %s", strerror(errno));
 			}
-			//else:do nothing.
-			//Not background processses has their waitpid() in wshell.
+			/*else:do nothing.*/
+			/*Not background processses has their waitpid() in wshell.*/
 		}
 	return;
 }
@@ -68,8 +68,8 @@ void proc(void)
 		OUT2E("psh: malloc failed: %s\n", strerror(errno));
 		return;
 	}
-	//arg[0] is command
-	//arg[MAXARG+1] is NULL
+	/*arg[0] is command
+	  arg[MAXARG+1] is NULL*/
 
 	if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
 		OUT2E("psh: signal error: %s", strerror(errno));
@@ -87,7 +87,7 @@ void proc(void)
 		ParaNum = read_command(&command,parameters,prompt);
 		if(ParaNum<0)
 			continue;
-		ParaNum--;//count of units in buffer
+		ParaNum--;/*count of units in buffer*/
 		parsing(parameters,ParaNum,&info);
 		do_run(command, parameters, info);
 	}

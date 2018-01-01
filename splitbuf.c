@@ -51,7 +51,6 @@ int split_buffer(char **command, char **parameters, char *buffer)
 				p--;
 			if(*p == '/')
 				p++;
-			//else //p==pStart
 			parameters[0] = p;
 			count += 2;
 #ifdef DEBUG

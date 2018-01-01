@@ -19,9 +19,10 @@
 
 #include "pshell.h"
 
-//return value: number of parameters
-//0 represents only command without any parameters
-//-1 represents wrong input
+/*return value: number of parameters
+  0 represents only command without any parameters
+  -1 represents wrong input*/
+
 int read_command(char **command,char **parameters,char *prompt)
 {
 	char *buffer=malloc(sizeof(char)*MAXLINE);

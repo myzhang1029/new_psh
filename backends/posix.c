@@ -49,7 +49,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 	default:
 		break;
 	}
-	if(info.flag & IS_PIPED) //command is not null
+	if(info.flag & IS_PIPED) /*command is not null*/
 	{
 		if(pipe(pipe_fd)<0)
 		{
@@ -57,11 +57,11 @@ int do_run(char *command, char **parameters, struct parse_info info)
 			exit(0);
 		}
 	}
-	if((ChdPid = fork())!=0) //shell
+	if((ChdPid = fork())!=0) /*shell*/
 	{
 		if(info.flag & IS_PIPED)
 		{
-			if((ChdPid2=fork()) == 0) //command
+			if((ChdPid2=fork()) == 0) /*command*/
 			{
 				close(pipe_fd[1]);
 				close(fileno(stdin));
@@ -73,7 +73,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 			{
 				close(pipe_fd[0]);
 				close(pipe_fd[1]);
-				waitpid(ChdPid2,&status,0); //wait command
+				waitpid(ChdPid2,&status,0); /*wait command*/
 			}
 		}
 
@@ -83,7 +83,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 			for(i=0; i<MAXPIDTABLE; i++)
 				if(BPTable[i]==0)
 				{
-					BPTable[i] = ChdPid; //register a background process
+					BPTable[i] = ChdPid; /*register a background process*/
 					break;
 				}
 
@@ -94,25 +94,25 @@ int do_run(char *command, char **parameters, struct parse_info info)
 		}
 		else
 		{
-			waitpid(ChdPid,&status,0);//wait command1
+			waitpid(ChdPid,&status,0);/*wait command1*/
 		}
 	}
-	else //command1
+	else /*command1*/
 	{
 
-		if(info.flag & IS_PIPED) //command is not null
+		if(info.flag & IS_PIPED) /*command is not null*/
 		{
-			if(!(info.flag & OUT_REDIRECT) && !(info.flag & OUT_REDIRECT_APPEND)) // ONLY PIPED
+			if(!(info.flag & OUT_REDIRECT) && !(info.flag & OUT_REDIRECT_APPEND)) /* ONLY PIPED*/
 			{
 				close(pipe_fd[0]);
 				close(fileno(stdout));
 				dup2(pipe_fd[1], fileno(stdout));
 				close(pipe_fd[1]);
 			}
-			else //OUT_REDIRECT and PIPED
+			else /*OUT_REDIRECT and PIPED*/
 			{
 				close(pipe_fd[0]);
-				close(pipe_fd[1]);//send a EOF to command
+				close(pipe_fd[1]);/*send a EOF to command*/
 				if(info.flag & OUT_REDIRECT)
 					out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 				else
@@ -124,14 +124,14 @@ int do_run(char *command, char **parameters, struct parse_info info)
 		}
 		else
 		{
-			if(info.flag & OUT_REDIRECT) // OUT_REDIRECT WITHOUT PIPE
+			if(info.flag & OUT_REDIRECT) /* OUT_REDIRECT WITHOUT PIPE*/
 			{
 				out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 				close(fileno(stdout));
 				dup2(out_fd, fileno(stdout));
 				close(out_fd);
 			}
-			if(info.flag & OUT_REDIRECT_APPEND) // OUT_REDIRECT_APPEND WITHOUT PIPE
+			if(info.flag & OUT_REDIRECT_APPEND) /* OUT_REDIRECT_APPEND WITHOUT PIPE*/
 			{
 				out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_APPEND, 0666);
 				close(fileno(stdout));

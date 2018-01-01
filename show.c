@@ -34,8 +34,10 @@ void type_prompt(char *prompt)
 		sprintf(prompt,"%s@%s:",username,strtok(hostname,"."));
 	else
 		sprintf(prompt,"%s@unknown:",username);
-	//printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
-	//pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
+#ifdef DEBUG
+	printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
+	pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
+#endif
 	length = strlen(prompt);
 	if(strlen(pathname) < strlen(hdir) ||
 	        strncmp(pathname,hdir,strlen(hdir))!=0)
@@ -51,8 +53,3 @@ void type_prompt(char *prompt)
 	return;
 }
 
-//int main()
-//{
-//	type_prompt();
-//	return 0;
-//}
