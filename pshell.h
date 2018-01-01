@@ -17,7 +17,6 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #ifndef NO_READLINE
 #include <readline/readline.h>
 #endif
@@ -31,7 +30,7 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
-#define PSH_VERSION "0.7.28"
+#define PSH_VERSION "0.7.29"
 
 struct parse_info;
 

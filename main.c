@@ -23,7 +23,6 @@
 pid_t BPTable[MAXPIDTABLE]= {0};
 int status=0;
 pid_t ChdPid, ChdPid2;
-int pipe_fd[2], in_fd, out_fd;
 
 void sigchld_handler(int sig)
 {
@@ -57,7 +56,6 @@ void sigintabrt_hadler(int sig)
 
 void proc(void)
 {
-	int i;
 	char *command = NULL;
 	int ParaNum;
 	char prompt[MAX_PROMPT];
