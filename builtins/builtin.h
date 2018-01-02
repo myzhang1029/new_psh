@@ -24,4 +24,5 @@ int builtin_echo(ARGS);
 int builtin_cd(ARGS);
 int builtin_pwd(ARGS);
 int builtin_history(ARGS);
+int builtin_builtin(ARGS);
 
