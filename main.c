@@ -86,7 +86,17 @@ void proc(void)
 			continue;
 		ParaNum--;/*count of units in buffer*/
 		parsing(parameters,ParaNum,&info);
-		do_run(command, parameters, info);
+		switch(run_builtin(command,parameters))
+		{
+		case 1:
+			break;
+		case 2:
+			status=1;
+			break;
+		default:
+			do_run(command, parameters, info);
+			break;
+		}
 	}
 }
 

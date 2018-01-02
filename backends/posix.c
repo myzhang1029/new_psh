@@ -41,16 +41,6 @@ char *getun(void)
 
 int do_run(char *command, char **parameters, struct parse_info info)
 {
-	switch(run_builtin(command,parameters))
-	{
-	case 1:
-		return 1;
-	case 2:
-		status=1;
-		return 1;
-	default:
-		break;
-	}
 	if(info.flag & IS_PIPED) /*command is not null*/
 	{
 		if(pipe(pipe_fd)<0)
