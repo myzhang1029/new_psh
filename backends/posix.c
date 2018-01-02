@@ -19,6 +19,8 @@
 
 #include "backend.h"
 #include <pwd.h>
+
+pid_t ChdPid, ChdPid2;
 int pipe_fd[2], in_fd, out_fd;
 
 char *gethd(void)

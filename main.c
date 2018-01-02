@@ -22,7 +22,6 @@
 
 pid_t BPTable[MAXPIDTABLE]= {0};
 int status=0;
-pid_t ChdPid, ChdPid2;
 
 void sigchld_handler(int sig)
 {
