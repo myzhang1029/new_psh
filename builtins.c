@@ -21,6 +21,8 @@
 #include "builtins/builtin.h"
 #define cmdis(cmd) (strcmp(command,cmd) == 0)
 
+extern int status;
+
 int run_builtin(char *command, char **parameters)
 {
 	if(cmdis("exit") || cmdis("quit"))
@@ -37,6 +39,10 @@ int run_builtin(char *command, char **parameters)
 			exit(i);
 		}
 	}
+	else if(cmdis("true"))
+		return (status=0),1;
+	else if(cmdis("false"))
+		return (status=1);
 	else if(cmdis("about"))
 	{
 		printf("psh is a not fully implemented shell in UNIX.\n");
