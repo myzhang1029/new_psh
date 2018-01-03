@@ -32,6 +32,7 @@
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
 #define PSH_VERSION "0.7.30"
 
+extern char *argv0;
 struct parse_info;
 
 char *preprocess_cmdline(char *buffer);
@@ -41,7 +42,6 @@ int parsing(char **,int,struct parse_info *);
 int parse_info_init(struct parse_info *info);
 int run_builtin(char *command, char **parameters);
 int split_buffer(char **command, char **parameters, char *buffer);
-
 
 #ifndef STRUCT_PARSE_INFO
 #define STRUCT_PARSE_INFO

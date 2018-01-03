@@ -22,6 +22,7 @@
 
 pid_t BPTable[MAXPIDTABLE]= {0};
 int status=0;
+char *argv0;
 
 void sigchld_handler(int sig)
 {
@@ -100,8 +101,14 @@ void proc(void)
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
+	argv0=strdup(argv[0]);
+	if(argv0==NULL)
+	{
+		OUT2E("psh: strdup: No memory\n");
+		exit(1);
+	}
 	proc();
 	return 0;
 }

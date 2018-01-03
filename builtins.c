@@ -30,12 +30,14 @@ int run_builtin(char *command, char **parameters)
 		if(parameters[1]==NULL)
 		{
 			free(parameters);
+			free(argv0);
 			exit(0);
 		}
 		else
 		{
 			int i=atoi(parameters[1]);
 			free(parameters);
+			free(argv0);
 			exit(i);
 		}
 	}
