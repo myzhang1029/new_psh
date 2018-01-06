@@ -59,7 +59,7 @@ int builtin_history(char *command, char **parameters)
 				case 'r':
 					if(flags&AFLAG)
 					{
-						OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
+						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, command);
 						USAGE();
 						return 2;
 					}
@@ -70,7 +70,7 @@ int builtin_history(char *command, char **parameters)
 				case 'w':
 					if(flags&AFLAG||flags&RFLAG)
 					{
-						OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
+						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, command);
 						USAGE();
 						return 2;
 					}
@@ -81,7 +81,7 @@ int builtin_history(char *command, char **parameters)
 				case 'n':
 					if(flags&AFLAG||flags&RFLAG||flags&WFLAG)
 					{
-						OUT2E("psh: %s: cannot use more than one of -anrw\n", command);
+						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, command);
 						USAGE();
 						return 2;
 					}
@@ -103,7 +103,7 @@ int builtin_history(char *command, char **parameters)
 					n=atoi(parameters[count]);
 					if(n<0)
 					{
-						OUT2E("psh: %s: %d: invalid option\n", command, n);
+						OUT2E("%s: %s: %d: invalid option\n", argv0, command, n);
 						return 2;
 					}
 					if(!n)
@@ -112,16 +112,16 @@ int builtin_history(char *command, char **parameters)
 						for(count2=0; parameters[count][count2]; ++count2)
 							if(parameters[count][count2]!='0'&&(!isspace(parameters[count][count2])))
 							{
-								OUT2E("psh: %s: %s: numeric argument required\n", command, parameters[count]);
+								OUT2E("%s: %s: %s: numeric argument required\n", argv0, command, parameters[count]);
 								return 2;
 							}
 					}
 					break;
 				case '?':
-					OUT2E("psh: %s: invalid option '-%c'\n",command, optopt);
+					OUT2E("%s: %s: invalid option '-%c'\n", argv0, command, optopt);
 					return 2;
 				case ':':
-					OUT2E("psh: %s: -d: option requires an argument\n", command);
+					OUT2E("%s: %s: -d: option requires an argument\n", argv0, command);
 					return 2;
 			}
 		}

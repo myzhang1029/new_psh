@@ -4,7 +4,7 @@ FILES=run_backend.o main.o show.o splitbuf.o input.o preprocess.o parser.o built
 CFLAGS=-W -Wall -std=c89 -I.
 
 psh: pshell.h builtins/builtin.h $(FILES) 
-	$(CROSS_PREFIX)$(CC) $(LDFLAGS) $(FILES) -o $@ -lreadline -lhistory
+	$(CROSS_PREFIX)$(CC) $(LDFLAGS) $(FILES) -o $@ -lreadline -lhistory 
 
 %.o:%.c
 	$(CROSS_PREFIX)$(CC) $(CFLAGS) -c $^ -o $@

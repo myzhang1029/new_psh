@@ -23,7 +23,7 @@ int builtin_builtin(char *command, char **parameters)
 {
 	if(run_builtin(parameters[1], &parameters[1])==0)
 	{
-		OUT2E("psh: %s: %s: not a shell builtin\n", command, parameters[1]);
+		OUT2E("%s: %s: %s: not a shell builtin\n", argv0, command, parameters[1]);
 		return 2;
 	}
 	return 1;

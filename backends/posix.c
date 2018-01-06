@@ -45,7 +45,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 	{
 		if(pipe(pipe_fd)<0)
 		{
-			OUT2E("psh: pipe failed: %s\n", strerror(errno));
+			OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
 			exit(0);
 		}
 	}
@@ -81,7 +81,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 
 			printf("[%d] %u\n", i+1, ChdPid);
 			if(i==MAXPIDTABLE)
-				OUT2E("psh: Too much background processes\n");
+				OUT2E("%s: Too much background processes\n", argv0);
 			usleep(5000);
 		}
 		else
@@ -141,7 +141,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 		}
 		if(execvp(command,parameters)==-1)
 		{
-			OUT2E("psh: %s: %s\n", strerror(errno), command);
+			OUT2E("%s: %s: %s\n", argv0, strerror(errno), command);
 			/* Exit the failed command child process */
 			_Exit(1);
 		}

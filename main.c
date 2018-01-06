@@ -40,7 +40,7 @@ void sigchld_handler(int sig)
 			else if(pid < 0)
 			{
 				if(errno != ECHILD)
-					OUT2E("psh: waitpid error: %s", strerror(errno));
+					OUT2E("%s: waitpid error: %s", argv0, strerror(errno));
 			}
 			/*else:do nothing.*/
 			/*Not background processses has their waitpid() in wshell.*/
@@ -63,20 +63,20 @@ void proc(void)
 	char **parameters = malloc(sizeof(char *)*(MAXARG+2));
 	if(parameters == NULL)
 	{
-		OUT2E("psh: malloc failed: %s\n", strerror(errno));
+		OUT2E("%s: malloc failed: %s\n", argv0, strerror(errno));
 		return;
 	}
 	/*arg[0] is command
 	  arg[MAXARG+1] is NULL*/
 
 	if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
-		OUT2E("psh: signal error: %s", strerror(errno));
+		OUT2E("%s: signal error: %s", argv0, strerror(errno));
 
 	if(signal(SIGINT,sigintabrt_hadler) == SIG_ERR)
-		OUT2E("psh: signal error: %s", strerror(errno));
+		OUT2E("%s: signal error: %s", argv0, strerror(errno));
 
 	if(signal(SIGQUIT,sigintabrt_hadler) == SIG_ERR)
-		OUT2E("psh: signal error: %s", strerror(errno));
+		OUT2E("%s: signal error: %s", argv0, strerror(errno));
 	using_history();	
 	while(1)
 	{
@@ -103,7 +103,8 @@ void proc(void)
 
 int main(int argc, char **argv)
 {
-	argv0=strdup(argv[0]);
+	argv0=strdup((strrchr(argv[0], '/')==NULL?argv[0]:strrchr(argv[0], '/')+1));
+
 	if(argv0==NULL)
 	{
 		OUT2E("psh: strdup: No memory\n");

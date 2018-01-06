@@ -66,7 +66,7 @@ int run_builtin(char *command, char **parameters)
 		return builtin_builtin(command, parameters);	
 	else if(cmdis("export")||cmdis("alias"))
 	{
-		OUT2E("psh: %s: Not supported\n", command);
+		OUT2E("%s: %s: Not supported\n", argv0, command);
 		return 1;
 	}
 	return 0;

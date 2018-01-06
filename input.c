@@ -49,7 +49,7 @@ int read_command(char **command,char **parameters,char *prompt)
 		res=history_expand(buffer,&expans);
 		if(res<0)
 		{
-			OUT2E("psh: Error on history expansion\n");
+			OUT2E("%s: Error on history expansion\n", argv0);
 			free(expans);
 			exit(1);
 		}
