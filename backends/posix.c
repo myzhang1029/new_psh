@@ -19,6 +19,8 @@
 
 #include "backend.h"
 #include <pwd.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 pid_t ChdPid, ChdPid2;
 int pipe_fd[2], in_fd, out_fd;
@@ -37,6 +39,13 @@ char *getun(void)
 	if(pwd==NULL)
 		return NULL;
 	return pwd->pw_name;
+}
+
+char *pshgetcwd(void)
+{
+	char *cwd=malloc(4097);
+	getcwd(cwd, 4097);
+	return cwd;
 }
 
 int do_run(char *command, char **parameters, struct parse_info info)

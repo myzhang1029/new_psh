@@ -26,7 +26,7 @@ const int max_path_len = 1024;
 void type_prompt(char *prompt)
 {
 	char hostname[max_name_len];
-	char *pathname=getcwd(NULL,0);
+	char *pathname=pshgetcwd();
 	int length;
 	char *hdir=gethd(), *username=getun();
 

@@ -18,10 +18,11 @@
 */
 
 #include "builtin.h"
+#include "backends/backend.h"
 
 int builtin_pwd(char *command, char **parameters)
 {
-	char *path=getcwd(NULL, 0);
+	char *path=pshgetcwd();
 	puts(path);
 	free(path);
 	return 1;

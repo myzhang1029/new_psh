@@ -26,4 +26,5 @@ extern int pipe_fd[2], in_fd, out_fd;
 
 char *gethd(void);
 char *getun(void);
+char *pshgetcwd(void);
 int do_run(char *command, char **parameters, struct parse_info info);
