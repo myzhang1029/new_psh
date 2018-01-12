@@ -39,8 +39,9 @@ int read_command(char **command,char **parameters,char *prompt)
 		exit(0);
 	}
 	
+#ifdef NO_HISTORY
 	buffer=preprocess_cmdline(buffer);
-#ifndef NO_HISTORY
+#else
 	if(buffer && *buffer)
 	{
 		char *expans;
