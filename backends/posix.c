@@ -150,7 +150,10 @@ int do_run(char *command, char **parameters, struct parse_info info)
 		}
 		if(execvp(command,parameters)==-1)
 		{
-			OUT2E("%s: %s: %s\n", argv0, strerror(errno), command);
+			if(errno == ENOENT)
+				OUT2E("%s: %s: command not found", argv0, command);
+			else
+				OUT2E("%s: %s: %s\n", argv0, command, strerror(errno));
 			/* Exit the failed command child process */
 			_Exit(1);
 		}
