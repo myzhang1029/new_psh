@@ -1,7 +1,6 @@
 /*
    preprocess.c - input preprocesser
 
-   Copyright 2013 wuyue.
    Copyright 2017 Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +17,17 @@
 */
 
 #include "pshell.h"
+#include "backends/backend.h"
 
+/* XXX: This kind of preprocess might cause SEGV */
 char *preprocess_cmdline(char *buffer)
 {
 	char *new_buffer=malloc(sizeof(char) * MAXLINE);
-	int count=0,ncount=0;
+	int count=0,ncount=0,nncount;
+	/* count: old counter
+	 * ncount: preprocessed count, will be decreased to 0 in the '\' deletion
+	 * nncount: kept preprocessed count
+	 */
 	for(; buffer[count]!=0; count++,ncount++)
 	{
 		if(buffer[count]=='>'&&buffer[count+1]=='>'&&buffer[count-1]!='\\')
@@ -68,7 +73,21 @@ char *preprocess_cmdline(char *buffer)
 			new_buffer[ncount++]=' ';
 			new_buffer[ncount]='&';
 		}
-		else
+		else if(buffer[count]=='~'&&buffer[count-1]!='\\')
+		{
+			if(buffer[count+1]=='/')/* Replace to home dir */
+			{
+				char *hdir=gethd();
+				int len=strlen(hdir)+1;
+				int i;
+				for(i=0;i<len;++i,++ncount)
+											new_buffer[ncount]=hdir[i];
+			}
+			else /* TODO:~user, replace to user's home dir */
+				;
+		}
+
+		else /* Normal char */
 			new_buffer[ncount]=buffer[count];
 	}
 	while(ncount--)
@@ -78,5 +97,20 @@ char *preprocess_cmdline(char *buffer)
 		else
 			break;
 	}
+	nncount=ncount;
+	while(ncount--)
+	{
+		if(new_buffer[ncount]=='\\')
+		{
+			int i;
+			if(new_buffer[ncount-1]=='\\')
+				/* Keep one */
+				ncount--;
+			/* Remove the '\' and move forward */
+			for(i=ncount;i<=nncount;++i)
+				new_buffer[i]=new_buffer[i+1];
+		}
+	}
+
 	return new_buffer;
 }
