@@ -75,13 +75,15 @@ char *preprocess_cmdline(char *buffer)
 		}
 		else if(buffer[count]=='~'&&buffer[count-1]!='\\')
 		{
-			if(buffer[count+1]=='/')/* Replace to home dir */
+			if(buffer[count+1]=='/'||buffer[count+1]==' '||buffer[count+1]==0)/* Replace to home dir */
 			{
 				char *hdir=gethd();
-				int len=strlen(hdir)+1;
+				int len=strlen(hdir);
 				int i;
 				for(i=0;i<len;++i,++ncount)
 											new_buffer[ncount]=hdir[i];
+				if(new_buffer[ncount]==0)
+					ncount--;
 			}
 			else /* TODO:~user, replace to user's home dir */
 				;
