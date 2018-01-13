@@ -17,6 +17,9 @@
    limitations under the License.
 */
 
+#ifndef PSHELL_HEADER_INCLUDED
+#define PSHELL_HEADER_INCLUDED
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -37,28 +40,17 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
-#define PSH_VERSION "0.7.41"
+#define PSH_VERSION "0.7.42"
 
-extern char *argv0;
-struct parse_info;
+#define BACKGROUND		0x01 /*cmd&*/
+#define IN_REDIRECT		0x02 /*cmd<f*/
+#define OUT_REDIRECT		0x04 /*cmd>f*/
+#define OUT_REDIRECT_APPEND	0x08 /*cmd>>f*/
+#define IS_PIPED		0x10 /*cmd|cmd*/
+#define RUN_AND			0x20 /*cmd&&cmd*/
+#define RUN_OR			0x40 /*cmd||cmd*/
+#define HEREDOC			0x80 /*cmd<<id*/
 
-char *preprocess_cmdline(char *buffer);
-void type_prompt(char*);
-int read_command(char **,char **,char*);
-int parsing(char **,int,struct parse_info *);
-int parse_info_init(struct parse_info *info);
-int run_builtin(char *command, char **parameters);
-int split_buffer(char **command, char **parameters, char *buffer);
-
-#ifndef STRUCT_PARSE_INFO
-#define STRUCT_PARSE_INFO
-#define BACKGROUND		0x01
-#define IN_REDIRECT		0x02
-#define OUT_REDIRECT		0x04
-#define OUT_REDIRECT_APPEND	0x08
-#define IS_PIPED		0x10
-#define RUN_AND			0x20
-#define RUN_OR			0x40
 struct parse_info
 {
 	int flag;
@@ -69,4 +61,15 @@ struct parse_info
 	char **parameters;
 	struct parse_info *next;
 };
+
+extern char *argv0;
+
+char *preprocess_cmdline(char *buffer);
+void type_prompt(char*);
+int read_command(char **,char **,char*);
+int parsing(char **,int,struct parse_info *);
+int parse_info_init(struct parse_info *info);
+int run_builtin(char *command, char **parameters);
+int split_buffer(char **command, char **parameters, char *buffer);
+
 #endif

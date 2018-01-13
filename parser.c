@@ -24,8 +24,10 @@ int parse_info_init(struct parse_info *info)
 	info->flag = 0;
 	info->in_file = NULL;
 	info->out_file = NULL;
+	info->buffer = NULL;
 	info->command = NULL;
 	info->parameters = NULL;
+	info->next = NULL;
 	return 0;
 }
 
