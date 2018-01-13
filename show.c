@@ -30,7 +30,7 @@ void type_prompt(char *prompt)
 	int length;
 	char *hdir=gethd(), *username=getun();
 
-	if(gethostname(hostname,max_name_len)==0)
+	if(pshgethostname(hostname,max_name_len)==0)
 		sprintf(prompt,"%s@%s:",username,strtok(hostname,"."));
 	else
 		sprintf(prompt,"%s@unknown:",username);

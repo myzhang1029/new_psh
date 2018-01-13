@@ -48,6 +48,11 @@ char *pshgetcwd(void)
 	return cwd;
 }
 
+int pshgethostname(char *hstnme, size_t len)
+{
+	return gethostname(hstnme, len);
+}
+
 int do_run(char *command, char **parameters, struct parse_info info)
 {
 	if(info.flag & IS_PIPED) /*command is not null*/
