@@ -21,9 +21,58 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
 
 pid_t ChdPid, ChdPid2;
+pid_t BPTable[MAXPIDTABLE]= {0};
 int pipe_fd[2], in_fd, out_fd;
+extern char *argv0;/*main.c*/
+
+void sigchld_handler(int sig)
+{
+	pid_t pid;
+	int i;
+	for(i=0; i<MAXPIDTABLE; i++)
+		if(BPTable[i] != 0) /*only handler the background processes*/
+		{
+			pid = waitpid(BPTable[i],NULL,WNOHANG);
+			if(pid > 0)
+			{
+				printf("[%d] %d done\n", i+1, pid);
+				BPTable[i] = 0; /*clear*/
+			}
+			else if(pid < 0)
+			{
+				if(errno != ECHILD)
+					OUT2E("%s: waitpid error: %s", argv0, strerror(errno));
+			}
+			/*else:do nothing.*/
+			/*Not background processses has their waitpid() in wshell.*/
+		}
+	return;
+}
+
+void sigintabrt_hadler(int sig)
+{
+	status=sig;
+	return;
+}
+
+int prepare(void)
+{
+	int ret=0;
+	if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
+		OUT2E("%s: signal error: %s", argv0, strerror(errno)),ret++;
+
+	if(signal(SIGINT,sigintabrt_hadler) == SIG_ERR)
+		OUT2E("%s: signal error: %s", argv0, strerror(errno)),ret++;
+
+	if(signal(SIGQUIT,sigintabrt_hadler) == SIG_ERR)
+		OUT2E("%s: signal error: %s", argv0, strerror(errno)),ret++;
+	return ret;
+}
 
 char *gethd(void)
 {

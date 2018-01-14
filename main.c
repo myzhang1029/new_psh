@@ -20,39 +20,8 @@
 #include "pshell.h"
 #include "backends/backend.h"
 
-pid_t BPTable[MAXPIDTABLE]= {0};
 int status=0;
 char *argv0;
-
-void sigchld_handler(int sig)
-{
-	pid_t pid;
-	int i;
-	for(i=0; i<MAXPIDTABLE; i++)
-		if(BPTable[i] != 0) /*only handler the background processes*/
-		{
-			pid = waitpid(BPTable[i],NULL,WNOHANG);
-			if(pid > 0)
-			{
-				printf("[%d] %d done\n", i+1, pid);
-				BPTable[i] = 0; /*clear*/
-			}
-			else if(pid < 0)
-			{
-				if(errno != ECHILD)
-					OUT2E("%s: waitpid error: %s", argv0, strerror(errno));
-			}
-			/*else:do nothing.*/
-			/*Not background processses has their waitpid() in wshell.*/
-		}
-	return;
-}
-
-void sigintabrt_hadler(int sig)
-{
-	status=sig;
-	return;
-}
 
 void proc(void)
 {
@@ -68,15 +37,7 @@ void proc(void)
 	}
 	/*arg[0] is command
 	  arg[MAXARG+1] is NULL*/
-
-	if(signal(SIGCHLD,sigchld_handler) == SIG_ERR)
-		OUT2E("%s: signal error: %s", argv0, strerror(errno));
-
-	if(signal(SIGINT,sigintabrt_hadler) == SIG_ERR)
-		OUT2E("%s: signal error: %s", argv0, strerror(errno));
-
-	if(signal(SIGQUIT,sigintabrt_hadler) == SIG_ERR)
-		OUT2E("%s: signal error: %s", argv0, strerror(errno));
+	prepare();
 #ifndef NO_HISTORY
 	using_history();
 #endif

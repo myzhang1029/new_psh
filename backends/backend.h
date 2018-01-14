@@ -24,6 +24,7 @@ extern int status;
 extern pid_t ChdPid, ChdPid2;
 extern int pipe_fd[2], in_fd, out_fd;
 
+int prepare(void);
 char *gethd(void);
 char *getun(void);
 char *pshgetcwd(void);

@@ -25,8 +25,6 @@
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #ifndef NO_READLINE
 #include <readline/readline.h>
 #endif
@@ -40,7 +38,7 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
-#define PSH_VERSION "0.7.45"
+#define PSH_VERSION "0.7.46"
 
 #define BACKGROUND		0x01 /*cmd&*/
 #define IN_REDIRECT		0x02 /*cmd<f*/
