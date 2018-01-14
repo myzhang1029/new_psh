@@ -140,6 +140,6 @@ noopts:
 				printf ("    %d  %s\n", i + history_base, histlist[i]->line);
 	}
 	return 1;
-}
 #endif			
+}
 
