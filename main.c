@@ -77,7 +77,9 @@ void proc(void)
 
 	if(signal(SIGQUIT,sigintabrt_hadler) == SIG_ERR)
 		OUT2E("%s: signal error: %s", argv0, strerror(errno));
-	using_history();	
+#ifndef NO_HISTORY
+	using_history();
+#endif
 	while(1)
 	{
 		memset(parameters, 0, sizeof(char *)*(MAXARG+2));
