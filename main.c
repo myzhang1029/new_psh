@@ -19,9 +19,11 @@
 
 #include "pshell.h"
 #include "backends/backend.h"
+#include <setjmp.h>
 
 int status=0;
 char *argv0;
+jmp_buf reset_point;
 
 void proc(void)
 {
@@ -41,6 +43,8 @@ void proc(void)
 #ifndef NO_HISTORY
 	using_history();
 #endif
+	if(setjmp(reset_point) == 1)
+		printf("\n");
 	while(1)
 	{
 		memset(parameters, 0, sizeof(char *)*(MAXARG+2));
