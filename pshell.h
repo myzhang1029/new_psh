@@ -52,22 +52,20 @@
 struct parse_info
 {
 	int flag;
+	int paracount;/*argc*/
 	char *in_file;
 	char *out_file;
 	char *buffer;
-	char *command;
-	char **parameters;
+	char parameters[MAXARG][MAXEACHARG];/*argv*/
 	struct parse_info *next;
 };
 
 extern char *argv0;
 
-char *preprocess_cmdline(char *buffer);
 void type_prompt(char*);
 int read_command(char **,char **,char*);
-int parsing(char **,int,struct parse_info *);
-int parse_info_init(struct parse_info *info);
 int run_builtin(char *command, char **parameters);
-int split_buffer(char **command, char **parameters, char *buffer);
+void free_parse_info(struct parse_info *info);
+int filpinfo(char *buffer, struct parse_info *info);
 
 #endif

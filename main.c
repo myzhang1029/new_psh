@@ -28,8 +28,7 @@ void proc(void)
 	char *command = NULL;
 	int ParaNum;
 	char prompt[MAX_PROMPT];
-	struct parse_info info;
-	char **parameters = malloc(sizeof(char *)*(MAXARG+2));
+	struct parse_info *info;
 	if(parameters == NULL)
 	{
 		OUT2E("%s: malloc failed: %s\n", argv0, strerror(errno));
@@ -49,7 +48,7 @@ void proc(void)
 		if(ParaNum<0)
 			continue;
 		ParaNum--;/*count of units in buffer*/
-		parsing(parameters,ParaNum,&info);
+		
 		switch(run_builtin(command,parameters))
 		{
 		case 1:
@@ -61,6 +60,7 @@ void proc(void)
 			do_run(command, parameters, info);
 			break;
 		}
+		free_parse_info(info);
 	}
 }
 

@@ -122,7 +122,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 				close(fileno(stdin));
 				dup2(pipe_fd[0], fileno(stdin));
 				close(pipe_fd[0]);
-				execvp(info.command,info.parameters);
+				execvp(info.parameters[0], (char **)info.parameters);
 			}
 			else
 			{
