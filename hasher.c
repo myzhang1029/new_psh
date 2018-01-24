@@ -19,17 +19,18 @@
    You should have received a copy of the GNU General Public License
    along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <stdio.h>
 
-unsigned int
-hasher(const char *s, unsigned int ulimit)
+int
+hasher(const char *s, int ulimit)
 {
-  unsigned int i;
+  int i;
   for (i = 0; *s; s++)
     {
       i *= 16777619;
       i ^= *s;
     }
 
-  return i&ulimit;
+  return i%ulimit;
 }
 

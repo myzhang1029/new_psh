@@ -18,11 +18,15 @@
 
 #include "pshell.h"
 #include "hash.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 /* Resize the hash table, the new size cannot be lower than the old size, otherwise return 1. return 2 if realloc failed, 0 if success */
-int realloc_hash(PSH_HASH *table, size_t newlen)
+int realloc_hash(PSH_HASH *table, int newlen)
 {
-	size_t oldlen=table->len;
+	int oldlen=table->len;
 
 	if(! (newlen > oldlen))
 		return 1;
@@ -55,8 +59,9 @@ static int search_hash_empty(PSH_HASH *table)
 	
 	
 /* Allocate a new hash table, return the table if success, NULL if not */
-PSH_HASH *new_hash(size_t len)
+PSH_HASH *new_hash(int len)
 {
+	int i;
 	PSH_HASH *table=malloc(sizeof(PSH_HASH) * len);
 	if(table==NULL)
 	{
@@ -66,8 +71,9 @@ PSH_HASH *new_hash(size_t len)
 
 	table[0].len=len;
 
-	for(int i=0; i<len; ++i)
+	for(i=0; i<len; ++i)
 	{
+		table[i].key=table[i].val=NULL;
 		table[i].used=0;
 	}
 
@@ -75,16 +81,16 @@ PSH_HASH *new_hash(size_t len)
 }
 
 /* Edit the vaule of an element, return 0 if success, 1 if not */
-static int edit_hash_elem(PSH_HASH elem, char *val)
+static int edit_hash_elem(PSH_HASH *elem, char *val)
 {
 	/* Need more space/free extra space */
-	if(realloc(elem.val, strlen(val)+1)==NULL)
+	if(((*elem).val=realloc((*elem).val, strlen(val)+1))==NULL)
 	{
 		OUT2E("%s: Unable to realloc: %s\n", argv0, strerror(errno));
-		strncpy(elem.val, val, strlen(elem.val));
+		strncpy((*elem).val, val, strlen((*elem).val));
 		return 1;
 	}
-	strcpy(elem.val, val);
+	strcpy((*elem).val, val);
 	return 0;
 }
 
@@ -92,8 +98,9 @@ static int edit_hash_elem(PSH_HASH elem, char *val)
 static int search_for_element_by_key(PSH_HASH *table, char *key)
 {
 	int i;
-	for(i=0; i < table->len; ++i)
-		if(strcmp(table[i].key, key)==0)
+	for(i=0; i < (table->len); ++i)
+		if(table[i].key != NULL
+				&&strcmp(table[i].key, key)==0)
 			return i;
 	return -1;
 }
@@ -101,16 +108,17 @@ static int search_for_element_by_key(PSH_HASH *table, char *key)
 /* Add or edit a hash element, return 0 if success, 1 if not */
 int add_hash(PSH_HASH *table, char *key, char *val)
 {
-	int i, hash_result=hasher(key, table->len);
+	int i;
+	int hash_result=hasher(key, table->len);
 	if(table[hash_result].used!=0)
 	{
 		/* Doing edit */
 		if(strcmp(table[hash_result].key,key)==0)
 		{
-			return edit_hash_elem(table[hash_result], val);
+			return edit_hash_elem(&table[hash_result], val);
 		}
 		if((i=search_for_element_by_key(table, key))>=0)
-			return edit_hash_elem(table[i], val);
+			return edit_hash_elem(&table[i], val);
 		hash_result=search_hash_empty(table);
 		if(hash_result==-1)
 		{
@@ -122,17 +130,18 @@ int add_hash(PSH_HASH *table, char *key, char *val)
 	table[hash_result].key=malloc(strlen(key)+1);
 	strcpy(table[hash_result].key, key);
 	/* Write element */
-	return edit_hash_elem(table[hash_result], val);
+	return edit_hash_elem(&table[hash_result], val);
 }
 
 /* Get a hash value by key, return value if success, NULL if not */
 char *get_hash(PSH_HASH *table, char *key)
 {
 	int hash_result=hasher(key, table->len);
-	if(strcmp(table[hash_result].key, key)==0)
-		return table[hash_result].val;
+	if(table[hash_result].key != NULL)
+		if(strcmp(table[hash_result].key, key)==0)
+			return table[hash_result].val;
 	hash_result=search_for_element_by_key(table, key);
-	if(hash_result==-1||table[hash_result].used==0)
+	if(hash_result==-1 || table[hash_result].used==0)
 		return NULL;
 	return table[hash_result].val;
 }
@@ -147,7 +156,9 @@ int rm_hash(PSH_HASH *table, char *key)
 			return 1;
 		table[hash_result].used=0;
 		free(table[hash_result].key);
+		table[hash_result].key=NULL;
 		free(table[hash_result].val);
+		table[hash_result].val=NULL;
 		return 0;
 	}
 	hash_result=search_for_element_by_key(table, key);

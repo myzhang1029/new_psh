@@ -15,22 +15,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <stdio.h>
 
 typedef struct psh_hash_struct
 {
 	char *key;
 	char *val;
-	char used;
-	size_t len;
+	unsigned used:1;
+	int len;
 }PSH_HASH;
 
-int realloc_hash(PSH_HASH *, size_t);
-PSH_HASH *new_hash(size_t);
+int realloc_hash(PSH_HASH *, int);
+PSH_HASH *new_hash(int);
 int add_hash(PSH_HASH *, char *, char *);
 char *get_hash(PSH_HASH *, char *);
 int rm_hash(PSH_HASH *, char *);
 void del_hash(PSH_HASH *);
 
-unsigned int
-hasher(const char *s, unsigned int ulimit);
+int
+hasher(const char *s, int ulimit);
 
