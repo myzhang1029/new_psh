@@ -24,6 +24,7 @@ extern int pipe_fd[2], in_fd, out_fd;
 
 int prepare(void);
 char *gethd(void);
+char *gethdnam(char *);
 char *getun(void);
 char *pshgetcwd(void);
 int   pshgethostname(char *, size_t);
