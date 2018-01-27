@@ -29,14 +29,12 @@ int run_builtin(struct parse_info *info)
 	{
 		if(info->parameters[1]==NULL)
 		{
-			free(info->parameters);
 			free(argv0);
 			exit(0);
 		}
 		else
 		{
 			int i=atoi(info->parameters[1]);
-			free(info->parameters);
 			free(argv0);
 			exit(i);
 		}

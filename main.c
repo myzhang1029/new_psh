@@ -31,8 +31,7 @@ void proc(void)
 {
 	int ParaNum;
 	char prompt[MAX_PROMPT];
-	char *buffer;
-	struct parse_info info;
+	struct parse_info *info=malloc(sizeof(struct parse_info));
 	prepare();
 #ifndef NO_HISTORY
 	using_history();
@@ -42,12 +41,12 @@ void proc(void)
 	while(1)
 	{
 		type_prompt(prompt);
-		ParaNum = read_command(buffer, prompt, &info);
+		ParaNum = read_command(prompt, info);
 		if(ParaNum<0)
 			continue;
 		ParaNum--;/*count of units in buffer*/
 		
-		switch(run_builtin(&info))
+		switch(run_builtin(info))
 		{
 		case 1:
 			break;
@@ -55,11 +54,10 @@ void proc(void)
 			status=1;
 			break;
 		default:
-			do_run(&info);
+			do_run(info);
 			break;
 		}
-		free_parse_info(&info);
-		memset(&info, 0, sizeof(info));
+		free_parse_info(info);
 	}
 }
 

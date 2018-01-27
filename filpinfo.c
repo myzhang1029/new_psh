@@ -17,6 +17,7 @@
 */
 
 #include "pshell.h"
+#include "backends/backend.h"
 
 static int endwith(char* s,char c)
 {
@@ -53,27 +54,21 @@ static struct parse_info *getpos(struct parse_info *base, int n)
 /* Free a parse_info and its nexts */
 void free_parse_info(struct parse_info *info)
 {
-	int i;
-	while(1)
+	struct parse_info *temp;
+	while(info!=NULL)
 	{
-		for(i=1;; ++i)
-			if(getpos(info, i)->next==NULL)
-			{
-				free(getpos(info, i));
-				break;
-			}
-		if(i==1)
-			break;
+		temp = info;
+		info = info->next;
+		free(temp);
+		temp = NULL;
 	}
-	free(info);
-
 }
 
 /* Fills a parse_info with a buffer, returns characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
-	#define write_current() getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count]
-	#define write_char(c) getpos(info, pos)->parameters[paracount][parametercount++]=c
+	#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
+	#define write_char(c) (getpos(info, pos)->parameters[paracount][parametercount++]=c)
 	#define escape (buffer[count-1]=='\\')
 	#define ignore (isInDoubleQuote==1||isInSingleQuote==1||escape)
 	/*
@@ -135,11 +130,18 @@ int filpinfo(char *buffer, struct parse_info *info)
 				if(ignore)
 					write_current();
 				else
+				{	
 					write_char(0);
 					paracount++;
-					while(count++)
-						if(buffer[count]!=' ')
+					parametercount=0;
+					while(++count)
+						if(buffer[count]!=' '&&buffer[count]!='\t')
+						{
+							--count;
 							break;
+						}
+
+				}
 				break;
 			case '&':
 				if(ignore)

@@ -84,6 +84,14 @@ char *gethd(void)
 	return pwd->pw_dir;
 }
 
+char *gethdnam(char *username)
+{
+	struct passwd *pwd=getpwnam(username);
+	if(pwd==NULL)
+		return NULL;
+	return pwd->pw_dir;
+}
+
 char *getun(void)
 {
 	struct passwd *pwd=getpwuid(getuid());

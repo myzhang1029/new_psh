@@ -23,10 +23,10 @@
   0 represents only command without any parameters
   -1 represents wrong input*/
 
-int read_command(char *buffer, char *prompt, struct parse_info *info)
+int read_command(char *prompt, struct parse_info *info)
 {
 	int count;
-	buffer=malloc(sizeof(char)*MAXLINE);
+	char *buffer=malloc(sizeof(char)*MAXLINE);
 	memset(buffer, 0, sizeof(char)*MAXLINE);
 #ifndef NO_READLINE
 	buffer = readline(prompt);

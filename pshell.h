@@ -63,7 +63,7 @@ struct parse_info
 extern char *argv0;
 
 void type_prompt(char*);
-int read_command(char *buffer, char *prompt, struct parse_info *info);
+int read_command(char *prompt, struct parse_info *info);
 int run_builtin(struct parse_info *info);
 void free_parse_info(struct parse_info *info);
 int filpinfo(char *buffer, struct parse_info *info);
