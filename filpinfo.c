@@ -36,7 +36,6 @@ static int parse_info_init(struct parse_info *info)
 	info->flag = 0;
 	info->in_file = NULL;
 	info->out_file = NULL;
-	info->buffer = NULL;
 	memset(info->parameters, 0, MAXLINE);
 	info->next = NULL;
 	return 0;
@@ -258,9 +257,16 @@ int filpinfo(char *buffer, struct parse_info *info)
 				 * ANSI-C style escape, command substitude,
 				 * arithmetic expansion code here */
 			case '>':
+				if(ignore)
+					break;
+				if(buffer[count+1] == '>') /* Output append */
+					;
+				if(buffer[count+1] == '&') /* fd redirect */
+					;
 				/* TODO: Write output redirect code here */
 			case '<':
 				/* TODO: Write input redirect and heredoc code here */
+				write_current();
 				break;
 			default:
 				write_current();

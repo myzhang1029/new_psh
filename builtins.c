@@ -19,24 +19,24 @@
 
 #include "pshell.h"
 #include "builtins/builtin.h"
-#define cmdis(cmd) (strcmp(command,cmd) == 0)
+#define cmdis(cmd) (strcmp(info->parameters[0],cmd) == 0)
 
 extern int status;
 
-int run_builtin(char *command, char **parameters)
+int run_builtin(struct parse_info *info)
 {
 	if(cmdis("exit") || cmdis("quit"))
 	{
-		if(parameters[1]==NULL)
+		if(info->parameters[1]==NULL)
 		{
-			free(parameters);
+			free(info->parameters);
 			free(argv0);
 			exit(0);
 		}
 		else
 		{
-			int i=atoi(parameters[1]);
-			free(parameters);
+			int i=atoi(info->parameters[1]);
+			free(info->parameters);
 			free(argv0);
 			exit(i);
 		}
@@ -66,7 +66,7 @@ int run_builtin(char *command, char **parameters)
 		return builtin_builtin(command, parameters);	
 	else if(cmdis("export")||cmdis("alias"))
 	{
-		OUT2E("%s: %s: Not supported\n", argv0, command);
+		OUT2E("%s: %s: Not supported\n", argv0, info->parameters[0]);
 		return 1;
 	}
 	return 0;

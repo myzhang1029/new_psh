@@ -19,43 +19,43 @@
 
 #include "builtin.h"
 
-int builtin_echo(char *command, char **parameters)
+int builtin_echo(ARGS)
 {
-	if(parameters[1] == NULL)
+	if(b_parameters[1] == NULL)
 	{
 		/* A blank line */
 		printf("\n");
 		return 1;
 	}
-	else if(parameters[1][0] == '-')
+	else if(b_parameters[1][0] == '-')
 	{
-		switch(parameters[1][1])
+		switch(b_parameters[1][1])
 		{
 		case 0:
 			/* Another blank line */
 			puts("");
 			return 1;
 		case 'n':
-			if(parameters[2] == NULL)
+			if(b_parameters[2] == NULL)
 				/* No more blank line */
 				return 1;
 			else
 			{
 				int cnt=2;
-				printf("%s", parameters[cnt]);
-				while (parameters[++cnt] != NULL)
+				printf("%s", b_parameters[cnt]);
+				while (b_parameters[++cnt] != NULL)
 				{
-					printf(" %s", parameters[cnt]);
+					printf(" %s", b_parameters[cnt]);
 				}
 				return 1;
 			}
 		default:
 		{
 			int cnt=1;
-			printf("%s", parameters[cnt]);
-			while (parameters[++cnt] != NULL)
+			printf("%s", b_parameters[cnt]);
+			while (b_parameters[++cnt] != NULL)
 			{
-				printf(" %s", parameters[cnt]);
+				printf(" %s", b_parameters[cnt]);
 				cnt++;
 			}
 			puts("");
@@ -66,10 +66,10 @@ int builtin_echo(char *command, char **parameters)
 	else
 	{
 		int cnt=1;
-		printf("%s", parameters[cnt]);
-		while (parameters[++cnt] != NULL)
+		printf("%s", b_parameters[cnt]);
+		while (b_parameters[++cnt] != NULL)
 		{
-			printf(" %s", parameters[cnt]);
+			printf(" %s", b_parameters[cnt]);
 			cnt++;
 		}
 		puts("");

@@ -20,7 +20,7 @@
 #include "builtin.h"
 #include "backends/backend.h"
 
-int builtin_pwd(char *command, char **parameters)
+int builtin_pwd(ARGS)
 {
 	char *path=pshgetcwd();
 	puts(path);

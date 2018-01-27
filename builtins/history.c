@@ -30,13 +30,13 @@
 #define CFLAG   0x40
 #define DFLAG   0x80
 
-int builtin_history(char *command, char **parameters)
+int builtin_history(ARGS)
 {
 #ifdef NO_HISTORY
-	OUT2E("%s: libhistory not compiled!\n", command);
+	OUT2E("%s: libhistory not compiled!\n", b_command);
 	return 2;
 #else
-	if(parameters[1]!=NULL)
+	if(b_parameters[1]!=NULL)
 	{
 		int count, ch, flags=0, n;
 		char *filename=malloc(sizeof(char)*MAXEACHARG);
@@ -46,8 +46,8 @@ int builtin_history(char *command, char **parameters)
 		};
 		
 		/*Get argc for getopt*/
-		for(count=0; parameters[count];count++);
-		while((ch=getopt_long(count, parameters, ":a::w::r::n::p::s::cd:", longopts, NULL))!=-1)
+		for(count=0; b_parameters[count];count++);
+		while((ch=getopt_long(count, b_parameters, ":a::w::r::n::p::s::cd:", longopts, NULL))!=-1)
 		{
 			switch(ch)
 			{
@@ -59,7 +59,7 @@ int builtin_history(char *command, char **parameters)
 				case 'r':
 					if(flags&AFLAG)
 					{
-						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, command);
+						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, b_command);
 						USAGE();
 						return 2;
 					}
@@ -70,7 +70,7 @@ int builtin_history(char *command, char **parameters)
 				case 'w':
 					if(flags&AFLAG||flags&RFLAG)
 					{
-						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, command);
+						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, b_command);
 						USAGE();
 						return 2;
 					}
@@ -81,7 +81,7 @@ int builtin_history(char *command, char **parameters)
 				case 'n':
 					if(flags&AFLAG||flags&RFLAG||flags&WFLAG)
 					{
-						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, command);
+						OUT2E("%s: %s: cannot use more than one of -anrw\n", argv0, b_command);
 						USAGE();
 						return 2;
 					}
@@ -100,28 +100,28 @@ int builtin_history(char *command, char **parameters)
 					break;
 				case 'd':
 					flags|=DFLAG;
-					n=atoi(parameters[count]);
+					n=atoi(b_parameters[count]);
 					if(n<0)
 					{
-						OUT2E("%s: %s: %d: invalid option\n", argv0, command, n);
+						OUT2E("%s: %s: %d: invalid option\n", argv0, b_command, n);
 						return 2;
 					}
 					if(!n)
 					{
 						int count2;
-						for(count2=0; parameters[count][count2]; ++count2)
-							if(parameters[count][count2]!='0'&&(!isspace(parameters[count][count2])))
+						for(count2=0; b_parameters[count][count2]; ++count2)
+							if(b_parameters[count][count2]!='0'&&(!isspace(b_parameters[count][count2])))
 							{
-								OUT2E("%s: %s: %s: numeric argument required\n", argv0, command, parameters[count]);
+								OUT2E("%s: %s: %s: numeric argument required\n", argv0, b_command, b_parameters[count]);
 								return 2;
 							}
 					}
 					break;
 				case '?':
-					OUT2E("%s: %s: invalid option '-%c'\n", argv0, command, optopt);
+					OUT2E("%s: %s: invalid option '-%c'\n", argv0, b_command, optopt);
 					return 2;
 				case ':':
-					OUT2E("%s: %s: -d: option requires an argument\n", argv0, command);
+					OUT2E("%s: %s: -d: option requires an argument\n", argv0, b_command);
 					return 2;
 			}
 		}

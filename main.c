@@ -20,24 +20,18 @@
 #include "pshell.h"
 #include "backends/backend.h"
 #include <setjmp.h>
+#include <string.h>
 
 int status=0;
-char *argv0;
 jmp_buf reset_point;
+char *argv0;
 
 void proc(void)
 {
-	char *command = NULL;
 	int ParaNum;
 	char prompt[MAX_PROMPT];
-	struct parse_info *info;
-	if(parameters == NULL)
-	{
-		OUT2E("%s: malloc failed: %s\n", argv0, strerror(errno));
-		return;
-	}
-	/*arg[0] is command
-	  arg[MAXARG+1] is NULL*/
+	char *buffer;
+	struct parse_info info;
 	prepare();
 #ifndef NO_HISTORY
 	using_history();
@@ -46,14 +40,13 @@ void proc(void)
 		printf("\n");
 	while(1)
 	{
-		memset(parameters, 0, sizeof(char *)*(MAXARG+2));
 		type_prompt(prompt);
-		ParaNum = read_command(&command,parameters,prompt);
+		ParaNum = read_command(buffer, prompt, &info);
 		if(ParaNum<0)
 			continue;
 		ParaNum--;/*count of units in buffer*/
 		
-		switch(run_builtin(command,parameters))
+		switch(run_builtin(&info))
 		{
 		case 1:
 			break;
@@ -61,10 +54,10 @@ void proc(void)
 			status=1;
 			break;
 		default:
-			do_run(command, parameters, info);
+			do_run(&info);
 			break;
 		}
-		free_parse_info(info);
+		free_parse_info(&info);
 	}
 }
 

@@ -18,7 +18,11 @@
 */
 
 #include "../pshell.h"
-#define ARGS char *command, char **parameters
+
+#define ARGS struct parse_info *info
+#define b_command info->parameters[0]
+#define b_parameters info->parameters
+
 int builtin_exec(ARGS);
 int builtin_echo(ARGS);
 int builtin_cd(ARGS);

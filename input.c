@@ -23,9 +23,9 @@
   0 represents only command without any parameters
   -1 represents wrong input*/
 
-int read_command(char **command,char **parameters,char *prompt)
+int read_command(char *buffer, char *prompt, struct parse_info *info)
 {
-	char *buffer=malloc(sizeof(char)*MAXLINE);
+	buffer=malloc(sizeof(char)*MAXLINE);
 	memset(buffer, 0, sizeof(char)*MAXLINE);
 #ifndef NO_READLINE
 	buffer = readline(prompt);
@@ -38,15 +38,11 @@ int read_command(char **command,char **parameters,char *prompt)
 		printf("\n");
 		exit(0);
 	}
-	
-#ifdef NO_HISTORY
-	buffer=preprocess_cmdline(buffer);
-#else
+#ifndef NO_HISTORY	
 	if(buffer && *buffer)
 	{
 		char *expans;
 		int res;
-		buffer=preprocess_cmdline(buffer);
 		res=history_expand(buffer,&expans);
 		if(res<0)
 		{
@@ -68,15 +64,7 @@ int read_command(char **command,char **parameters,char *prompt)
 #endif
 	if(buffer[0] == '\0')
 		return -1;
-	int count=split_buffer(command, parameters, buffer);
-#ifdef DEBUG
-	/*input analysis*/
-	printf("input analysis:\n");
-	printf("pathname:[%s]\ncommand:[%s]\nparameters:\n",*command,parameters[0]);
-	int i;
-	for(i=0; i<count-1; i++)
-		printf("[%s]\n",parameters[i]);
-#endif
+	filpinfo(buffer, info);
 	free(buffer);
 	return count;
 }
