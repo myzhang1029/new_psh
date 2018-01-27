@@ -21,6 +21,7 @@
 #include "backends/backend.h"
 #include <setjmp.h>
 #include <string.h>
+#include <memory.h>
 
 int status=0;
 jmp_buf reset_point;
@@ -58,6 +59,7 @@ void proc(void)
 			break;
 		}
 		free_parse_info(&info);
+		memset(&info, 0, sizeof(info));
 	}
 }
 

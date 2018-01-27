@@ -25,6 +25,7 @@
 
 int read_command(char *buffer, char *prompt, struct parse_info *info)
 {
+	int count;
 	buffer=malloc(sizeof(char)*MAXLINE);
 	memset(buffer, 0, sizeof(char)*MAXLINE);
 #ifndef NO_READLINE
@@ -64,7 +65,7 @@ int read_command(char *buffer, char *prompt, struct parse_info *info)
 #endif
 	if(buffer[0] == '\0')
 		return -1;
-	filpinfo(buffer, info);
+	count=filpinfo(buffer, info);
 	free(buffer);
 	return count;
 }

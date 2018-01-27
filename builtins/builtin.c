@@ -19,11 +19,12 @@
 
 #include "builtin.h"
 
-int builtin_builtin(char *command, char **parameters)
+int builtin_builtin(ARGS)
 {
-	if(run_builtin(parameters[1], &parameters[1])==0)
+	memmove(info->parameters, &(info->parameters[1]), MAXLINE-1);
+	if(run_builtin(info)==0)
 	{
-		OUT2E("%s: %s: %s: not a shell builtin\n", argv0, command, parameters[1]);
+		OUT2E("%s: %s: %s: not a shell builtin\n", argv0, info->parameters[0], info->parameters[1]);
 		return 2;
 	}
 	return 1;

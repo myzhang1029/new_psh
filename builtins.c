@@ -51,19 +51,19 @@ int run_builtin(struct parse_info *info)
 		return 1;
 	}
 	else if(cmdis("cd")||cmdis("chdir"))
-		return builtin_cd(command, parameters);
+		return builtin_cd(info);
 	else if(cmdis("echo"))
-		return builtin_echo(command, parameters);
+		return builtin_echo(info);
 	else if(cmdis("exec"))
-		return builtin_exec(command, parameters);
+		return builtin_exec(info);
 	else if(cmdis("pwd"))
-		return builtin_pwd(command, parameters);
+		return builtin_pwd(info);
 	else if(cmdis("history"))
-		return builtin_history(command, parameters);
+		return builtin_history(info);
 	else if(cmdis(":"))
 		return 1;
 	else if(cmdis("builtin"))
-		return builtin_builtin(command, parameters);	
+		return builtin_builtin(info);	
 	else if(cmdis("export")||cmdis("alias"))
 	{
 		OUT2E("%s: %s: Not supported\n", argv0, info->parameters[0]);

@@ -104,9 +104,9 @@ int pshgethostname(char *hstnme, size_t len)
 	return gethostname(hstnme, len);
 }
 
-int do_run(char *command, char **parameters, struct parse_info info)
+int do_run(struct parse_info *info)
 {
-	if(info.flag & IS_PIPED) /*command is not null*/
+	if(info->flag & IS_PIPED) /*command is not null*/
 	{
 		if(pipe(pipe_fd)<0)
 		{
@@ -116,7 +116,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 	}
 	if((ChdPid = fork())!=0) /*shell*/
 	{
-		if(info.flag & IS_PIPED)
+		if(info->flag & IS_PIPED)
 		{
 			if((ChdPid2=fork()) == 0) /*command*/
 			{
@@ -124,7 +124,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 				close(fileno(stdin));
 				dup2(pipe_fd[0], fileno(stdin));
 				close(pipe_fd[0]);
-				execvp(info.parameters[0], (char **)info.parameters);
+				execvp(info->parameters[0], (char **)info->parameters);
 			}
 			else
 			{
@@ -134,7 +134,7 @@ int do_run(char *command, char **parameters, struct parse_info info)
 			}
 		}
 
-		if(info.flag & BACKGROUND)
+		if(info->flag & BACKGROUND)
 		{
 			int i;
 			for(i=0; i<MAXPIDTABLE; i++)
@@ -157,9 +157,9 @@ int do_run(char *command, char **parameters, struct parse_info info)
 	else /*command1*/
 	{
 
-		if(info.flag & IS_PIPED) /*command is not null*/
+		if(info->flag & IS_PIPED) /*command is not null*/
 		{
-			if(!(info.flag & OUT_REDIRECT) && !(info.flag & OUT_REDIRECT_APPEND)) /* ONLY PIPED*/
+			if(!(info->flag & OUT_REDIRECT) && !(info->flag & OUT_REDIRECT_APPEND)) /* ONLY PIPED*/
 			{
 				close(pipe_fd[0]);
 				close(fileno(stdout));
@@ -170,10 +170,10 @@ int do_run(char *command, char **parameters, struct parse_info info)
 			{
 				close(pipe_fd[0]);
 				close(pipe_fd[1]);/*send a EOF to command*/
-				if(info.flag & OUT_REDIRECT)
-					out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+				if(info->flag & OUT_REDIRECT)
+					out_fd = open(info->out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 				else
-					out_fd = open(info.out_file, O_WRONLY|O_APPEND|O_TRUNC, 0666);
+					out_fd = open(info->out_file, O_WRONLY|O_APPEND|O_TRUNC, 0666);
 				close(fileno(stdout));
 				dup2(out_fd, fileno(stdout));
 				close(out_fd);
@@ -181,35 +181,35 @@ int do_run(char *command, char **parameters, struct parse_info info)
 		}
 		else
 		{
-			if(info.flag & OUT_REDIRECT) /* OUT_REDIRECT WITHOUT PIPE*/
+			if(info->flag & OUT_REDIRECT) /* OUT_REDIRECT WITHOUT PIPE*/
 			{
-				out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+				out_fd = open(info->out_file, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 				close(fileno(stdout));
 				dup2(out_fd, fileno(stdout));
 				close(out_fd);
 			}
-			if(info.flag & OUT_REDIRECT_APPEND) /* OUT_REDIRECT_APPEND WITHOUT PIPE*/
+			if(info->flag & OUT_REDIRECT_APPEND) /* OUT_REDIRECT_APPEND WITHOUT PIPE*/
 			{
-				out_fd = open(info.out_file, O_WRONLY|O_CREAT|O_APPEND, 0666);
+				out_fd = open(info->out_file, O_WRONLY|O_CREAT|O_APPEND, 0666);
 				close(fileno(stdout));
 				dup2(out_fd, fileno(stdout));
 				close(out_fd);
 			}
 		}
 
-		if(info.flag & IN_REDIRECT)
+		if(info->flag & IN_REDIRECT)
 		{
-			in_fd = open(info.in_file, O_CREAT |O_RDONLY, 0666);
+			in_fd = open(info->in_file, O_CREAT |O_RDONLY, 0666);
 			close(fileno(stdin));
 			dup2(in_fd, fileno(stdin));
 			close(in_fd);
 		}
-		if(execvp(command,parameters)==-1)
+		if(execvp(info->parameters[0], (char **)info->parameters)==-1)
 		{
 			if(errno == ENOENT)
-				OUT2E("%s: %s: command not found\n", argv0, command);
+				OUT2E("%s: %s: command not found\n", argv0, info->parameters[0]);
 			else
-				OUT2E("%s: %s: %s\n", argv0, command, strerror(errno));
+				OUT2E("%s: %s: %s\n", argv0, info->parameters[0], strerror(errno));
 			/* Exit the failed command child process */
 			_Exit(1);
 		}

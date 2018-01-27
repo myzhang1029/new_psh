@@ -32,7 +32,6 @@ static int endwith(char* s,char c)
 
 static int parse_info_init(struct parse_info *info)
 {
-	info->paracount=0;
 	info->flag = 0;
 	info->in_file = NULL;
 	info->out_file = NULL;
@@ -229,7 +228,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 				{
 					char *username=malloc(sizeof(char)*256);
 					char *posit;
-					strncpy(username, &(buffer[count+1]));
+					strncpy(username, &(buffer[count+1]), 256);
 					posit=strchr(username, '/');
 					if(posit!=NULL)
 						*posit=0;/* Terminate the string */
