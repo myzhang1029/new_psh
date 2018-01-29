@@ -33,10 +33,14 @@ static int endwith(char* s,char c)
 
 static int parse_info_init(struct parse_info *info)
 {
+	int count;
 	info->flag = 0;
 	info->in_file = NULL;
 	info->out_file = NULL;
-	memset(info->parameters, 0, MAXLINE);
+	for(count=0; count<MAXARG; ++count)
+	{
+		memset(info->parameters[count], 0, MAXEACHARG);
+	}
 	info->next = NULL;
 	return 0;
 }
@@ -51,6 +55,29 @@ static struct parse_info *getpos(struct parse_info *base, int n)
 	return info;
 }
 
+static void malloc_parameters(struct parse_info *info)
+{
+	int count;
+	info->parameters=NULL;
+	info->parameters=(char **)malloc(sizeof(char *) * MAXARG);
+	for(count=0; count<MAXARG; ++count)
+	{
+		info->parameters[count] = (char *)malloc(sizeof(char) * MAXEACHARG);
+	}
+}
+
+static void free_parameters(struct parse_info *info)
+{
+	int count;
+	for(count=0; count<MAXARG; ++count)
+	{
+		free(info->parameters[count]);
+		info->parameters[count]=NULL;
+	}
+	free(info->parameters);
+	info->parameters=NULL;
+}
+
 /* Free a parse_info and its nexts */
 void free_parse_info(struct parse_info *info)
 {
@@ -59,12 +86,13 @@ void free_parse_info(struct parse_info *info)
 	{
 		temp = info;
 		info = info->next;
+		free_parameters(temp);
 		free(temp);
 		temp = NULL;
 	}
 }
 
-/* Fills a parse_info with a buffer, returns characters processed */
+/* Malloc and fill a parse_info with a buffer, return characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
 	#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
@@ -87,6 +115,13 @@ int filpinfo(char *buffer, struct parse_info *info)
 		paracount: count representing how many elements are there in parameter
 	*/
 	int isInSingleQuote = 0, isInDoubleQuote = 0;
+	if(info==NULL)
+	{
+		OUT2E("%s: filpinfo: info is NULL\n", argv0);
+		return -1;
+	}
+	malloc_parameters(info);
+	parse_info_init(info);
 	for(;count<len;++count)
 	{
 		switch(buffer[count])
@@ -223,7 +258,10 @@ int filpinfo(char *buffer, struct parse_info *info)
 				break;
 			case '~':
 				if(ignore)
+				{
+					write_current();
 					break;
+				}
 				if(buffer[count+1]!=0 && buffer[count+1]!='\n'
 						&& buffer[count+1]!='\t' && buffer[count+1]!=' '
 						&& buffer[count+1]!='/')/* ~username */
@@ -233,24 +271,63 @@ int filpinfo(char *buffer, struct parse_info *info)
 					strncpy(username, &(buffer[count+1]), 256);
 					posit=strchr(username, '/');
 					if(posit!=NULL)
-						*posit=0;/* Terminate the string */
-					else
-						while(--posit!=username)
+						while(--posit!=username)/* Remove blank */
 							if(*posit!=' ' && *posit!='\t')
-								break;/* Remove blank */
+							{
+								*(++posit)=0;/* Terminate the string */
+								break;
+							}
+					else
+					{
+						int usernamelen=strlen(username);
+						for(--usernamelen; usernamelen != 0; --usernamelen)
+							if(username[usernamelen]!=' '
+								&& username[usernamelen]!='\t')
+								{
+									username[++usernamelen]=0;/* Terminate the string*/
+									break;
+								}
+					}
 					char *hdir=gethdnam(username);
 					if(hdir==NULL)
+					{
 						/* No such user, treat as a normal ~ as in bash */
 						write_current();
-					strncpy(&(info->parameters[paracount][parametercount]), hdir, 4094-parametercount);
+						break;
+					}
+					strncpy(info->parameters[paracount], hdir, 4094-parametercount);
 					count+=strlen(username);
+					parametercount+=strlen(hdir);
+					free(username);
 				}
 				else/* ~/ and ~ */
 				{
 					char *hdir=gethd();
-					strncpy(&(info->parameters[paracount][parametercount]), hdir, 4094-parametercount);
+					strncpy(info->parameters[paracount], hdir, 4094-parametercount);
+					parametercount+=strlen(hdir);
 				}
 				break;
+			case '\\':
+			{
+				int case_count=0;
+				while(++case_count, ++count)
+				{
+						if(buffer[count]!='\\')
+						{
+							--count;
+							break;
+						}
+						else /* Print the '\' at a even location,
+								and ignore the odd ones,
+								the same behavior as in bash */
+						{
+							if(case_count&1) /* Odd number */
+								continue;
+							else /* Even number */
+								write_current();
+						}
+				}
+			}
 			case '`':
 				/* TODO: Write command substitude code here */
 			case '$':
