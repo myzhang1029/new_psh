@@ -24,7 +24,7 @@ int builtin_cd(ARGS)
 {
 	char *cd_path = NULL, *hdir=gethd();
 
-	if(b_parameters[1] == NULL/* 'cd' */)
+	if(b_parameters[1][0] == 0/* 'cd' */)
 	{
 		cd_path=malloc(strlen(hdir)+1);
 		if(cd_path == NULL)
