@@ -61,6 +61,8 @@ static void free_parameters(struct parse_info *info)
 			free(info->parameters[count]);
 			info->parameters[count]=NULL;
 		}
+		else
+			break;/* All parameters should be freed after here */
 	}
 	free(info->parameters);
 	info->parameters=NULL;
