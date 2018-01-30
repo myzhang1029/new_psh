@@ -18,6 +18,9 @@
 */
 
 #include "pshell.h"
+#include <setjmp.h>
+
+extern jmp_buf reset_point;
 
 /*return value: number of parameters
   0 represents only command without any parameters
@@ -49,7 +52,7 @@ int read_command(char *prompt, struct parse_info *info)
 		{
 			OUT2E("%s: Error on history expansion\n", argv0);
 			free(expans);
-			exit(1);
+			longjmp(reset_point, 1);
 		}
 		if(res==1||res==2)
 			printf("%s\n",expans);
