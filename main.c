@@ -31,7 +31,7 @@ void proc(void)
 {
 	int ParaNum;
 	char prompt[MAX_PROMPT];
-	struct parse_info *info=malloc(sizeof(struct parse_info));
+	struct parse_info *info;
 	prepare();
 #ifndef NO_HISTORY
 	using_history();
@@ -40,6 +40,11 @@ void proc(void)
 		printf("\n");
 	while(1)
 	{
+		if(new_parse_info(&info) == -1)
+		{
+			OUT2E("%s: malloc failed\n", argv0);
+			longjmp(reset_point, 1);
+		}
 		type_prompt(prompt);
 		ParaNum = read_command(prompt, info);
 		if(ParaNum<0)

@@ -56,7 +56,7 @@ struct parse_info
 	int redirfd_to;
 	char *in_file;
 	char *out_file;
-	char parameters[MAXARG][MAXEACHARG];/*argv*/
+	char **parameters;/*argv*/
 	struct parse_info *next;
 };
 
@@ -67,6 +67,7 @@ int read_command(char *prompt, struct parse_info *info);
 int run_builtin(struct parse_info *info);
 void free_parse_info(struct parse_info *info);
 int filpinfo(char *buffer, struct parse_info *info);
+int new_parse_info(struct parse_info **info);
 void free_parse_info(struct parse_info *info);
 
 #endif

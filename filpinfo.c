@@ -1,5 +1,5 @@
 /*
-   filpinfo - function to fill parse info(merges original preprocesser, splitbuf, parser)
+  filpinfo - function to fill parse info(merges original preprocesser, splitbuf, parser) and some other functions for parse_info magaging
 
    Copyright 2017 Zhang Maiyun.
 
@@ -33,14 +33,10 @@ static int endwith(char* s,char c)
 
 static int parse_info_init(struct parse_info *info)
 {
-	int count;
 	info->flag = 0;
 	info->in_file = NULL;
 	info->out_file = NULL;
-	for(count=0; count<MAXARG; ++count)
-	{
-		memset(info->parameters[count], 0, MAXEACHARG);
-	}
+	info->parameters = NULL;
 	info->next = NULL;
 	return 0;
 }
@@ -55,27 +51,43 @@ static struct parse_info *getpos(struct parse_info *base, int n)
 	return info;
 }
 
-static void malloc_parameters(struct parse_info *info)
-{
-	int count;
-	info->parameters=NULL;
-	info->parameters=(char **)malloc(sizeof(char *) * MAXARG);
-	for(count=0; count<MAXARG; ++count)
-	{
-		info->parameters[count] = (char *)malloc(sizeof(char) * MAXEACHARG);
-	}
-}
-
 static void free_parameters(struct parse_info *info)
 {
 	int count;
 	for(count=0; count<MAXARG; ++count)
 	{
-		free(info->parameters[count]);
-		info->parameters[count]=NULL;
+		if(info->parameters[count]!=NULL)
+		{
+			free(info->parameters[count]);
+			info->parameters[count]=NULL;
+		}
 	}
 	free(info->parameters);
 	info->parameters=NULL;
+}
+
+/* Malloc a parse_info, enNULL all elements, malloc the first parameter[] */
+int new_parse_info(struct parse_info **info)
+{
+	*info=malloc(sizeof(struct parse_info));
+	if((*info)==NULL)
+		return -1;
+	parse_info_init(*info);
+	(*info)->parameters=malloc(sizeof(char *)*MAXARG);
+	if((*info)->parameters == NULL)
+	{
+		free(*info);
+		return -1;
+	}
+	memset((*info)->parameters, 0, MAXARG);/* This will be used to detect whether an element is used or not */
+	(*info)->parameters[0]=malloc(sizeof(char)*MAXEACHARG);
+	if((*info)->parameters[0] == NULL)
+	{
+		free((*info)->parameters);
+		free(*info);
+		return -1;
+	}
+	return 0;
 }
 
 /* Free a parse_info and its nexts */
@@ -95,6 +107,7 @@ void free_parse_info(struct parse_info *info)
 /* Malloc and fill a parse_info with a buffer, return characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
+	#define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG)
 	#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
 	#define write_char(c) (getpos(info, pos)->parameters[paracount][parametercount++]=c)
 	#define escape (buffer[count-1]=='\\')
@@ -120,8 +133,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 		OUT2E("%s: filpinfo: info is NULL\n", argv0);
 		return -1;
 	}
-	malloc_parameters(info);
-	parse_info_init(info);
+	/* The input parse_info should be initialized */
 	for(;count<len;++count)
 	{
 		switch(buffer[count])
@@ -169,6 +181,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 					write_char(0);
 					paracount++;
 					parametercount=0;
+					malloc_one(paracount);
 					while(++count)
 						if(buffer[count]!=' '&&buffer[count]!='\t')
 						{
@@ -191,7 +204,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 						if(buffer[count+2] == 0)
 						{
 							char *cmdand_buf=malloc(MAXLINE);
-							getpos(info, pos)->next=malloc(sizeof(struct parse_info));
+							new_parse_info(&(getpos(info, pos)->next));
 #ifdef NO_READLINE
 							printf("> ");
 							fgets(cmdand_buf, MAXLINE, stdin);
@@ -207,9 +220,8 @@ int filpinfo(char *buffer, struct parse_info *info)
 						info->flag|=BACKGROUND;
 					}
 
-					info->next=malloc(sizeof(struct parse_info));
+					new_parse_info(&(getpos(info, pos)->next));
 					pos++;
-					parse_info_init(getpos(info, pos));
 				}
 				break;
 			case '|':
@@ -223,7 +235,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 						if(buffer[count+2] == 0)
 						{
 							char *cmdor_buf=malloc(MAXLINE);
-							getpos(info, pos)->next=malloc(sizeof(struct parse_info));
+							new_parse_info(&(getpos(info, pos)->next));
 #ifdef NO_READLINE
 							printf("> ");
 							fgets(cmdor_buf, MAXLINE, stdin);
@@ -240,7 +252,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 						if(buffer[count+1] == 0)
 						{
 							char *pipe_buf=malloc(MAXLINE);
-							getpos(info, pos)->next=malloc(sizeof(struct parse_info));
+							new_parse_info(&(getpos(info, pos)->next));
 #ifdef NO_READLINE
 							printf("> ");
 							fgets(pipe_buf, MAXLINE, stdin);
@@ -251,9 +263,8 @@ int filpinfo(char *buffer, struct parse_info *info)
 							free(pipe_buf);
 						}
 					}
-					info->next=malloc(sizeof(struct parse_info));
+					new_parse_info(&(getpos(info, pos)->next));
 					pos++;
-					parse_info_init(getpos(info, pos));
 				}
 				break;
 			case '~':
@@ -271,12 +282,14 @@ int filpinfo(char *buffer, struct parse_info *info)
 					strncpy(username, &(buffer[count+1]), 256);
 					posit=strchr(username, '/');
 					if(posit!=NULL)
+					{
 						while(--posit!=username)/* Remove blank */
 							if(*posit!=' ' && *posit!='\t')
 							{
 								*(++posit)=0;/* Terminate the string */
 								break;
 							}
+					}
 					else
 					{
 						int usernamelen=strlen(username);
