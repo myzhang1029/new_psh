@@ -324,8 +324,8 @@ int filpinfo(char *buffer, struct parse_info *info)
 				break;
 			case '\\':
 			{
-				int case_count=0;
-				while(++case_count, ++count)
+				int case_count;
+				for(case_count=1;buffer[count];++case_count, ++count)
 				{
 						if(buffer[count]!='\\')
 						{
