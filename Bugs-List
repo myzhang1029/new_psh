@@ -1,0 +1,35 @@
+1. Reason: random SEGV
+
+pshgetcwd() at posix.c:65
+Call Trace:
+* thread #1, queue = 'com.apple.main-thread', stop reason = signal SIGABRT
+  * frame #0: 0x00007fff61849e3e libsystem_kernel.dylib`__pthread_kill + 10
+    frame #1: 0x00007fff61988150 libsystem_pthread.dylib`pthread_kill + 333
+    frame #2: 0x00007fff617a6312 libsystem_c.dylib`abort + 127
+    frame #3: 0x00007fff618aeb28 libsystem_malloc.dylib`szone_error + 596
+    frame #4: 0x00007fff618b013f libsystem_malloc.dylib`small_free_list_remove_ptr_no_clear + 790
+    frame #5: 0x00007fff618a4191 libsystem_malloc.dylib`small_malloc_from_free_list + 403
+    frame #6: 0x00007fff618a289d libsystem_malloc.dylib`szone_malloc_should_clear + 1600
+    frame #7: 0x00007fff618a2201 libsystem_malloc.dylib`malloc_zone_malloc + 103
+    frame #8: 0x00007fff618a150b libsystem_malloc.dylib`malloc + 24
+    frame #9: 0x0000000100000fc4 psh`pshgetcwd at posix.c:105
+    frame #10: 0x0000000100001905 psh`type_prompt(prompt="zmy@yuandongmeideiMac:~/Git/psh$ ") at show.c:29
+    frame #11: 0x000000010000177e psh`proc at main.c:48
+    frame #12: 0x00000001000018d6 psh`main(argc=1, argv=0x00007ffeefbff920) at main.c:78
+    frame #13: 0x00007fff616fa115 libdyld.dylib`start + 1
+
+read_command() at input.c:67, only appear when compile with libhistory
+Call Trace:
+* thread #1, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=1, address=0x10050001e)
+  * frame #0: 0x00007fff618a3ecd libsystem_malloc.dylib`tiny_free_list_add_ptr + 108
+    frame #1: 0x00007fff618a362b libsystem_malloc.dylib`tiny_malloc_from_free_list + 1110
+    frame #2: 0x00007fff618a2403 libsystem_malloc.dylib`szone_malloc_should_clear + 422
+    frame #3: 0x00007fff618a2201 libsystem_malloc.dylib`malloc_zone_malloc + 103
+    frame #4: 0x00007fff618a150b libsystem_malloc.dylib`malloc + 24
+    frame #5: 0x00000001000c8f0d libreadline.7.dylib`xmalloc + 9
+    frame #6: 0x00000001000c33aa libreadline.7.dylib`alloc_history_entry + 26
+    frame #7: 0x00000001000c35c3 libreadline.7.dylib`add_history + 375
+    frame #8: 0x000000010000238a psh`read_command(prompt="zmy@yuandongmeideiMac:~/Git/psh$ ", info=0x0000000100202090) at input.c:67
+    frame #9: 0x0000000100001de6 psh`proc at main.c:49
+    frame #10: 0x0000000100001f26 psh`main(argc=1, argv=0x00007ffeefbff920) at main.c:78
+    frame #11: 0x00007fff616fa115 libdyld.dylib`start + 1
