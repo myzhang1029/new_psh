@@ -90,6 +90,7 @@ int new_parse_info(struct parse_info **info)
 		free(*info);
 		return -1;
 	}
+	memset((*info)->parameters[0], 0, MAXEACHARG);
 	return 0;
 }
 
@@ -110,7 +111,7 @@ void free_parse_info(struct parse_info *info)
 /* Malloc and fill a parse_info with a buffer, return characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
-	#define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG)
+	#define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG);memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
 	#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
 	#define write_char(c) (getpos(info, pos)->parameters[paracount][parametercount++]=c)
 	#define escape (buffer[count-1]=='\\')
