@@ -29,11 +29,12 @@ extern jmp_buf reset_point;
 int read_command(char *prompt, struct parse_info *info)
 {
 	int count;
-	char *buffer=malloc(sizeof(char)*MAXLINE);
-	memset(buffer, 0, sizeof(char)*MAXLINE);
+	char *buffer;
 #ifndef NO_READLINE
 	buffer = readline(prompt);
 #else
+	buffer=malloc(sizeof(char)*MAXLINE);
+	memset(buffer, 0, sizeof(char)*MAXLINE);
 	printf(prompt);
 	fgets(buffer, MAXLINE, stdin);
 #endif
