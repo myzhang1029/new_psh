@@ -18,6 +18,7 @@
 
 #include "pshell.h"
 #include "backends/backend.h"
+#include <ctype.h>
 
 static int endwith(char* s,char c)
 {
@@ -345,22 +346,56 @@ int filpinfo(char *buffer, struct parse_info *info)
 			}
 			case '`':
 				/* TODO: Write command substitude code here */
+
 			case '$':
 				/* TODO: Write variable, variable cut,
 				 * ANSI-C style escape, command substitude,
 				 * arithmetic expansion code here */
 			case '>':
 				if(ignore)
+				{
+					write_current();
 					break;
-				if(buffer[count+1] == '>') /* Output append */
-					;
-				if(buffer[count+1] == '&') /* fd redirect */
-					;
-				/* TODO: Write output redirect code here */
+				}
+				switch(buffer[count+1])
+				{
+					case '&':
+						while(buffer[++count])
+						{
+							if(isdigit(buffer[count]))/* >& n */
+							{
+								;
+							}
+							else if(isblank(buffer[count]))
+								continue;
+						}
+					case '|':
+						break;
+					case ' ': /* > word, word must be the filename */
+						while(buffer[++count])
+						{
+
+						}
+					case '\t':
+						;
+				}
 			case '<':
 				/* TODO: Write input redirect and heredoc code here */
 				write_current();
 				break;
+			case '#':
+				if(ignore)
+				{
+					write_current();
+					break;
+				}
+				write_char(0);
+				return count;
+			case '(':
+			case ')':
+				/* TODO: Write command sequence code here */
+			case ';':
+				/* TODO: Write muiltiple command process code here */
 			default:
 				write_current();
 		}
