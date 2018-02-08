@@ -1,7 +1,6 @@
 /*
    backend.h - backend definitions of the psh
 
-   Copyright 2013 wuyue.
    Copyright 2017 Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
