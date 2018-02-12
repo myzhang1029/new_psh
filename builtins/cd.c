@@ -54,9 +54,27 @@ static int create_new_pwd(char **cd_dir)
 				}
 			}
 		}
-
 	}
-
+	else
+	{
+		char *oldpwd=getenv("PWD");
+		*cd_dir=realloc(*cd_dir, strlen(*cd_dir)+1/*\0*/+strlen(oldpwd)+1/*'/'*/);
+		if(!cd_dir)
+		{
+			OUT2E("%s: create_new_pwd: realloc failed\n", argv0);
+			return 1;
+		}
+		{
+			int count=strlen(*cd_dir)+1/*\0*/;
+			char *d = (*cd_dir)+strlen(oldpwd)+1/*'/'*/+count-1;
+			char *s = (*cd_dir)+count-1;
+			while (count--)
+				*d-- = *s--;
+		}
+		memmove(*cd_dir, oldpwd, strlen(oldpwd));
+		(*cd_dir)[strlen(oldpwd)]='/';
+	}
+	return 0;
 }
 
 int builtin_cd(ARGS)
@@ -108,11 +126,14 @@ int builtin_cd(ARGS)
 	}
 
 	create_new_pwd(&cd_path);
-	setenv("OLDPWD", getenv("PWD"), 1);
-	setenv("PWD", cd_path, 1);
 
 	if(chdir(cd_path)!= 0)
 		OUT2E("%s: %s: %s\n", b_command, strerror(errno), cd_path);
+	else
+	{
+		setenv("OLDPWD", getenv("PWD"), 1);
+		setenv("PWD", cd_path, 1);
+	}
 	free(cd_path);
 	return 1;
 }
