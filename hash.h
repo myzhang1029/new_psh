@@ -23,7 +23,7 @@ typedef struct psh_hash_struct
 	char *val;
 	unsigned used:1;
 	int len;
-}PSH_HASH;
+} PSH_HASH;
 
 int realloc_hash(PSH_HASH *, int);
 PSH_HASH *new_hash(int);

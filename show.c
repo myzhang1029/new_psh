@@ -36,7 +36,7 @@ void type_prompt(char *prompt)
 		sprintf(prompt,"%s@unknown:",username);
 #ifdef DEBUG
 	printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n",
-	pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
+	       pathname,strlen(pathname),pwd->pw_dir,strlen(pwd->pw_dir));
 #endif
 	length = strlen(prompt);
 	if(strlen(pathname) < strlen(hdir) ||

@@ -24,13 +24,13 @@
 int
 hasher(const char *s, int ulimit)
 {
-  int i;
-  for (i = 0; *s; s++)
-    {
-      i *= 16777619;
-      i ^= *s;
-    }
+	int i;
+	for (i = 0; *s; s++)
+	{
+		i *= 16777619;
+		i ^= *s;
+	}
 
-  return i%ulimit;
+	return i%ulimit;
 }
 

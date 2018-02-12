@@ -50,17 +50,17 @@ void proc(void)
 		if(ParaNum<0)
 			continue;
 		ParaNum--;/*count of units in buffer*/
-		
+
 		switch(run_builtin(info))
 		{
-		case 1:
-			break;
-		case 2:
-			status=1;
-			break;
-		default:
-			do_run(info);
-			break;
+			case 1:
+				break;
+			case 2:
+				status=1;
+				break;
+			default:
+				do_run(info);
+				break;
 		}
 		free_parse_info(info);
 	}

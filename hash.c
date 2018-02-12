@@ -39,7 +39,7 @@ int realloc_hash(PSH_HASH *table, int newlen)
 	else
 		table->len=newlen;
 
-	for(;oldlen<newlen;++oldlen)
+	for(; oldlen<newlen; ++oldlen)
 		table[oldlen].used=0;
 
 	return 0;
@@ -56,8 +56,8 @@ static int search_hash_empty(PSH_HASH *table)
 		return -1;
 	return table->len-7;
 }
-	
-	
+
+
 /* Allocate a new hash table, return the table if success, NULL if not */
 PSH_HASH *new_hash(int len)
 {
@@ -100,7 +100,7 @@ static int search_for_element_by_key(PSH_HASH *table, char *key)
 	int i;
 	for(i=0; i < (table->len); ++i)
 		if(table[i].key != NULL
-				&&strcmp(table[i].key, key)==0)
+		        &&strcmp(table[i].key, key)==0)
 			return i;
 	return -1;
 }
@@ -174,7 +174,7 @@ int rm_hash(PSH_HASH *table, char *key)
 void del_hash(PSH_HASH *table)
 {
 	int i;
-	for(i=0;i < (table->len);++i)
+	for(i=0; i < (table->len); ++i)
 	{
 		if(table[i].used!=0)
 		{

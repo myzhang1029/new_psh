@@ -43,7 +43,7 @@ int read_command(char *prompt, struct parse_info *info)
 		printf("\n");
 		exit(0);
 	}
-#ifndef NO_HISTORY	
+#ifndef NO_HISTORY
 	if(buffer && *buffer)
 	{
 		char *expans;

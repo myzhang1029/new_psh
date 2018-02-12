@@ -33,7 +33,7 @@
 #endif
 
 #define MAX_PROMPT 1024
-#define MAXLINE 262144 
+#define MAXLINE 262144
 #define MAXARG 64
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024

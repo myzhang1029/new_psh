@@ -61,7 +61,7 @@ int run_builtin(struct parse_info *info)
 	else if(cmdis(":"))
 		return 1;
 	else if(cmdis("builtin"))
-		return builtin_builtin(info);	
+		return builtin_builtin(info);
 	else if(cmdis("export")||cmdis("alias"))
 	{
 		OUT2E("%s: %s: Not supported\n", argv0, info->parameters[0]);

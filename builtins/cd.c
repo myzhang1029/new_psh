@@ -19,20 +19,81 @@
 
 #include "builtin.h"
 #include "backends/backend.h"
+#include <string.h>
+#include <stdlib.h>
+
+static int create_new_pwd(char **cd_dir)
+{
+	char *nowpwd=getenv("PWD");
+	if(!cd_dir || !(*cd_dir))
+		return 1;
+	if((*cd_dir)[0]=='/')/* cd_dir is an abs path */
+	{
+		if(strstr((*cd_dir), "..") == NULL)
+		{
+			if(strstr((*cd_dir), ".") == NULL)
+				/* cd_dir did not contain a .. or . */
+				return 0;
+			else
+				/* have . but no .. */
+			{
+				char *delim;
+				while(1)
+				{
+					delim=strstr((*cd_dir), ".");
+					if(!delim)
+						return 0; /* All set */
+					/* NOTE: Must reach here. */
+					if(!(delim+1))/* after '.' is EOL */
+						*delim = 0;/* Just remove '.' */
+					else if(*(delim+1) != '/')/* Not the thing we're looking for */
+						continue;/* ignore */
+					else
+						memmove(delim, delim+2, strlen(delim+2)+1/*\0*/);
+					/* Move forward the string to remove ./ */
+				}
+			}
+		}
+
+	}
+
+}
 
 int builtin_cd(ARGS)
 {
-	char *cd_path = NULL, *hdir=gethd();
-
-	if(b_parameters[1] == NULL/* 'cd' */)
+	char *cd_path = NULL;
+	char *oldpwd = getenv("PWD");
+	if(b_parameters[1] == NULL)/* 'cd', the same as cd $HOME */
 	{
-		cd_path=malloc(strlen(hdir)+1);
+		char *homedir=getenv("HOME");
+		if(!homedir)
+		{
+			OUT2E("%s: %s: HOME not set\n", argv0, b_command);
+			return 2;
+		}
+		cd_path=malloc(strlen(homedir)+1);
 		if(cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
 			return 2;
 		}
-		strcpy(cd_path, hdir);
+		strcpy(cd_path, homedir);
+	}
+	else if(strcmp(b_parameters[1], "-") == 0)/* 'cd -', the same as cd $OLDPWD*/
+	{
+		char *oldpwd=getenv("OLDPWD");
+		if(!oldpwd)
+		{
+			OUT2E("%s: %s: OLDPWD not set\n", argv0, b_command);
+			return 2;
+		}
+		cd_path=malloc(strlen(oldpwd)+1);
+		if(cd_path == NULL)
+		{
+			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
+			return 2;
+		}
+		strcpy(cd_path, oldpwd);
 	}
 	else
 	{
@@ -43,9 +104,16 @@ int builtin_cd(ARGS)
 			return 2;
 		}
 		strcpy(cd_path, b_parameters[1]);
+
 	}
+
+	create_new_pwd(&cd_path);
+	setenv("OLDPWD", getenv("PWD"), 1);
+	setenv("PWD", cd_path, 1);
+
 	if(chdir(cd_path)!= 0)
 		OUT2E("%s: %s: %s\n", b_command, strerror(errno), cd_path);
 	free(cd_path);
 	return 1;
 }
+

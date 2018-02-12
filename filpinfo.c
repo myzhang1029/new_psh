@@ -111,11 +111,11 @@ void free_parse_info(struct parse_info *info)
 /* Malloc and fill a parse_info with a buffer, return characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
-	#define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG);memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
-	#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
-	#define write_char(c) (getpos(info, pos)->parameters[paracount][parametercount++]=c)
-	#define escape (buffer[count-1]=='\\')
-	#define ignore (isInDoubleQuote==1||isInSingleQuote==1||escape)
+#define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG);memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
+#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
+#define write_char(c) (getpos(info, pos)->parameters[paracount][parametercount++]=c)
+#define escape (buffer[count-1]=='\\')
+#define ignore (isInDoubleQuote==1||isInSingleQuote==1||escape)
 	/*
 		write_current: Write the current char to parameters
 		write_char: Write a character to parameters
@@ -138,7 +138,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 		return -1;
 	}
 	/* The input parse_info should be initialized */
-	for(;count<len;++count)
+	for(; count<len; ++count)
 	{
 		switch(buffer[count])
 		{
@@ -169,11 +169,10 @@ int filpinfo(char *buffer, struct parse_info *info)
 							write_current();
 						else
 							isInDoubleQuote = 0;
+					else if(escape)
+						write_current();
 					else
-						if(escape)
-							write_current();
-						else
-							isInDoubleQuote = 1;
+						isInDoubleQuote = 1;
 				}
 				break;
 			case '\t':
@@ -181,7 +180,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 				if(ignore)
 					write_current();
 				else
-				{	
+				{
 					write_char(0);
 					paracount++;
 					parametercount=0;
@@ -278,8 +277,8 @@ int filpinfo(char *buffer, struct parse_info *info)
 					break;
 				}
 				if(buffer[count+1]!=0 && buffer[count+1]!='\n'
-						&& buffer[count+1]!='\t' && buffer[count+1]!=' '
-						&& buffer[count+1]!='/')/* ~username */
+				        && buffer[count+1]!='\t' && buffer[count+1]!=' '
+				        && buffer[count+1]!='/')/* ~username */
 				{
 					char *username=malloc(sizeof(char)*256);
 					char *posit;
@@ -299,11 +298,11 @@ int filpinfo(char *buffer, struct parse_info *info)
 						int usernamelen=strlen(username);
 						for(--usernamelen; usernamelen != 0; --usernamelen)
 							if(username[usernamelen]!=' '
-								&& username[usernamelen]!='\t')
-								{
-									username[++usernamelen]=0;/* Terminate the string*/
-									break;
-								}
+							        && username[usernamelen]!='\t')
+							{
+								username[++usernamelen]=0;/* Terminate the string*/
+								break;
+							}
 					}
 					char *hdir=gethdnam(username);
 					if(hdir==NULL)
@@ -327,31 +326,31 @@ int filpinfo(char *buffer, struct parse_info *info)
 			case '\\':
 			{
 				int case_count;
-				for(case_count=1;buffer[count];++case_count, ++count)
+				for(case_count=1; buffer[count]; ++case_count, ++count)
 				{
-						if(buffer[count]!='\\')
-						{
-							--count;
-							break;
-						}
-						else /* Print the '\' at a even location,
-								and ignore the odd ones,
-								the same behavior as in bash */
-						{
-							if(case_count&1) /* Odd number */
-								continue;
-							else /* Even number */
-								write_current();
-						}
+					if(buffer[count]!='\\')
+					{
+						--count;
+						break;
+					}
+					else /* Print the '\' at a even location,
+							and ignore the odd ones,
+							the same behavior as in bash */
+					{
+						if(case_count&1) /* Odd number */
+							continue;
+						else /* Even number */
+							write_current();
+					}
 				}
 			}
 			case '`':
-				/* TODO: Write command substitude code here */
+			/* TODO: Write command substitude code here */
 
 			case '$':
-				/* TODO: Write variable, variable cut,
-				 * ANSI-C style escape, command substitude,
-				 * arithmetic expansion code here */
+			/* TODO: Write variable, variable cut,
+			 * ANSI-C style escape, command substitude,
+			 * arithmetic expansion code here */
 			case '>':
 				if(ignore)
 				{
@@ -394,9 +393,9 @@ int filpinfo(char *buffer, struct parse_info *info)
 				return count;
 			case '(':
 			case ')':
-				/* TODO: Write command sequence code here */
+			/* TODO: Write command sequence code here */
 			case ';':
-				/* TODO: Write muiltiple command process code here */
+			/* TODO: Write muiltiple command process code here */
 			default:
 				write_current();
 		}

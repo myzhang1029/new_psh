@@ -22,7 +22,55 @@
 
 int builtin_pwd(ARGS)
 {
-	char *path=pshgetcwd();
+	int flag=0;
+	char *path=NULL;
+	/* Ignore any args after [1]
+	unless it is started by '-' as in bash */
+	{
+		int argc;
+		for(argc=1;
+		        b_parameters[argc]
+		        &&b_parameters[argc][0]=='-';
+		        ++argc)
+		{
+			switch(b_parameters[argc][1])
+			{
+				case 'P':
+					flag=1;
+					break;
+				case 'L':
+					break;
+				default:/* Invalid option */
+					OUT2E("%s: %s: -%c: invalid option\n",
+					      argv0, b_command, b_parameters[argc][1]);
+					return 2;
+			}
+		}
+	}
+	if(!flag)/* No -P */
+	{
+		char *wd = getenv ("PWD");
+		char *p;
+		int use_logical=1;
+
+		if (!wd || wd[0] != '/')
+			use_logical=0;
+		p = wd;
+		while ((p = strstr (p, "/.")))
+		{
+			if (!p[2] || p[2] == '/'
+			        || (p[2] == '.' && (!p[3] || p[3] == '/')))
+				use_logical=0;
+			p++;
+		}
+		if(use_logical)
+			path=strdup(wd);
+		else
+			path=pshgetcwd();
+	}
+	else
+		path=pshgetcwd();
+
 	puts(path);
 	free(path);
 	return 1;

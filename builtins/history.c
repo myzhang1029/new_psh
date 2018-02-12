@@ -40,13 +40,14 @@ int builtin_history(ARGS)
 	{
 		int count, ch, flags=0, n;
 		char *filename=malloc(sizeof(char)*MAXEACHARG);
-		struct option longopts[]={
+		struct option longopts[]=
+		{
 			{"help",no_argument,NULL,'h'},
 			{NULL,0,NULL,0}
 		};
-		
+
 		/*Get argc for getopt*/
-		for(count=0; b_parameters[count];count++);
+		for(count=0; b_parameters[count]; count++);
 		while((ch=getopt_long(count, b_parameters, ":a::w::r::n::p::s::cd:", longopts, NULL))!=-1)
 		{
 			switch(ch)
@@ -140,6 +141,6 @@ noopts:
 				printf ("    %d  %s\n", i + history_base, histlist[i]->line);
 	}
 	return 1;
-#endif			
+#endif
 }
 

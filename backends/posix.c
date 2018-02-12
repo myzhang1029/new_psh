@@ -1,5 +1,5 @@
 /*
-   posix.c - backend of POSIX systems 
+   posix.c - backend of POSIX systems
 
    Copyright 2013 wuyue.
    Copyright 2017 Zhang Maiyun.
@@ -104,7 +104,7 @@ char *pshgetcwd(void)
 {
 	char *cwd=malloc(4097);
 	if(cwd == NULL)
-	 return NULL;
+		return NULL;
 	getcwd(cwd, 4097);
 	return cwd;
 }
