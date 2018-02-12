@@ -1,7 +1,7 @@
 /*
    cd.c - builtin cd
 
-   Copyright 2013 wuyue.
+   Copyright 2013 wuyve.
    Copyright 2017 Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
