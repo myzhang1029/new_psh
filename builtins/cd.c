@@ -111,6 +111,7 @@ int builtin_cd(ARGS)
 			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
 			return 2;
 		}
+		puts(oldpwd);
 		strcpy(cd_path, oldpwd);
 	}
 	else
