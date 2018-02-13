@@ -128,7 +128,7 @@ int builtin_cd(ARGS)
 
 	create_new_pwd(&cd_path);
 
-	if(chdir(cd_path)!= 0)
+	if(pshchdir(cd_path)!= 0)
 		OUT2E("%s: %s: %s\n", b_command, strerror(errno), cd_path);
 	else
 	{
@@ -138,4 +138,3 @@ int builtin_cd(ARGS)
 	free(cd_path);
 	return 1;
 }
-

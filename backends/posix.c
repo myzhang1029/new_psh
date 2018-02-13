@@ -114,6 +114,16 @@ int pshgethostname(char *hstnme, size_t len)
 	return gethostname(hstnme, len);
 }
 
+int pshgetuid(void)
+{
+	return geteuid();
+}
+
+int pshchdir(char *dir)
+{
+	return chdir(dir);
+}
+
 int do_run(struct parse_info *info)
 {
 	if(info->flag & IS_PIPED) /*command is not null*/
@@ -231,4 +241,20 @@ int do_run(struct parse_info *info)
 		}
 	}
 	return 0;
+}
+
+/* * *
+ * Platform dependent builtins part
+ *  * *
+ */
+#include "builtins/builtin.h"
+
+/* Builtin exec */
+int builtin_exec(ARGS)
+{
+	if(b_parameters[1]==NULL)
+		return 1;/* Do nothing */
+	if(execv(b_parameters[1], &b_parameters[1])==-1)
+		OUT2E("exec: %s: %s\n", b_parameters[1], strerror(errno));
+	return 2;
 }

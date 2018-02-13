@@ -45,7 +45,7 @@ void type_prompt(char *prompt)
 	else
 		sprintf(prompt+length,"~%s",pathname+strlen(hdir));
 	length = strlen(prompt);
-	if(geteuid()==0)
+	if(pshgetuid()==0)
 		sprintf(prompt+length,"# ");
 	else
 		sprintf(prompt+length,"$ ");
