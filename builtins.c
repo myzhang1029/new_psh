@@ -21,7 +21,7 @@
 #include "builtins/builtin.h"
 #define cmdis(cmd) (strcmp(info->parameters[0],cmd) == 0)
 
-extern int status;
+extern int last_command_status;
 
 int run_builtin(struct parse_info *info)
 {
@@ -30,7 +30,7 @@ int run_builtin(struct parse_info *info)
 		if(info->parameters[1]==NULL)
 		{
 			free(argv0);
-			exit(0);
+			exit(last_command_status);
 		}
 		else
 		{
@@ -40,9 +40,9 @@ int run_builtin(struct parse_info *info)
 		}
 	}
 	else if(cmdis("true"))
-		return (status=0),1;
+		return (last_command_status=0),1;
 	else if(cmdis("false"))
-		return (status=1);
+		return (last_command_status=1);
 	else if(cmdis("about"))
 	{
 		printf("psh is a not fully implemented shell in UNIX.\n");

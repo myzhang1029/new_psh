@@ -58,7 +58,7 @@ void sigchld_handler(int sig)
 
 void sigintabrt_hadler(int sig)
 {
-	status=sig;
+	last_command_status=sig;
 	longjmp(reset_point, 1);
 }
 
@@ -140,7 +140,7 @@ int do_run(struct parse_info *info)
 			{
 				close(pipe_fd[0]);
 				close(pipe_fd[1]);
-				waitpid(ChdPid2,&status,0); /*wait command*/
+				waitpid(ChdPid2,&last_command_status,0); /*wait command*/
 			}
 		}
 
@@ -161,7 +161,7 @@ int do_run(struct parse_info *info)
 		}
 		else
 		{
-			waitpid(ChdPid,&status,0);/*wait command1*/
+			waitpid(ChdPid,&last_command_status,0);/*wait command1*/
 		}
 	}
 	else /*command1*/
@@ -217,10 +217,16 @@ int do_run(struct parse_info *info)
 		if(execvp(info->parameters[0], (char **)info->parameters)==-1)
 		{
 			if(errno == ENOENT)
+			{
 				OUT2E("%s: %s: command not found\n", argv0, info->parameters[0]);
+				last_command_status = 127;
+			}
 			else
+			{
 				OUT2E("%s: %s: %s\n", argv0, info->parameters[0], strerror(errno));
 			/* Exit the failed command child process */
+				last_command_status = 126;
+			}
 			_Exit(1);
 		}
 	}

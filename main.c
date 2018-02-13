@@ -23,7 +23,7 @@
 #include <string.h>
 #include <memory.h>
 
-int status=0;
+int last_command_status=0;
 jmp_buf reset_point;
 char *argv0;
 
@@ -56,7 +56,7 @@ void proc(void)
 			case 1:
 				break;
 			case 2:
-				status=1;
+				last_command_status=1;
 				break;
 			default:
 				do_run(info);

@@ -18,7 +18,7 @@
 
 #include "../pshell.h"
 
-extern int status;
+extern int last_command_status;
 extern int pipe_fd[2], in_fd, out_fd;
 
 int prepare(void);
