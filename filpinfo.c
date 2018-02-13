@@ -20,18 +20,6 @@
 #include "backends/backend.h"
 #include <ctype.h>
 
-static int endwith(char* s,char c)
-{
-	if(s[strlen(s)-1]==c)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
 static int parse_info_init(struct parse_info *info)
 {
 	info->flag = 0;
@@ -112,24 +100,41 @@ void free_parse_info(struct parse_info *info)
 int filpinfo(char *buffer, struct parse_info *info)
 {
 #define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG);memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
-#define write_current() (getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count])
-#define write_char(c) (getpos(info, pos)->parameters[paracount][parametercount++]=c)
+
+/* Write the current char in buffer to current parse_info, increase retcount only if current not blank or 0 */
+#define write_current() \
+	do\
+	{\
+		getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count];\
+		if(strchr(" \t", buffer[count]) == NULL \
+				&& buffer[count] != 0)/* current char not blank */ \
+			retcount++;\
+	}/* Make the semicolon happy */while(0)
+
+/* Write any char to current parse_info, increase retcount only if c != 0 */
+#define write_char(c) \
+	do\
+	{\
+		getpos(info, pos)->parameters[paracount][parametercount++]=c;\
+		if(strchr(" \t", c) == NULL && c!=0)\
+			retcount++;\
+	}while(0)
+
 #define escape (buffer[count-1]=='\\')
 #define ignore (isInDoubleQuote==1||isInSingleQuote==1||escape)
 	/*
-		write_current: Write the current char to parameters
-		write_char: Write a character to parameters
 		escape: determine whether the last character is '\\'
-		ignore: determine whether a meta character should be ignored(not for a $(), or a ${})
+		ignore: determine whether a meta character should be ignored(not for a dollar)
 	*/
 
 	int len=strlen(buffer);
 	int pos=1;
-	int count=0, parametercount=0, paracount=0;
+	int count=0, parametercount=0, paracount=0, retcount=0;
 	/*
 		count: count for buffer
 		parametercount: count for current parameter element
 		paracount: count representing how many elements are there in parameter
+		retcount: characters actually wrote to the parse_info, returned
 	*/
 	int isInSingleQuote = 0, isInDoubleQuote = 0;
 	if(info==NULL)
@@ -390,7 +395,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 					break;
 				}
 				write_char(0);
-				return count;
+				return retcount;
 			case '(':
 			case ')':
 			/* TODO: Write command sequence code here */
@@ -401,6 +406,6 @@ int filpinfo(char *buffer, struct parse_info *info)
 		}
 	}
 	write_char(0);
-	return count;
+	return retcount;
 }
 

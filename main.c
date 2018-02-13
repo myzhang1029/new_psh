@@ -29,7 +29,6 @@ char *argv0;
 
 void proc(void)
 {
-	int ParaNum;
 	char prompt[MAX_PROMPT];
 	struct parse_info *info;
 	prepare();
@@ -46,10 +45,8 @@ void proc(void)
 			longjmp(reset_point, 1);
 		}
 		type_prompt(prompt);
-		ParaNum = read_command(prompt, info);
-		if(ParaNum<0)
+		if(read_command(prompt, info) <= 0)
 			continue;
-		ParaNum--;/*count of units in buffer*/
 
 		switch(run_builtin(info))
 		{
