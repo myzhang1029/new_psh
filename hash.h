@@ -21,7 +21,7 @@ typedef struct psh_hash_struct
 {
 	char *key;
 	char *val;
-	unsigned used:1;
+	unsigned used : 1;
 	int len;
 } PSH_HASH;
 
@@ -32,6 +32,4 @@ char *get_hash(PSH_HASH *, char *);
 int rm_hash(PSH_HASH *, char *);
 void del_hash(PSH_HASH *);
 
-int
-hasher(const char *s, int ulimit);
-
+int hasher(const char *s, int ulimit);

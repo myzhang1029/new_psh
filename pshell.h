@@ -20,11 +20,11 @@
 #ifndef PSHELL_HEADER_INCLUDED
 #define PSHELL_HEADER_INCLUDED
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #ifndef NO_READLINE
 #include <readline/readline.h>
 #endif
@@ -37,17 +37,17 @@
 #define MAXARG 64
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
-#define OUT2E(...) fprintf(stderr,__VA_ARGS__)
+#define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 #define PSH_VERSION "0.11.2"
 
-#define BACKGROUND		0x01 /*cmd&*/
-#define IN_REDIRECT		0x02 /*cmd<f*/
-#define OUT_REDIRECT		0x04 /*cmd>f*/
-#define OUT_REDIRECT_APPEND	0x08 /*cmd>>f*/
-#define IS_PIPED		0x10 /*cmd|cmd*/
-#define RUN_AND			0x20 /*cmd&&cmd*/
-#define RUN_OR			0x40 /*cmd||cmd*/
-#define HEREDOC			0x80 /*cmd<<id*/
+#define BACKGROUND 0x01		 /*cmd&*/
+#define IN_REDIRECT 0x02	 /*cmd<f*/
+#define OUT_REDIRECT 0x04	/*cmd>f*/
+#define OUT_REDIRECT_APPEND 0x08 /*cmd>>f*/
+#define IS_PIPED 0x10		 /*cmd|cmd*/
+#define RUN_AND 0x20		 /*cmd&&cmd*/
+#define RUN_OR 0x40		 /*cmd||cmd*/
+#define HEREDOC 0x80		 /*cmd<<id*/
 
 struct parse_info
 {
@@ -56,13 +56,13 @@ struct parse_info
 	int redirfd_to;
 	char *in_file;
 	char *out_file;
-	char **parameters;/*argv*/
+	char **parameters; /*argv*/
 	struct parse_info *next;
 };
 
 extern char *argv0;
 
-void type_prompt(char*);
+void type_prompt(char *);
 int read_command(char *prompt, struct parse_info *info);
 int run_builtin(struct parse_info *info);
 void free_parse_info(struct parse_info *info);

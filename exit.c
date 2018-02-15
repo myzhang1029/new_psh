@@ -24,4 +24,3 @@ void exit_psh(int status)
 	free(argv0);
 	exit(status);
 }
-

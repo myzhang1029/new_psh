@@ -1,5 +1,6 @@
 /*
-  filpinfo - function to fill parse info(merges original preprocesser, splitbuf, parser) and some other functions for parse_info magaging
+  filpinfo - function to fill parse info(merges original preprocesser, splitbuf,
+  parser) and some other functions for parse_info magaging
 
    Copyright 2017 Zhang Maiyun.
 
@@ -16,9 +17,9 @@
    limitations under the License.
 */
 
-#include "pshell.h"
-#include "backends/backend.h"
 #include <ctype.h>
+#include "backends/backend.h"
+#include "pshell.h"
 
 static int parse_info_init(struct parse_info *info)
 {
@@ -34,45 +35,47 @@ static int parse_info_init(struct parse_info *info)
 static struct parse_info *getpos(struct parse_info *base, int n)
 {
 	int count;
-	struct parse_info *info=base;
-	for (count=1; count<n; ++count)
-		info=info->next;
+	struct parse_info *info = base;
+	for (count = 1; count < n; ++count)
+		info = info->next;
 	return info;
 }
 
 static void free_parameters(struct parse_info *info)
 {
 	int count;
-	for(count=0; count<MAXARG; ++count)
+	for (count = 0; count < MAXARG; ++count)
 	{
-		if(info->parameters[count]!=NULL)
+		if (info->parameters[count] != NULL)
 		{
 			free(info->parameters[count]);
-			info->parameters[count]=NULL;
+			info->parameters[count] = NULL;
 		}
 		else
-			break;/* All parameters should be freed after here */
+			break; /* All parameters should be freed after here */
 	}
 	free(info->parameters);
-	info->parameters=NULL;
+	info->parameters = NULL;
 }
 
 /* Malloc a parse_info, enNULL all elements, malloc the first parameter[] */
 int new_parse_info(struct parse_info **info)
 {
-	*info=malloc(sizeof(struct parse_info));
-	if((*info)==NULL)
+	*info = malloc(sizeof(struct parse_info));
+	if ((*info) == NULL)
 		return -1;
 	parse_info_init(*info);
-	(*info)->parameters=malloc(sizeof(char *)*MAXARG);
-	if((*info)->parameters == NULL)
+	(*info)->parameters = malloc(sizeof(char *) * MAXARG);
+	if ((*info)->parameters == NULL)
 	{
 		free(*info);
 		return -1;
 	}
-	memset((*info)->parameters, 0, MAXARG);/* This will be used to detect whether an element is used or not */
-	(*info)->parameters[0]=malloc(sizeof(char)*MAXEACHARG);
-	if((*info)->parameters[0] == NULL)
+	memset((*info)->parameters, 0,
+	       MAXARG); /* This will be used to detect whether an element is
+			   used or not */
+	(*info)->parameters[0] = malloc(sizeof(char) * MAXEACHARG);
+	if ((*info)->parameters[0] == NULL)
 	{
 		free((*info)->parameters);
 		free(*info);
@@ -86,7 +89,7 @@ int new_parse_info(struct parse_info **info)
 void free_parse_info(struct parse_info *info)
 {
 	struct parse_info *temp;
-	while(info!=NULL)
+	while (info != NULL)
 	{
 		temp = info;
 		info = info->next;
@@ -99,82 +102,94 @@ void free_parse_info(struct parse_info *info)
 /* Malloc and fill a parse_info with a buffer, return characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
-#define malloc_one(n) (getpos(info, pos)->parameters[n])=malloc(sizeof(char)*MAXEACHARG);memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
+#define malloc_one(n)                                                          \
+	(getpos(info, pos)->parameters[n]) =                                   \
+	    malloc(sizeof(char) * MAXEACHARG);                                 \
+	memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
 
-/* Write the current char in buffer to current parse_info, increase retcount only if current not blank or 0 */
-#define write_current() \
-	do\
-	{\
-		getpos(info, pos)->parameters[paracount][parametercount++]=buffer[count];\
-		if(strchr(" \t", buffer[count]) == NULL \
-				&& buffer[count] != 0)/* current char not blank */ \
-			retcount++;\
-	}/* Make the semicolon happy */while(0)
+/* Write the current char in buffer to current parse_info, increase retcount
+ * only if current not blank or 0 */
+#define write_current()                                                        \
+	do                                                                     \
+	{                                                                      \
+		getpos(info, pos)->parameters[paracount][parametercount++] =   \
+		    buffer[count];                                             \
+		if (strchr(" \t", buffer[count]) == NULL &&                    \
+		    buffer[count] != 0) /* current char not blank */           \
+			retcount++;                                            \
+	} /* Make the semicolon happy */ while (0)
 
 /* Write any char to current parse_info, increase retcount only if c != 0 */
-#define write_char(c) \
-	do\
-	{\
-		getpos(info, pos)->parameters[paracount][parametercount++]=c;\
-		if(strchr(" \t", c) == NULL && c!=0)\
-			retcount++;\
-	}while(0)
+#define write_char(c)                                                          \
+	do                                                                     \
+	{                                                                      \
+		getpos(info, pos)->parameters[paracount][parametercount++] =   \
+		    c;                                                         \
+		if (strchr(" \t", c) == NULL && c != 0)                        \
+			retcount++;                                            \
+	} while (0)
 
-#define escape (buffer[count-1]=='\\')
-#define ignore (isInDoubleQuote==1||isInSingleQuote==1||escape)
+#define escape (buffer[count - 1] == '\\')
+#define ignore (isInDoubleQuote == 1 || isInSingleQuote == 1 || escape)
 	/*
 		escape: determine whether the last character is '\\'
-		ignore: determine whether a meta character should be ignored(not for a dollar)
+		ignore: determine whether a meta character should be ignored(not
+	   for a dollar)
 	*/
 
-	int len=strlen(buffer);
-	int pos=1;
-	int count=0, parametercount=0, paracount=0, retcount=0;
+	int len = strlen(buffer);
+	int pos = 1;
+	int count = 0, parametercount = 0, paracount = 0, retcount = 0;
 	/*
 		count: count for buffer
 		parametercount: count for current parameter element
-		paracount: count representing how many elements are there in parameter
-		retcount: characters actually wrote to the parse_info, returned
+		paracount: count representing how many elements are there in
+	   parameter retcount: characters actually wrote to the parse_info,
+	   returned
 	*/
 	int isInSingleQuote = 0, isInDoubleQuote = 0;
-	if(info==NULL)
+	if (info == NULL)
 	{
 		OUT2E("%s: filpinfo: info is NULL\n", argv0);
 		return -1;
 	}
 	/* The input parse_info should be initialized */
-	for(; count<len; ++count)
+	for (; count < len; ++count)
 	{
-		switch(buffer[count])
+		switch (buffer[count])
 		{
 			case '\'':
-				if(isInDoubleQuote == 1)/* Already in a "" quote, just write a ' */
+				if (isInDoubleQuote ==
+				    1) /* Already in a "" quote, just write a '
+					*/
 					write_current();
 
-				else if(isInSingleQuote == 1)/* Get out of the quote */
+				else if (isInSingleQuote ==
+					 1) /* Get out of the quote */
 					isInSingleQuote = 0;
 				else
 				{
-					if(count == 0)
+					if (count == 0)
 						isInSingleQuote = 1;
-					else if(!escape)
+					else if (!escape)
 						isInSingleQuote = 1;
-					else /* count != 0 && buffer[count-1] == '\\' */
+					else /* count != 0 && buffer[count-1] ==
+						'\\' */
 						/* Write a ' */
 						write_current();
 				}
 				break;
 			case '"':
-				if(isInSingleQuote == 1)
+				if (isInSingleQuote == 1)
 					write_current();
 				else
 				{
-					if(isInDoubleQuote == 1)
-						if(escape)
+					if (isInDoubleQuote == 1)
+						if (escape)
 							write_current();
 						else
 							isInDoubleQuote = 0;
-					else if(escape)
+					else if (escape)
 						write_current();
 					else
 						isInDoubleQuote = 1;
@@ -182,170 +197,222 @@ int filpinfo(char *buffer, struct parse_info *info)
 				break;
 			case '\t':
 			case ' ':
-				if(ignore)
+				if (ignore)
 					write_current();
 				else
 				{
 					write_char(0);
 					paracount++;
-					parametercount=0;
+					parametercount = 0;
 					malloc_one(paracount);
-					while(++count)
-						if(buffer[count]!=' '&&buffer[count]!='\t')
+					while (++count)
+						if (buffer[count] != ' ' &&
+						    buffer[count] != '\t')
 						{
 							--count;
 							break;
 						}
-
 				}
 				break;
 			case '&':
-				if(ignore)
+				if (ignore)
 					write_current();
 				else
 				{
-					if(buffer[count+1] == 0)/* End of input */
-						info->flag|=BACKGROUND;
-					else if(buffer[count+1] == '&')
+					if (buffer[count + 1] ==
+					    0) /* End of input */
+						info->flag |= BACKGROUND;
+					else if (buffer[count + 1] == '&')
 					{
-						info->flag|=RUN_AND;
-						if(buffer[count+2] == 0)
+						info->flag |= RUN_AND;
+						if (buffer[count + 2] == 0)
 						{
-							char *cmdand_buf=malloc(MAXLINE);
-							new_parse_info(&(getpos(info, pos)->next));
+							char *cmdand_buf =
+							    malloc(MAXLINE);
+							new_parse_info(
+							    &(getpos(info, pos)
+								  ->next));
 #ifdef NO_READLINE
 							printf("> ");
-							fgets(cmdand_buf, MAXLINE, stdin);
+							fgets(cmdand_buf,
+							      MAXLINE, stdin);
 #else
-							cmdand_buf = readline("> ");
+							cmdand_buf =
+							    readline("> ");
 #endif
-							strncat(buffer, cmdand_buf, MAXLINE-count-1);
+							strncat(buffer,
+								cmdand_buf,
+								MAXLINE -
+								    count - 1);
 							free(cmdand_buf);
 						}
 					}
 					else
 					{
-						info->flag|=BACKGROUND;
+						info->flag |= BACKGROUND;
 
-						new_parse_info(&(getpos(info, pos)->next));
+						new_parse_info(
+						    &(getpos(info, pos)->next));
 					}
 					pos++;
-					paracount=0;
-					parametercount=0;
+					paracount = 0;
+					parametercount = 0;
 				}
 				break;
 			case '|':
-				if(ignore)
+				if (ignore)
 					write_current();
 				else
 				{
-					if(buffer[count+1] == '|')
+					if (buffer[count + 1] == '|')
 					{
-						info->flag|=RUN_OR;
-						if(buffer[count+2] == 0)
+						info->flag |= RUN_OR;
+						if (buffer[count + 2] == 0)
 						{
-							char *cmdor_buf=malloc(MAXLINE);
-							new_parse_info(&(getpos(info, pos)->next));
+							char *cmdor_buf =
+							    malloc(MAXLINE);
+							new_parse_info(
+							    &(getpos(info, pos)
+								  ->next));
 #ifdef NO_READLINE
 							printf("> ");
-							fgets(cmdor_buf, MAXLINE, stdin);
+							fgets(cmdor_buf,
+							      MAXLINE, stdin);
 #else
-							cmdor_buf = readline("> ");
+							cmdor_buf =
+							    readline("> ");
 #endif
-							strncat(buffer, cmdor_buf, MAXLINE-count-1)/*\0*/;
+							strncat(
+							    buffer, cmdor_buf,
+							    MAXLINE - count -
+								1) /*\0*/;
 							free(cmdor_buf);
 						}
 					}
 					else
 					{
-						info->flag|=IS_PIPED;
-						if(buffer[count+1] == 0)
+						info->flag |= IS_PIPED;
+						if (buffer[count + 1] == 0)
 						{
-							char *pipe_buf=malloc(MAXLINE);
-							new_parse_info(&(getpos(info, pos)->next));
+							char *pipe_buf =
+							    malloc(MAXLINE);
+							new_parse_info(
+							    &(getpos(info, pos)
+								  ->next));
 #ifdef NO_READLINE
 							printf("> ");
-							fgets(pipe_buf, MAXLINE, stdin);
+							fgets(pipe_buf, MAXLINE,
+							      stdin);
 #else
-							pipe_buf = readline("> ");
+							pipe_buf =
+							    readline("> ");
 #endif
-							strncat(buffer, pipe_buf, MAXLINE-count-1);
+							strncat(buffer,
+								pipe_buf,
+								MAXLINE -
+								    count - 1);
 							free(pipe_buf);
 						}
 					}
 					pos++;
-					paracount=0;
-					parametercount=0;
+					paracount = 0;
+					parametercount = 0;
 				}
 				break;
 			case '~': /* This feature stable */
-				if(ignore)
+				if (ignore)
 				{
 					write_current();
 					break;
 				}
-				if(buffer[count+1]!=0 && buffer[count+1]!='\n'
-				        && buffer[count+1]!='\t' && buffer[count+1]!=' '
-				        && buffer[count+1]!='/')/* ~username */
+				if (buffer[count + 1] != 0 &&
+				    buffer[count + 1] != '\n' &&
+				    buffer[count + 1] != '\t' &&
+				    buffer[count + 1] != ' ' &&
+				    buffer[count + 1] != '/') /* ~username */
 				{
-					char *username=malloc(sizeof(char)*256);
+					char *username =
+					    malloc(sizeof(char) * 256);
 					char *posit;
-					strncpy(username, &(buffer[count+1]), 256);
-					posit=strchr(username, '/');
-					if(posit!=NULL)
+					strncpy(username, &(buffer[count + 1]),
+						256);
+					posit = strchr(username, '/');
+					if (posit != NULL)
 					{
-						while(--posit!=username)/* Remove blank */
-							if(*posit!=' ' && *posit!='\t')
+						while (
+						    --posit !=
+						    username) /* Remove blank */
+							if (*posit != ' ' &&
+							    *posit != '\t')
 							{
-								*(++posit)=0;/* Terminate the string */
+								*(++posit) =
+								    0; /* Terminate
+									  the
+									  string
+									*/
 								break;
 							}
 					}
 					else
 					{
-						int usernamelen=strlen(username);
-						for(--usernamelen; usernamelen != 0; --usernamelen)
-							if(username[usernamelen]!=' '
-							        && username[usernamelen]!='\t')
+						int usernamelen =
+						    strlen(username);
+						for (--usernamelen;
+						     usernamelen != 0;
+						     --usernamelen)
+							if (username[usernamelen] !=
+								' ' &&
+							    username[usernamelen] !=
+								'\t')
 							{
-								username[++usernamelen]=0;/* Terminate the string*/
+								username
+								    [++usernamelen] =
+									0; /* Terminate
+									      the
+									      string*/
 								break;
 							}
 					}
-					char *hdir=gethdnam(username);
-					if(hdir==NULL)
+					char *hdir = gethdnam(username);
+					if (hdir == NULL)
 					{
-						/* No such user, treat as a normal ~ as in bash */
+						/* No such user, treat as a
+						 * normal ~ as in bash */
 						write_current();
 						break;
 					}
-					strncpy(info->parameters[paracount], hdir, 4094-parametercount);
-					count+=strlen(username);
-					parametercount+=strlen(hdir);
+					strncpy(info->parameters[paracount],
+						hdir, 4094 - parametercount);
+					count += strlen(username);
+					parametercount += strlen(hdir);
 					free(username);
 				}
-				else/* ~/ and ~ */
+				else /* ~/ and ~ */
 				{
-					char *hdir=gethd();
-					strncpy(info->parameters[paracount], hdir, 4094-parametercount);
-					parametercount+=strlen(hdir);
+					char *hdir = gethd();
+					strncpy(info->parameters[paracount],
+						hdir, 4094 - parametercount);
+					parametercount += strlen(hdir);
 				}
 				break;
 			case '\\':
 			{
 				int case_count;
-				for(case_count=1; buffer[count]; ++case_count, ++count)
+				for (case_count = 1; buffer[count];
+				     ++case_count, ++count)
 				{
-					if(buffer[count]!='\\')
+					if (buffer[count] != '\\')
 					{
 						--count;
 						break;
 					}
-					else /* Print the '\' at a even location,
-							and ignore the odd ones,
-							the same behavior as in bash */
+					else /* Print the '\' at a even
+						location, and ignore the odd
+						ones, the same behavior as in
+						bash */
 					{
-						if(case_count&1) /* Odd number */
+						if (case_count &
+						    1) /* Odd number */
 							continue;
 						else /* Even number */
 							write_current();
@@ -353,24 +420,25 @@ int filpinfo(char *buffer, struct parse_info *info)
 				}
 			}
 			case '`':
-			/* TODO: Write command substitude code here */
+				/* TODO: Write command substitude code here */
 
 			case '$':
 			/* TODO: Write variable, variable cut,
 			 * ANSI-C style escape, command substitude,
 			 * arithmetic expansion code here */
 			case '>':
-				if(ignore)
+				if (ignore)
 				{
 					write_current();
 					break;
 				}
 			case '<':
-				/* TODO: Write input redirect and heredoc code here */
+				/* TODO: Write input redirect and heredoc code
+				 * here */
 				write_current();
 				break;
 			case '#':
-				if(ignore)
+				if (ignore)
 				{
 					write_current();
 					break;
@@ -389,4 +457,3 @@ int filpinfo(char *buffer, struct parse_info *info)
 	write_char(0);
 	return retcount;
 }
-
