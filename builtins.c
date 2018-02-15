@@ -29,14 +29,12 @@ int run_builtin(struct parse_info *info)
 	{
 		if(info->parameters[1]==NULL)
 		{
-			free(argv0);
-			exit(last_command_status);
+			exit_psh(last_command_status);
 		}
 		else
 		{
 			int i=atoi(info->parameters[1]);
-			free(argv0);
-			exit(i);
+			exit_psh(i);
 		}
 	}
 	else if(cmdis("getstat"))

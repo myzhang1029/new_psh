@@ -21,6 +21,7 @@
 #include <setjmp.h>
 
 extern jmp_buf reset_point;
+extern int last_command_status;
 
 /*return value: number of parameters
   0 represents only command without any parameters
@@ -38,10 +39,10 @@ int read_command(char *prompt, struct parse_info *info)
 	printf(prompt);
 	fgets(buffer, MAXLINE, stdin);
 #endif
-	if(feof(stdin))
+	if(feof(stdin) || !buffer)/* EOF reached */
 	{
 		printf("\n");
-		exit(0);
+		exit_psh(last_command_status);
 	}
 #ifndef NO_HISTORY
 	if(buffer && *buffer)

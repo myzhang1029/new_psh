@@ -38,7 +38,7 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr,__VA_ARGS__)
-#define PSH_VERSION "0.11.0"
+#define PSH_VERSION "0.11.2"
 
 #define BACKGROUND		0x01 /*cmd&*/
 #define IN_REDIRECT		0x02 /*cmd<f*/
@@ -69,5 +69,5 @@ void free_parse_info(struct parse_info *info);
 int filpinfo(char *buffer, struct parse_info *info);
 int new_parse_info(struct parse_info **info);
 void free_parse_info(struct parse_info *info);
-
+void exit_psh(int status);
 #endif
