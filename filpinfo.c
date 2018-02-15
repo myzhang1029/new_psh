@@ -226,10 +226,12 @@ int filpinfo(char *buffer, struct parse_info *info)
 					else
 					{
 						info->flag|=BACKGROUND;
-					}
 
-					new_parse_info(&(getpos(info, pos)->next));
+						new_parse_info(&(getpos(info, pos)->next));
+					}
 					pos++;
+					paracount=0;
+					parametercount=0;
 				}
 				break;
 			case '|':
@@ -250,7 +252,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 #else
 							cmdor_buf = readline("> ");
 #endif
-							strncat(buffer, cmdor_buf, MAXLINE-count-1);
+							strncat(buffer, cmdor_buf, MAXLINE-count-1)/*\0*/;
 							free(cmdor_buf);
 						}
 					}
@@ -271,11 +273,12 @@ int filpinfo(char *buffer, struct parse_info *info)
 							free(pipe_buf);
 						}
 					}
-					new_parse_info(&(getpos(info, pos)->next));
 					pos++;
+					paracount=0;
+					parametercount=0;
 				}
 				break;
-			case '~':
+			case '~': /* This feature stable */
 				if(ignore)
 				{
 					write_current();
@@ -361,28 +364,6 @@ int filpinfo(char *buffer, struct parse_info *info)
 				{
 					write_current();
 					break;
-				}
-				switch(buffer[count+1])
-				{
-					case '&':
-						while(buffer[++count])
-						{
-							if(isdigit(buffer[count]))/* >& n */
-							{
-								;
-							}
-							else if(isblank(buffer[count]))
-								continue;
-						}
-					case '|':
-						break;
-					case ' ': /* > word, word must be the filename */
-						while(buffer[++count])
-						{
-
-						}
-					case '\t':
-						;
 				}
 			case '<':
 				/* TODO: Write input redirect and heredoc code here */

@@ -51,6 +51,7 @@ void proc(void)
 		switch(run_builtin(info))
 		{
 			case 1:
+				last_command_status=0;
 				break;
 			case 2:
 				last_command_status=1;
@@ -75,3 +76,4 @@ int main(int argc, char **argv)
 	proc();
 	return 0;
 }
+

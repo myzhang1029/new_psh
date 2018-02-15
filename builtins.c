@@ -39,6 +39,8 @@ int run_builtin(struct parse_info *info)
 			exit(i);
 		}
 	}
+	else if(cmdis("getstat"))
+		return printf("%d\n", last_command_status), 1;
 	else if(cmdis("true"))
 		return (last_command_status=0),1;
 	else if(cmdis("false"))
