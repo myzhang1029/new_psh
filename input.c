@@ -68,7 +68,7 @@ int read_command(char *prompt, struct parse_info *info)
 		add_history(buffer);
 	}
 #endif
-	if (buffer[0] == '\0')
+	if (buffer == NULL || buffer[0] == '\0')
 		return -1;
 	count = filpinfo(buffer, info);
 	free(buffer);
