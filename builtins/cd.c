@@ -24,7 +24,6 @@
 
 static int create_new_pwd(char **cd_dir)
 {
-	char *nowpwd = getenv("PWD");
 	if (!cd_dir || !(*cd_dir))
 		return 1;
 	if ((*cd_dir)[0] == '/') /* cd_dir is an abs path */
@@ -88,7 +87,6 @@ static int create_new_pwd(char **cd_dir)
 int builtin_cd(ARGS)
 {
 	char *cd_path = NULL;
-	char *oldpwd = getenv("PWD");
 	if (b_parameters[1] == NULL) /* 'cd', the same as cd $HOME */
 	{
 		char *homedir = getenv("HOME");
