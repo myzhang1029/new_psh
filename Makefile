@@ -1,6 +1,6 @@
 CC=gcc
 PREFIX=/usr/local
-FILES=run_backend.o main.o show.o input.o filpinfo.o exit.o builtins.o builtins/echo.o builtins/cd.o builtins/pwd.o builtins/history.o builtins/builtin.o
+FILES=run_backend.o main.o strncpy.o show.o input.o filpinfo.o exit.o builtins.o builtins/echo.o builtins/cd.o builtins/pwd.o builtins/history.o builtins/builtin.o
 CFLAGS=-W -Wall -std=c89 -I.
 
 psh: pshell.h builtins/builtin.h $(FILES) 

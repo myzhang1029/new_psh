@@ -38,7 +38,8 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
-#define PSH_VERSION "0.11.6"
+#define strncpy p_sstrncpy
+#define PSH_VERSION "0.11.7"
 
 #define BACKGROUND 0x01		 /*cmd&*/
 #define IN_REDIRECT 0x02	 /*cmd<f*/
@@ -65,8 +66,8 @@ extern char *argv0;
 void type_prompt(char *);
 int read_command(char *prompt, struct parse_info *info);
 int run_builtin(struct parse_info *info);
-void free_parse_info(struct parse_info *info);
 int filpinfo(char *buffer, struct parse_info *info);
+size_t p_sstrncpy(char *dst, const char *src, size_t size);
 int new_parse_info(struct parse_info **info);
 void free_parse_info(struct parse_info *info);
 void exit_psh(int status);
