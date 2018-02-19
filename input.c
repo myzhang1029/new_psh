@@ -63,7 +63,13 @@ int read_command(char *prompt, struct parse_info *info)
 			free(expans);
 			return -2;
 		}
-		strncpy(buffer, expans, MAXLINE);
+#ifdef NO_READLINE
+		/* mallocked by malloc */
+		strncpy(buffer, expans, MAXLINE-1);
+#else
+		/* mallocked by readline */
+		strncpy(buffer, expans, strlen(buffer));
+#endif
 		free(expans);
 		add_history(buffer);
 	}
