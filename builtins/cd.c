@@ -125,7 +125,7 @@ int builtin_cd(ARGS)
 	}
 	else
 	{
-		cd_path = malloc(strlen(b_parameters[1] + 1));
+		cd_path = malloc(strlen(b_parameters[1]) + 1);
 		if (cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", b_command,
