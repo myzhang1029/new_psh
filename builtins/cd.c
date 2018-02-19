@@ -132,7 +132,7 @@ int builtin_cd(ARGS)
 			      strerror(errno));
 			return 2;
 		}
-		strcpy(cd_path, b_parameters[1]);
+		strncpy(cd_path, b_parameters[1], strlen(b_parameters[1]));
 	}
 
 	create_new_pwd(&cd_path);
