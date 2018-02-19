@@ -43,6 +43,11 @@ int builtin_history(ARGS)
 		char *filename = malloc(sizeof(char) * MAXEACHARG);
 		struct option longopts[] = {{"help", no_argument, NULL, 'h'},
 					    {NULL, 0, NULL, 0}};
+		if(!filename)
+		{
+			OUT2E("%s: %s: malloc failed\n", argv0, b_command);
+			return 2;
+		}
 
 		/*Get argc for getopt*/
 		for (count = 0; b_parameters[count]; count++)
@@ -68,6 +73,7 @@ int builtin_history(ARGS)
 						      "than one of -anrw\n",
 						      argv0, b_command);
 						USAGE();
+						free(filename);
 						return 2;
 					}
 					flags |= RFLAG;
@@ -84,6 +90,7 @@ int builtin_history(ARGS)
 						      "than one of -anrw\n",
 						      argv0, b_command);
 						USAGE();
+						free(filename);
 						return 2;
 					}
 					if (optarg)
@@ -101,6 +108,7 @@ int builtin_history(ARGS)
 						      "than one of -anrw\n",
 						      argv0, b_command);
 						USAGE();
+						free(filename);
 						return 2;
 					}
 					if (optarg)
@@ -127,6 +135,7 @@ int builtin_history(ARGS)
 						OUT2E("%s: %s: %d: invalid "
 						      "option\n",
 						      argv0, b_command, n);
+						free(filename);
 						return 2;
 					}
 					if (!n)
@@ -156,6 +165,7 @@ int builtin_history(ARGS)
 								    b_command,
 								    b_parameters
 									[count]);
+								free(filename);
 								return 2;
 							}
 					}
@@ -163,11 +173,13 @@ int builtin_history(ARGS)
 				case '?':
 					OUT2E("%s: %s: invalid option '-%c'\n",
 					      argv0, b_command, optopt);
+					free(filename);
 					return 2;
 				case ':':
 					OUT2E("%s: %s: -d: option requires an "
 					      "argument\n",
 					      argv0, b_command);
+					free(filename);
 					return 2;
 			}
 		}
