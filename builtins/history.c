@@ -172,7 +172,15 @@ int builtin_history(ARGS)
 			}
 		}
 		if (flags == 0)
+		{
+			free(filename);
 			goto noopts;
+		}
+		else
+		{
+			/* TODO:Code here */
+			free(filename);
+		}
 	}
 	else
 	noopts:
