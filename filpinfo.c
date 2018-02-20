@@ -129,7 +129,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 			retcount++;                                            \
 	} while (0)
 
-#define escape (buffer[count - 1] == '\\')
+#define escape (count!=0 && buffer[count - 1] == '\\')
 #define ignore (isInDoubleQuote == 1 || isInSingleQuote == 1 || escape)
 	/*
 		escape: determine whether the last character is '\\'
