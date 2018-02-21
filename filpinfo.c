@@ -278,6 +278,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 #else
 							cmdand_buf =
 							    readline("> ");
+							buffer = realloc(buffer, strlen(buffer) + strlen(cmdand_buf) +1 /* \0 */);
 #endif
 							strncat(buffer,
 								cmdand_buf,
@@ -322,6 +323,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 #else
 							cmdor_buf =
 							    readline("> ");
+							buffer = realloc(buffer, strlen(buffer) + strlen(cmdor_buf) +1 /* \0 */);
 #endif
 							strncat(
 							    buffer, cmdor_buf,
@@ -344,6 +346,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 #else
 							pipe_buf =
 							    readline("> ");
+							buffer = realloc(buffer, strlen(buffer) + strlen(pipe_buf) +1 /* \0 */);
 #endif
 							strncat(buffer,
 								pipe_buf,
