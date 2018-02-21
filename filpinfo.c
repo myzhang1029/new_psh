@@ -68,7 +68,7 @@ static int ignore_IFSs(char *buffer, int count)
 		if (buffer[count] != ' ' &&
 		buffer[count] != '\t')
 			return --count;
-	}while (++count);
+	}while(++count);
 	return -6;/* Reaching here impossible */
 }
 	
@@ -126,6 +126,15 @@ int filpinfo(char *buffer, struct parse_info *info)
 		count=tmp;\
 	}while(0)
 
+#define ignIFS_from_next_char() \
+	do\
+	{\
+		int tmp;\
+		if((tmp=ignore_IFSs(buffer, ++count))==-5)\
+			goto done;\
+		count=tmp;\
+	}while(0)
+
 #define malloc_one(n)                                                          \
 	(getpos(info, pos)->parameters[n]) =                                   \
 	    malloc(sizeof(char) * MAXEACHARG);                                 \
@@ -164,6 +173,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 	int len = strlen(buffer);
 	int pos = 1;
 	int count = 0, parametercount = 0, paracount = 0, retcount = 0;
+	int oldpc = 0;
 	/*
 		count: count for buffer
 		parametercount: count for current parameter element
@@ -230,6 +240,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 					ignIFS();
 					write_char(0);
 					paracount++;
+					oldpc=parametercount;
 					parametercount = 0;
 					malloc_one(paracount);
 				}
@@ -239,19 +250,27 @@ int filpinfo(char *buffer, struct parse_info *info)
 					write_current();
 				else
 				{
-					if (buffer[count + 1] ==
-					    0) /* End of input */
-						info->flag |= BACKGROUND;
+					if(parametercount == 0)/* Previously a blank reached */
+					{
+						parametercount=oldpc;
+						free(getpos(info, pos)->parameters[paracount]);
+						getpos(info, pos)->parameters[paracount] = NULL;
+						paracount--;
+					}
+					if (ignore_IFSs(buffer, count + 1/* the char after & */) == -5)/* EOL */
+					{
+						/* done */ 
+						info->flag |= BACKGROUND;/* cmd & \0 */
+						goto done;
+					}
 					else if (buffer[count + 1] == '&')
 					{
+						new_parse_info(&(getpos(info, pos)->next));
 						info->flag |= RUN_AND;
-						if (buffer[count + 2] == 0)
+						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */
 						{
 							char *cmdand_buf =
 							    malloc(MAXLINE);
-							new_parse_info(
-							    &(getpos(info, pos)
-								  ->next));
 #ifdef NO_READLINE
 							printf("> ");
 							fgets(cmdand_buf,
@@ -269,14 +288,13 @@ int filpinfo(char *buffer, struct parse_info *info)
 					}
 					else
 					{
+						new_parse_info(&(getpos(info, pos)->next));
 						info->flag |= BACKGROUND;
-
-						new_parse_info(
-						    &(getpos(info, pos)->next));
 					}
 					pos++;
 					paracount = 0;
 					parametercount = 0;
+					ignIFS_from_next_char();
 				}
 				break;
 			case '|':
@@ -284,16 +302,19 @@ int filpinfo(char *buffer, struct parse_info *info)
 					write_current();
 				else
 				{
+					if(parametercount == 0)/* Previously a blank reached */
+					{
+						parametercount=oldpc;
+						free(getpos(info, pos)->parameters[paracount]);
+						getpos(info, pos)->parameters[paracount] = NULL;
+					}
+					new_parse_info(&(getpos(info, pos)->next));
 					if (buffer[count + 1] == '|')
 					{
 						info->flag |= RUN_OR;
-						if (buffer[count + 2] == 0)
+						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */ 
 						{
-							char *cmdor_buf =
-							    malloc(MAXLINE);
-							new_parse_info(
-							    &(getpos(info, pos)
-								  ->next));
+							char *cmdor_buf;
 #ifdef NO_READLINE
 							printf("> ");
 							fgets(cmdor_buf,
@@ -312,14 +333,11 @@ int filpinfo(char *buffer, struct parse_info *info)
 					else
 					{
 						info->flag |= IS_PIPED;
-						if (buffer[count + 1] == 0)
+						if (ignore_IFSs(buffer, count + 2/* the char after | */) == -5)/* EOL */
 						{
-							char *pipe_buf =
-							    malloc(MAXLINE);
-							new_parse_info(
-							    &(getpos(info, pos)
-								  ->next));
+							char *pipe_buf;
 #ifdef NO_READLINE
+							pipe_buf = malloc(MAXLINE);
 							printf("> ");
 							fgets(pipe_buf, MAXLINE,
 							      stdin);
@@ -337,6 +355,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 					pos++;
 					paracount = 0;
 					parametercount = 0;
+					ignIFS_from_next_char();
 				}
 				break;
 			case '~': /* This feature stable */
