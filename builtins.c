@@ -39,10 +39,10 @@ int run_builtin(struct parse_info *info)
 	}
 	else if (cmdis("getstat"))
 		return printf("%d\n", last_command_status), 1;
-	else if (cmdis("true"))
-		return (last_command_status = 0), 1;
+	else if (cmdis("true") || cmdis(":"))
+		return 1;
 	else if (cmdis("false"))
-		return (last_command_status = 1);
+		return 2;
 	else if (cmdis("about"))
 	{
 		printf("psh is a not fully implemented shell in UNIX.\n");
@@ -58,8 +58,6 @@ int run_builtin(struct parse_info *info)
 		return builtin_pwd(info);
 	else if (cmdis("history"))
 		return builtin_history(info);
-	else if (cmdis(":"))
-		return 1;
 	else if (cmdis("builtin"))
 		return builtin_builtin(info);
 	else if (cmdis("export") || cmdis("alias"))
