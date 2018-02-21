@@ -38,8 +38,9 @@
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
+#undef strncpy
 #define strncpy p_sstrncpy
-#define PSH_VERSION "0.11.12"
+#define PSH_VERSION "0.11.13"
 
 #define BACKGROUND 0x01		 /*cmd&*/
 #define IN_REDIRECT 0x02	 /*cmd<f*/
