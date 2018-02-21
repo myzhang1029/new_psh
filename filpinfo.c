@@ -58,6 +58,21 @@ static void free_parameters(struct parse_info *info)
 	info->parameters = NULL;
 }
 
+/* Get the index of the last char in the buffer */
+static int ignore_IFSs(char *buffer, int count)
+{
+	do
+	{
+		if (!buffer[count])/* EOL */
+			return -5;
+		if (buffer[count] != ' ' &&
+		buffer[count] != '\t')
+			return --count;
+	}while (++count);
+	return -6;/* Reaching here impossible */
+}
+	
+
 /* Malloc a parse_info, enNULL all elements, malloc the first parameter[] */
 int new_parse_info(struct parse_info **info)
 {
@@ -102,6 +117,15 @@ void free_parse_info(struct parse_info *info)
 /* Malloc and fill a parse_info with a buffer, return characters processed */
 int filpinfo(char *buffer, struct parse_info *info)
 {
+#define ignIFS() \
+	do\
+	{\
+		int tmp;\
+		if((tmp=ignore_IFSs(buffer, count))==-5)\
+			goto done;\
+		count=tmp;\
+	}while(0)
+
 #define malloc_one(n)                                                          \
 	(getpos(info, pos)->parameters[n]) =                                   \
 	    malloc(sizeof(char) * MAXEACHARG);                                 \
@@ -153,6 +177,8 @@ int filpinfo(char *buffer, struct parse_info *info)
 		OUT2E("%s: filpinfo: info is NULL\n", argv0);
 		return -1;
 	}
+	ignIFS();
+	++count;
 	/* The input parse_info should be initialized */
 	for (; count < len; ++count)
 	{
@@ -201,17 +227,11 @@ int filpinfo(char *buffer, struct parse_info *info)
 					write_current();
 				else
 				{
+					ignIFS();
 					write_char(0);
 					paracount++;
 					parametercount = 0;
 					malloc_one(paracount);
-					while (++count)
-						if (buffer[count] != ' ' &&
-						    buffer[count] != '\t')
-						{
-							--count;
-							break;
-						}
 				}
 				break;
 			case '&':
@@ -454,6 +474,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 				write_current();
 		}
 	}
+done:
 	write_char(0);
 	return retcount;
 }
