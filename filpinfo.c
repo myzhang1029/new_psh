@@ -273,9 +273,9 @@ int filpinfo(char *buffer, struct command *info)
 						info->flag |= RUN_AND;
 						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */
 						{
-							char *cmdand_buf =
-							    malloc(MAXLINE);
+							char *cmdand_buf;
 #ifdef NO_READLINE
+							cmdand_buf = malloc(MAXLINE);
 							printf("> ");
 							fgets(cmdand_buf,
 							      MAXLINE, stdin);
@@ -333,6 +333,7 @@ int filpinfo(char *buffer, struct command *info)
 						{
 							char *cmdor_buf;
 #ifdef NO_READLINE
+							cmdor_buf = malloc(MAXLINE);
 							printf("> ");
 							fgets(cmdor_buf,
 							      MAXLINE, stdin);
