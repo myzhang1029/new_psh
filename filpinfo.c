@@ -264,7 +264,12 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else if (buffer[count + 1] == '&')
 					{
-						new_command(&(getpos(info, pos)->next));
+						if(new_command(&(getpos(info, pos)->next)) == -1)
+						{
+							OUT2E("%s: filpinfo: malloc failed\n", argv0);
+							retcount = -1;
+							goto done;
+						}
 						info->flag |= RUN_AND;
 						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */
 						{
@@ -288,7 +293,13 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else
 					{
-						new_command(&(getpos(info, pos)->next));
+						if(new_command(&(getpos(info, pos)->next)) == -1)
+						{
+							/* malloc failed, cleanup */
+							OUT2E("%s: filpinfo: malloc failed\n", argv0);
+							retcount = -1;
+							goto done;
+						}
 						info->flag |= BACKGROUND;
 					}
 					pos++;
@@ -308,7 +319,13 @@ int filpinfo(char *buffer, struct command *info)
 						free(getpos(info, pos)->parameters[paracount]);
 						getpos(info, pos)->parameters[paracount] = NULL;
 					}
-					new_command(&(getpos(info, pos)->next));
+					if(new_command(&(getpos(info, pos)->next)) == -1)
+					{
+						/* malloc failed, cleanup */
+						OUT2E("%s: filpinfo: malloc failed\n", argv0);
+						retcount = -1;
+						goto done;
+					}
 					if (buffer[count + 1] == '|')
 					{
 						info->flag |= RUN_OR;
