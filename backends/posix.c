@@ -120,8 +120,47 @@ int pshgetuid(void) { return geteuid(); }
 
 int pshchdir(char *dir) { return chdir(dir); }
 
-int do_run(struct command *info)
+static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char **env)
 {
+	pid_t pid;
+	struct redirect *info = arginfo;
+	if ((pid = fork()) == 0)
+	{
+		while(info)
+		{
+			switch(info->type)
+			{
+				case FD2FD:
+					dup2(info->in.fd, info->out.fd);
+					close(info->in.fd);
+					break;
+				case FD2FN:
+				case FN2FD:
+				case FN2FN:
+				case CLOSEFD:
+				case OPENFN:
+					break;
+			}
+			info = info->next;
+		}
+		execve(cmd, argv, env);
+	}
+
+	return pid;
+}
+
+int do_run(struct command *arginfo)
+{
+	struct command *info = arginfo;
+	while(1)
+	{
+		if(info->flag & IS_PIPED)
+			if (pipe(pipe_fd) < 0)
+			{
+				OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
+				exit_psh(1);
+			}
+	}
 	if (info->flag & IS_PIPED) /*command is not null*/
 	{
 		if (pipe(pipe_fd) < 0)
