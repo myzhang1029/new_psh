@@ -27,7 +27,7 @@ extern int last_command_status;
   0 represents only command without any parameters
   -1 represents wrong input*/
 
-int read_command(char *prompt, struct parse_info *info)
+int read_command(char *prompt, struct command *info)
 {
 	int count;
 	char *buffer;

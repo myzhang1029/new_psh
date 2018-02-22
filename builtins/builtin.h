@@ -18,7 +18,7 @@
 
 #include "../pshell.h"
 
-#define ARGS struct parse_info *info
+#define ARGS struct command *info
 #define b_command (info->parameters[0])
 #define b_parameters (info->parameters)
 

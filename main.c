@@ -30,7 +30,7 @@ char *argv0;
 void proc(void)
 {
 	char prompt[MAX_PROMPT];
-	struct parse_info *info;
+	struct command *info;
 	prepare();
 #ifndef NO_HISTORY
 	using_history();
@@ -39,7 +39,7 @@ void proc(void)
 		printf("\n");
 	while (1)
 	{
-		if (new_parse_info(&info) == -1)
+		if (new_command(&info) == -1)
 		{
 			OUT2E("%s: malloc failed\n", argv0);
 			longjmp(reset_point, 1);
@@ -60,7 +60,7 @@ void proc(void)
 				do_run(info);
 				break;
 		}
-		free_parse_info(info);
+		free_command(info);
 	}
 }
 

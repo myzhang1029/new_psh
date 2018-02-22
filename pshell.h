@@ -40,7 +40,7 @@
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 #undef strncpy
 #define strncpy p_sstrncpy
-#define PSH_VERSION "0.11.14"
+#define PSH_VERSION "0.12.0"
 
 #define BACKGROUND 0x01		 /*cmd&*/
 #define IN_REDIRECT 0x02	 /*cmd<f*/
@@ -51,25 +51,35 @@
 #define RUN_OR 0x40		 /*cmd||cmd*/
 #define HEREDOC 0x80		 /*cmd<<id*/
 
-struct parse_info
+struct command
 {
 	int flag;
-	int redirfd_from;
-	int redirfd_to;
-	char *in_file;
-	char *out_file;
+	struct redirect
+	{
+		union in
+		{
+			int fd;
+			char *file;
+		}in;
+		union out
+		{
+			int fd;
+			char *file;
+		}out;
+		struct redirect *next;
+	}*rlist;
 	char **parameters; /*argv*/
-	struct parse_info *next;
+	struct command *next;
 };
 
 extern char *argv0;
 
 void type_prompt(char *);
-int read_command(char *prompt, struct parse_info *info);
-int run_builtin(struct parse_info *info);
-int filpinfo(char *buffer, struct parse_info *info);
+int read_command(char *prompt, struct command *info);
+int run_builtin(struct command *info);
+int filpinfo(char *buffer, struct command *info);
 size_t p_sstrncpy(char *dst, const char *src, size_t size);
-int new_parse_info(struct parse_info **info);
-void free_parse_info(struct parse_info *info);
+int new_command(struct command **info);
+void free_command(struct command *info);
 void exit_psh(int status);
 #endif

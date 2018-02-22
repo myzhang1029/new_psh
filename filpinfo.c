@@ -1,6 +1,6 @@
 /*
   filpinfo - function to fill parse info(merges original preprocesser, splitbuf,
-  parser) and some other functions for parse_info magaging
+  parser) and some other functions for command magaging
 
    Copyright 2017 Zhang Maiyun.
 
@@ -21,27 +21,26 @@
 #include "backends/backend.h"
 #include "pshell.h"
 
-static int parse_info_init(struct parse_info *info)
+static int command_init(struct command *info)
 {
 	info->flag = 0;
-	info->in_file = NULL;
-	info->out_file = NULL;
+	info->rlist = NULL;
 	info->parameters = NULL;
 	info->next = NULL;
 	return 0;
 }
 
-/* Returns the nth next of the parse_info base, n begins with 1 */
-static struct parse_info *getpos(struct parse_info *base, int n)
+/* Returns the nth next of the command base, n begins with 1 */
+static struct command *getpos(struct command *base, int n)
 {
 	int count;
-	struct parse_info *info = base;
+	struct command *info = base;
 	for (count = 1; count < n; ++count)
 		info = info->next;
 	return info;
 }
 
-static void free_parameters(struct parse_info *info)
+static void free_parameters(struct command *info)
 {
 	int count;
 	for (count = 0; count < MAXARG; ++count)
@@ -73,13 +72,13 @@ static int ignore_IFSs(char *buffer, int count)
 }
 	
 
-/* Malloc a parse_info, enNULL all elements, malloc the first parameter[] */
-int new_parse_info(struct parse_info **info)
+/* Malloc a command, enNULL all elements, malloc the first parameter[] */
+int new_command(struct command **info)
 {
-	*info = malloc(sizeof(struct parse_info));
+	*info = malloc(sizeof(struct command));
 	if ((*info) == NULL)
 		return -1;
-	parse_info_init(*info);
+	command_init(*info);
 	(*info)->parameters = malloc(sizeof(char *) * MAXARG);
 	if ((*info)->parameters == NULL)
 	{
@@ -100,10 +99,10 @@ int new_parse_info(struct parse_info **info)
 	return 0;
 }
 
-/* Free a parse_info and its nexts */
-void free_parse_info(struct parse_info *info)
+/* Free a command and its nexts */
+void free_command(struct command *info)
 {
-	struct parse_info *temp;
+	struct command *temp;
 	while (info != NULL)
 	{
 		temp = info;
@@ -114,8 +113,8 @@ void free_parse_info(struct parse_info *info)
 	}
 }
 
-/* Malloc and fill a parse_info with a buffer, return characters processed */
-int filpinfo(char *buffer, struct parse_info *info)
+/* Malloc and fill a command with a buffer, return characters processed */
+int filpinfo(char *buffer, struct command *info)
 {
 #define ignIFS() \
 	do\
@@ -140,7 +139,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 	    malloc(sizeof(char) * MAXEACHARG);                                 \
 	memset(getpos(info, pos)->parameters[n], 0, MAXEACHARG)
 
-/* Write the current char in buffer to current parse_info, increase retcount
+/* Write the current char in buffer to current command, increase retcount
  * only if current not blank or 0 */
 #define write_current()                                                        \
 	do                                                                     \
@@ -152,7 +151,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 			retcount++;                                            \
 	} /* Make the semicolon happy */ while (0)
 
-/* Write any char to current parse_info, increase retcount only if c != 0 */
+/* Write any char to current command, increase retcount only if c != 0 */
 #define write_char(c)                                                          \
 	do                                                                     \
 	{                                                                      \
@@ -178,7 +177,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 		count: count for buffer
 		parametercount: count for current parameter element
 		paracount: count representing how many elements are there in
-	   parameter retcount: characters actually wrote to the parse_info,
+	   parameter retcount: characters actually wrote to the command,
 	   returned
 	*/
 	int isInSingleQuote = 0, isInDoubleQuote = 0;
@@ -189,7 +188,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 	}
 	ignIFS();
 	++count;
-	/* The input parse_info should be initialized */
+	/* The input command should be initialized */
 	for (; count < len; ++count)
 	{
 		switch (buffer[count])
@@ -265,7 +264,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 					}
 					else if (buffer[count + 1] == '&')
 					{
-						new_parse_info(&(getpos(info, pos)->next));
+						new_command(&(getpos(info, pos)->next));
 						info->flag |= RUN_AND;
 						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */
 						{
@@ -289,7 +288,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 					}
 					else
 					{
-						new_parse_info(&(getpos(info, pos)->next));
+						new_command(&(getpos(info, pos)->next));
 						info->flag |= BACKGROUND;
 					}
 					pos++;
@@ -309,7 +308,7 @@ int filpinfo(char *buffer, struct parse_info *info)
 						free(getpos(info, pos)->parameters[paracount]);
 						getpos(info, pos)->parameters[paracount] = NULL;
 					}
-					new_parse_info(&(getpos(info, pos)->next));
+					new_command(&(getpos(info, pos)->next));
 					if (buffer[count + 1] == '|')
 					{
 						info->flag |= RUN_OR;

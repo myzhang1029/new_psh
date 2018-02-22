@@ -23,7 +23,7 @@
 
 extern int last_command_status;
 
-int run_builtin(struct parse_info *info)
+int run_builtin(struct command *info)
 {
 	if (cmdis("exit") || cmdis("quit"))
 	{

@@ -120,7 +120,7 @@ int pshgetuid(void) { return geteuid(); }
 
 int pshchdir(char *dir) { return chdir(dir); }
 
-int do_run(struct parse_info *info)
+int do_run(struct command *info)
 {
 	if (info->flag & IS_PIPED) /*command is not null*/
 	{
@@ -191,20 +191,6 @@ int do_run(struct parse_info *info)
 			}
 			else /*OUT_REDIRECT and PIPED*/
 			{
-				close(pipe_fd[0]);
-				close(pipe_fd[1]); /*send a EOF to command*/
-				if (info->flag & OUT_REDIRECT)
-					out_fd = open(
-					    info->out_file,
-					    O_WRONLY | O_CREAT | O_TRUNC, 0666);
-				else
-					out_fd =
-					    open(info->out_file,
-						 O_WRONLY | O_APPEND | O_TRUNC,
-						 0666);
-				close(fileno(stdout));
-				dup2(out_fd, fileno(stdout));
-				close(out_fd);
 			}
 		}
 		else
@@ -212,32 +198,16 @@ int do_run(struct parse_info *info)
 			if (info->flag &
 			    OUT_REDIRECT) /* OUT_REDIRECT WITHOUT PIPE*/
 			{
-				out_fd =
-				    open(info->out_file,
-					 O_WRONLY | O_CREAT | O_TRUNC, 0666);
-				close(fileno(stdout));
-				dup2(out_fd, fileno(stdout));
-				close(out_fd);
 			}
 			if (info->flag &
 			    OUT_REDIRECT_APPEND) /* OUT_REDIRECT_APPEND WITHOUT
 						    PIPE*/
 			{
-				out_fd =
-				    open(info->out_file,
-					 O_WRONLY | O_CREAT | O_APPEND, 0666);
-				close(fileno(stdout));
-				dup2(out_fd, fileno(stdout));
-				close(out_fd);
 			}
 		}
 
 		if (info->flag & IN_REDIRECT)
 		{
-			in_fd = open(info->in_file, O_CREAT | O_RDONLY, 0666);
-			close(fileno(stdin));
-			dup2(in_fd, fileno(stdin));
-			close(in_fd);
 		}
 		if (execvp(info->parameters[0], (char **)info->parameters) ==
 		    -1)

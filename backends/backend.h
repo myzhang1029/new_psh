@@ -27,6 +27,6 @@ char *gethdnam(char *);
 char *getun(void);
 char *pshgetcwd(void);
 int pshgethostname(char *, size_t);
-int do_run(struct parse_info *info);
+int do_run(struct command *info);
 int pshgetuid(void);
 int pshchdir(char *);
