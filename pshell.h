@@ -56,12 +56,22 @@ struct command
 	int flag;
 	struct redirect
 	{
-		union in
+		enum redir_type
+		{
+			FD2FD = 0, /* fd to fd, n>&n; n<&n */
+			FD2FN, /* fd to filename, 
+			n>name; n<name; &>name;  */
+			FN2FD, /* filename to fd */
+			FN2FN, /* filename to filename */
+			CLOSEFD, /* n>&-; n<&- */
+			OPENFN /* n<>name */
+		}type;
+		union in /* file that redirect from */
 		{
 			int fd;
 			char *file;
 		}in;
-		union out
+		union out /* file than redirect to */
 		{
 			int fd;
 			char *file;
