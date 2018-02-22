@@ -113,7 +113,7 @@ void free_command(struct command *info)
 	}
 }
 
-/* Malloc and fill a command with a buffer, return characters processed */
+/* Malloc and fill a command with a buffer, free() buffer, return characters processed */
 int filpinfo(char *buffer, struct command *info)
 {
 #define ignIFS() \
@@ -515,5 +515,6 @@ int filpinfo(char *buffer, struct command *info)
 	}
 done:
 	write_char(0);
+	free(buffer);
 	return retcount;
 }

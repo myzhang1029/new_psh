@@ -77,6 +77,5 @@ int read_command(char *prompt, struct command *info)
 	if (buffer == NULL || buffer[0] == '\0')
 		return -1;
 	count = filpinfo(buffer, info);
-	free(buffer);
 	return count;
 }
