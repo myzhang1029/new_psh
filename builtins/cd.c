@@ -28,37 +28,45 @@ static int create_new_pwd(char **cd_dir)
 		return 1;
 	if ((*cd_dir)[0] == '/') /* cd_dir is an abs path */
 	{
-		if (strstr((*cd_dir), "..") == NULL)
+		char *delim;
+		while((delim = strstr((*cd_dir), "/.")))
 		{
-			if (strstr((*cd_dir), ".") == NULL)
-				/* cd_dir did not contain a .. or . */
-				return 0;
-			else
-			/* have . but no .. */
+			if(*(delim+2) == 0)/* /. */
 			{
-				char *delim;
-				while (1)
-				{
-					delim = strstr((*cd_dir), ".");
-					if (!delim)
-						return 0; /* All set */
-					/* NOTE: Must reach here. */
-					if (!(delim + 1)) /* after '.' is EOL */
-						*delim =
-						    0; /* Just remove '.' */
-					else if (*(delim + 1) !=
-						 '/')     /* Not the thing we're
-							     looking for */
-						continue; /* ignore */
-					else
-						memmove(delim, delim + 2,
-							strlen(delim + 2) +
-							    1 /*\0*/);
-					/* Move forward the string to remove ./
-					 */
-				}
+				*delim = 0;
 			}
-		}
+			else if(*(delim+2) == '/')/* /./ */
+			{
+				memmove(delim, delim+2, strlen(delim+2)+1);
+			}
+			else if(delim == *cd_dir)/* root/.. */
+			{
+				if(*(delim+3) == 0)
+					*(delim+1) =0;
+				else
+					memmove(delim, delim+3, strlen(delim+3)+1);
+			}
+			else if(*(delim+3) == 0) /* /..\0 */
+			{
+				char *lastnode;
+				*delim = 0;/* Terminate the string at the current / */
+				
+				lastnode = strrchr(*cd_dir, '/');
+				if(lastnode == *cd_dir)/* Root node reached */
+					*(lastnode+1) = 0;
+				else
+					*lastnode = 0;/* Then terminate the string at the last / */
+			}
+			else /* /../ */
+			{
+				char oldval=*delim;
+				char *lastnode;
+				*delim = 0;
+				lastnode = strrchr(*cd_dir, '/');
+				*delim = oldval;
+				memmove(lastnode, delim+3, strlen(delim+3)+1);
+			}
+		}/* while */
 	}
 	else
 	{
