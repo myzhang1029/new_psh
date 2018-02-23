@@ -134,11 +134,20 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char 
 					dup2(info->in.fd, info->out.fd);
 					close(info->in.fd);
 					break;
-				case FD2FN:
-				case FN2FD:
-				case FN2FN:
+				case OUT_REDIR:
+					dup2(open(info->out.file, O_WRONLY | O_CREAT | O_TRUNC, 0644), info->in.fd);
+					break;
+				case OUT_APPN:
+					dup2(open(info->out.file, O_WRONLY | O_CREAT | O_APPEND, 0644), info->in.fd);
+					break;
+				case IN_REDIR:
+					dup2(open(info->in.file, O_RDONLY | O_CREAT, 0644), info->out.fd);
+					break;
 				case CLOSEFD:
+					close(info->in.fd);
+					break;
 				case OPENFN:
+					dup2(open(info->in.file, O_RDWR | O_CREAT, 0644), info->out.fd);
 					break;
 			}
 			info = info->next;
@@ -154,14 +163,14 @@ int do_run(struct command *arginfo)
 	struct command *info = arginfo;
 	while(1)
 	{
-		if(info->flag & IS_PIPED)
+		if(info->flag & PIPED)
 			if (pipe(pipe_fd) < 0)
 			{
 				OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
 				exit_psh(1);
 			}
 	}
-	if (info->flag & IS_PIPED) /*command is not null*/
+	if (info->flag & PIPED) /*command is not null*/
 	{
 		if (pipe(pipe_fd) < 0)
 		{
@@ -171,7 +180,7 @@ int do_run(struct command *arginfo)
 	}
 	if ((ChdPid = fork()) != 0) /*shell*/
 	{
-		if (info->flag & IS_PIPED)
+		if (info->flag & PIPED)
 		{
 			if ((ChdPid2 = fork()) == 0) /*command*/
 			{
@@ -191,7 +200,7 @@ int do_run(struct command *arginfo)
 			}
 		}
 
-		if (info->flag & BACKGROUND)
+		if (info->flag & BG_CMD)
 		{
 			int i;
 			for (i = 0; i < MAXPIDTABLE; i++)
@@ -218,36 +227,14 @@ int do_run(struct command *arginfo)
 	else /*command1*/
 	{
 
-		if (info->flag & IS_PIPED) /*command is not null*/
+		if (info->flag & PIPED) /*command is not null*/
 		{
-			if (!(info->flag & OUT_REDIRECT) &&
-			    !(info->flag & OUT_REDIRECT_APPEND)) /* ONLY PIPED*/
-			{
 				close(pipe_fd[0]);
 				close(fileno(stdout));
 				dup2(pipe_fd[1], fileno(stdout));
 				close(pipe_fd[1]);
-			}
-			else /*OUT_REDIRECT and PIPED*/
-			{
-			}
 		}
-		else
-		{
-			if (info->flag &
-			    OUT_REDIRECT) /* OUT_REDIRECT WITHOUT PIPE*/
-			{
-			}
-			if (info->flag &
-			    OUT_REDIRECT_APPEND) /* OUT_REDIRECT_APPEND WITHOUT
-						    PIPE*/
-			{
-			}
-		}
-
-		if (info->flag & IN_REDIRECT)
-		{
-		}
+		
 		if (execvp(info->parameters[0], (char **)info->parameters) ==
 		    -1)
 		{

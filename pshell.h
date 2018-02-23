@@ -42,27 +42,24 @@
 #define strncpy p_sstrncpy
 #define PSH_VERSION "0.12.4"
 
-#define BACKGROUND 0x01		 /*cmd&*/
-#define IN_REDIRECT 0x02	 /*cmd<f*/
-#define OUT_REDIRECT 0x04	/*cmd>f*/
-#define OUT_REDIRECT_APPEND 0x08 /*cmd>>f*/
-#define IS_PIPED 0x10		 /*cmd|cmd*/
-#define RUN_AND 0x20		 /*cmd&&cmd*/
-#define RUN_OR 0x40		 /*cmd||cmd*/
-#define HEREDOC 0x80		 /*cmd<<id*/
-
-struct command
+struct command /* Everything about a command */
 {
-	int flag;
+	enum flag
+	{
+		BG_CMD = 1,
+		PIPED,
+		RUN_AND,
+		RUN_OR
+	}flag;
 	struct redirect
 	{
 		enum redir_type
 		{
-			FD2FD = 0, /* fd to fd, n>&n; n<&n */
-			FD2FN, /* fd to filename, 
+			FD2FD = 1, /* fd to fd, n>&n; n<&n */
+			OUT_REDIR, /* fd to filename, 
 			n>name; n<name; &>name;  */
-			FN2FD, /* filename to fd */
-			FN2FN, /* filename to filename */
+			OUT_APPN,
+			IN_REDIR, /* filename to fd */
 			CLOSEFD, /* n>&-; n<&- */
 			OPENFN /* n<>name */
 		}type;
@@ -91,5 +88,6 @@ int filpinfo(char *buffer, struct command *info);
 size_t p_sstrncpy(char *dst, const char *src, size_t size);
 int new_command(struct command **info);
 void free_command(struct command *info);
+void code_fault(char *file, int line);
 void exit_psh(int status);
 #endif

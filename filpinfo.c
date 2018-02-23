@@ -21,13 +21,22 @@
 #include "backends/backend.h"
 #include "pshell.h"
 
-static int command_init(struct command *info)
+static void command_init(struct command *info)
 {
 	info->flag = 0;
 	info->rlist = NULL;
 	info->parameters = NULL;
 	info->next = NULL;
-	return 0;
+}
+
+static void redirect_init(struct redirect *redir)
+{
+	redir->in.fd = 0;
+	redir->in.file = NULL;
+	redir->out.fd = 0;
+	redir->out.file = NULL;
+	redir->type = 0;
+	redir->next = NULL;
 }
 
 /* Returns the nth next of the command base, n begins with 1 */
@@ -57,6 +66,18 @@ static void free_parameters(struct command *info)
 	info->parameters = NULL;
 }
 
+static void free_redirect(struct redirect *redir)
+{
+	struct redirect *temp;
+	while (redir != NULL)
+	{
+		temp = redir;
+		redir = redir->next;
+		free(temp);
+		temp = NULL;
+	}
+}
+
 /* Get the index of the last char in the buffer */
 static int ignore_IFSs(char *buffer, int count)
 {
@@ -72,7 +93,7 @@ static int ignore_IFSs(char *buffer, int count)
 }
 	
 
-/* Malloc a command, enNULL all elements, malloc the first parameter[] */
+/* Malloc a command, enNULL all elements, malloc the first parameter[] and a struct redirect */
 int new_command(struct command **info)
 {
 	*info = malloc(sizeof(struct command));
@@ -87,7 +108,7 @@ int new_command(struct command **info)
 	}
 	memset((*info)->parameters, 0,
 	       MAXARG); /* This will be used to detect whether an element is
-			   used or not */
+			   used */
 	(*info)->parameters[0] = malloc(sizeof(char) * MAXEACHARG);
 	if ((*info)->parameters[0] == NULL)
 	{
@@ -96,6 +117,8 @@ int new_command(struct command **info)
 		return -1;
 	}
 	memset((*info)->parameters[0], 0, MAXEACHARG);
+	(*info)->rlist = malloc(sizeof(struct redirect));
+	redirect_init((*info)->rlist);
 	return 0;
 }
 
@@ -108,6 +131,7 @@ void free_command(struct command *info)
 		temp = info;
 		info = info->next;
 		free_parameters(temp);
+		free_redirect(info->rlist);
 		free(temp);
 		temp = NULL;
 	}
@@ -258,8 +282,14 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					if (ignore_IFSs(buffer, count + 1/* the char after & */) == -5)/* EOL */
 					{
-						/* done */ 
-						info->flag |= BACKGROUND;/* cmd & \0 */
+						/* done */
+						if(info->flag == 0)
+							info->flag = BG_CMD;/* cmd & \0 */
+						else
+						{
+							OUT2E("%s: syntax error near unexpected token `&'\n", argv0);
+							retcount = -2;
+						}
 						goto done;
 					}
 					else if (buffer[count + 1] == '&')
@@ -270,7 +300,14 @@ int filpinfo(char *buffer, struct command *info)
 							retcount = -1;
 							goto done;
 						}
-						info->flag |= RUN_AND;
+						if(info->flag == 0)
+							info->flag = RUN_AND;
+						else
+						{
+							OUT2E("%s: syntax error near unexpected token `&&'\n", argv0);
+							retcount = -2;
+							goto done;
+						}
 						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */
 						{
 							char *cmdand_buf;
@@ -300,7 +337,14 @@ int filpinfo(char *buffer, struct command *info)
 							retcount = -1;
 							goto done;
 						}
-						info->flag |= BACKGROUND;
+						if(info->flag == 0)
+							info->flag = BG_CMD;
+						else
+						{
+							OUT2E("%s: syntax error near unexpected token `&'\n", argv0);
+							retcount = -2;
+							goto done;
+						}
 					}
 					pos++;
 					paracount = 0;
@@ -328,7 +372,13 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					if (buffer[count + 1] == '|')
 					{
-						info->flag |= RUN_OR;
+						if(info->flag == 0)
+							info->flag = RUN_OR;
+						else
+						{
+							OUT2E("%s: syntax error near unexpected token `||'\n", argv0);
+							retcount = -2;
+						}
 						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */ 
 						{
 							char *cmdor_buf;
@@ -351,7 +401,13 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else
 					{
-						info->flag |= IS_PIPED;
+						if(info->flag == 0)
+							info->flag = PIPED;
+						else
+						{
+							OUT2E("%s: syntax error near unexpected token `|'\n", argv0);
+							retcount = -2;
+						}
 						if (ignore_IFSs(buffer, count + 2/* the char after | */) == -5)/* EOL */
 						{
 							char *pipe_buf;

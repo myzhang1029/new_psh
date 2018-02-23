@@ -19,6 +19,14 @@
 
 #include "pshell.h"
 
+void code_fault(char *file, int line)
+{
+	OUT2E("%s: Programming error at %s: %d\n", argv0, file, line);
+	OUT2E("Shell version: %s", PSH_VERSION);
+	OUT2E("Please create a GitHub Issue with above info\n");
+	exit_psh(1);
+}
+
 void exit_psh(int status)
 {
 	free(argv0);
