@@ -40,7 +40,7 @@
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 #undef strncpy
 #define strncpy p_sstrncpy
-#define PSH_VERSION "0.12.5"
+#define PSH_VERSION "0.12.6"
 
 struct command /* Everything about a command */
 {

@@ -572,7 +572,8 @@ int filpinfo(char *buffer, struct command *info)
 		}
 	}
 done:
-	write_char(0);
+	if(retcount > 0)
+		write_char(0);
 	free(buffer);
 	return retcount;
 }
