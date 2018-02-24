@@ -131,7 +131,7 @@ void free_command(struct command *info)
 		temp = info;
 		info = info->next;
 		free_parameters(temp);
-		free_redirect(info->rlist);
+		free_redirect(temp->rlist);
 		free(temp);
 		temp = NULL;
 	}
@@ -327,6 +327,7 @@ int filpinfo(char *buffer, struct command *info)
 								    count - 1);
 							free(cmdand_buf);
 						}
+						++count;
 					}
 					else
 					{
@@ -398,6 +399,7 @@ int filpinfo(char *buffer, struct command *info)
 								1) /*\0*/;
 							free(cmdor_buf);
 						}
+						++count;
 					}
 					else
 					{
