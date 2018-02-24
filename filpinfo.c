@@ -91,7 +91,6 @@ static int ignore_IFSs(char *buffer, int count)
 	}while(++count);
 	return -6;/* Reaching here impossible */
 }
-	
 
 /* Malloc a command, enNULL all elements, malloc the first parameter[] and a struct redirect */
 int new_command(struct command **info)
@@ -140,6 +139,9 @@ void free_command(struct command *info)
 /* Malloc and fill a command with a buffer, free() buffer, return characters processed */
 int filpinfo(char *buffer, struct command *info)
 {
+#define synerr(token) OUT2E("%s: syntax error near unexpected token `%s'\n", argv0, token)
+#define CUR_INFO getpos(info, pos)
+
 #define ignIFS() \
 	do\
 	{\
@@ -196,13 +198,16 @@ int filpinfo(char *buffer, struct command *info)
 	int len = strlen(buffer);
 	int pos = 1;
 	int count = 0, parametercount = 0, paracount = 0, retcount = 0;
-	int oldpc = 0;
+	int oldpc = 0, basecount=0;
 	/*
 		count: count for buffer
 		parametercount: count for current parameter element
 		paracount: count representing how many elements are there in
-	   parameter retcount: characters actually wrote to the command,
+	   parameter
+	   	retcount: characters actually wrote to the command,
 	   returned
+	   	oldpc: saved parametercount for undo IFS
+		basecount: the first non-IFS char in buffer
 	*/
 	int isInSingleQuote = 0, isInDoubleQuote = 0;
 	if (info == NULL)
@@ -211,7 +216,7 @@ int filpinfo(char *buffer, struct command *info)
 		return -1;
 	}
 	ignIFS();
-	++count;
+	basecount=++count;
 	/* The input command should be initialized */
 	for (; count < len; ++count)
 	{
@@ -228,11 +233,11 @@ int filpinfo(char *buffer, struct command *info)
 					isInSingleQuote = 0;
 				else
 				{
-					if (count == 0)
+					if (count == basecount)
 						isInSingleQuote = 1;
 					else if (!escape)
 						isInSingleQuote = 1;
-					else /* count != 0 && buffer[count-1] ==
+					else /* count != basecount && buffer[count-1] ==
 						'\\' */
 						/* Write a ' */
 						write_current();
@@ -276,8 +281,8 @@ int filpinfo(char *buffer, struct command *info)
 					if(parametercount == 0)/* Previously a blank reached */
 					{
 						parametercount=oldpc;
-						free(getpos(info, pos)->parameters[paracount]);
-						getpos(info, pos)->parameters[paracount] = NULL;
+						free(CUR_INFO->parameters[paracount]);
+						CUR_INFO->parameters[paracount] = NULL;
 						paracount--;
 					}
 					if (ignore_IFSs(buffer, count + 1/* the char after & */) == -5)/* EOL */
@@ -287,14 +292,14 @@ int filpinfo(char *buffer, struct command *info)
 							info->flag = BG_CMD;/* cmd & \0 */
 						else
 						{
-							OUT2E("%s: syntax error near unexpected token `&'\n", argv0);
+							synerr("&");
 							retcount = -2;
 						}
 						goto done;
 					}
 					else if (buffer[count + 1] == '&')
 					{
-						if(new_command(&(getpos(info, pos)->next)) == -1)
+						if(new_command(&(CUR_INFO->next)) == -1)
 						{
 							OUT2E("%s: filpinfo: malloc failed\n", argv0);
 							retcount = -1;
@@ -304,7 +309,7 @@ int filpinfo(char *buffer, struct command *info)
 							info->flag = RUN_AND;
 						else
 						{
-							OUT2E("%s: syntax error near unexpected token `&&'\n", argv0);
+							synerr("&&");
 							retcount = -2;
 							goto done;
 						}
@@ -331,7 +336,7 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else
 					{
-						if(new_command(&(getpos(info, pos)->next)) == -1)
+						if(new_command(&(CUR_INFO->next)) == -1)
 						{
 							/* malloc failed, cleanup */
 							OUT2E("%s: filpinfo: malloc failed\n", argv0);
@@ -342,7 +347,7 @@ int filpinfo(char *buffer, struct command *info)
 							info->flag = BG_CMD;
 						else
 						{
-							OUT2E("%s: syntax error near unexpected token `&'\n", argv0);
+							synerr("&");
 							retcount = -2;
 							goto done;
 						}
@@ -361,10 +366,10 @@ int filpinfo(char *buffer, struct command *info)
 					if(parametercount == 0)/* Previously a blank reached */
 					{
 						parametercount=oldpc;
-						free(getpos(info, pos)->parameters[paracount]);
-						getpos(info, pos)->parameters[paracount] = NULL;
+						free(CUR_INFO->parameters[paracount]);
+						CUR_INFO->parameters[paracount] = NULL;
 					}
-					if(new_command(&(getpos(info, pos)->next)) == -1)
+					if(new_command(&(CUR_INFO->next)) == -1)
 					{
 						/* malloc failed, cleanup */
 						OUT2E("%s: filpinfo: malloc failed\n", argv0);
@@ -377,8 +382,9 @@ int filpinfo(char *buffer, struct command *info)
 							info->flag = RUN_OR;
 						else
 						{
-							OUT2E("%s: syntax error near unexpected token `||'\n", argv0);
+							synerr("||");
 							retcount = -2;
+							goto done;
 						}
 						if (ignore_IFSs(buffer, count + 2/* the char after || */) == -5)/* EOL */ 
 						{
@@ -407,8 +413,9 @@ int filpinfo(char *buffer, struct command *info)
 							info->flag = PIPED;
 						else
 						{
-							OUT2E("%s: syntax error near unexpected token `|'\n", argv0);
+							synerr("|");
 							retcount = -2;
+							goto done;
 						}
 						if (ignore_IFSs(buffer, count + 2/* the char after | */) == -5)/* EOL */
 						{
