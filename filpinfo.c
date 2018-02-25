@@ -636,10 +636,17 @@ int filpinfo(char *buffer, struct command *info)
 				write_current();
 				break;
 			case '#':
-				if (ignore)
+				if (cnt_buffer == cnt_first_nonIFS || (!strchr(" \t", buffer[cnt_buffer-1]))/* Is IFS */)
 				{
 					write_current();
 					break;
+				}
+				if (cnt_argument_char == 0) /* Previously a blank reached */
+				{
+					cnt_argument_char = cnt_old_parameter;
+					free(CUR_INFO->parameters[cnt_argument_element]);
+					CUR_INFO->parameters[cnt_argument_element] = NULL;
+					cnt_argument_element--;
 				}
 				write_char(0);
 				return cnt_return;
