@@ -206,11 +206,17 @@ int filpinfo(char *buffer, struct command *info)
 	    cnt_return = 0, cnt_old_parameter = 0, cnt_first_nonIFS = 0;
 	/*
 		Variable prefixes:
-			cnt: count
-				stat: status
-		cnt_buffer: count for buffer
-		cnt_argument_char: count for current parameter element
-		cnt_argument_element: count representing how many elements are
+			cnt: count;
+			stat: status
+		Variable description:
+			stat_in_squote: whether in a '' quote
+			stat_in_dquote: whether in a "" quote
+
+			cnt_strct_cmd: count representing which node of the
+	   struct command list we are currently on
+			cnt_buffer: count for buffer
+			cnt_argument_char: count for current parameter element
+			cnt_argument_element: count representing how many elements are
 	   there in parameter cnt_return: characters actually wrote to the
 	   command, returned cnt_old_parameter: saved cnt_argument_char for undo
 	   IFS cnt_first_nonIFS: the first non-IFS char in buffer
