@@ -120,34 +120,45 @@ int pshgetuid(void) { return geteuid(); }
 
 int pshchdir(char *dir) { return chdir(dir); }
 
-static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char **env)
+static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
+			 char **env)
 {
 	pid_t pid;
 	struct redirect *info = arginfo;
 	if ((pid = fork()) == 0)
 	{
-		while(info)
+		while (info)
 		{
-			switch(info->type)
+			switch (info->type)
 			{
 				case FD2FD:
 					dup2(info->in.fd, info->out.fd);
 					close(info->in.fd);
 					break;
 				case OUT_REDIR:
-					dup2(open(info->out.file, O_WRONLY | O_CREAT | O_TRUNC, 0644), info->in.fd);
+					dup2(open(info->out.file,
+						  O_WRONLY | O_CREAT | O_TRUNC,
+						  0644),
+					     info->in.fd);
 					break;
 				case OUT_APPN:
-					dup2(open(info->out.file, O_WRONLY | O_CREAT | O_APPEND, 0644), info->in.fd);
+					dup2(open(info->out.file,
+						  O_WRONLY | O_CREAT | O_APPEND,
+						  0644),
+					     info->in.fd);
 					break;
 				case IN_REDIR:
-					dup2(open(info->in.file, O_RDONLY | O_CREAT, 0644), info->out.fd);
+					dup2(open(info->in.file,
+						  O_RDONLY | O_CREAT, 0644),
+					     info->out.fd);
 					break;
 				case CLOSEFD:
 					close(info->in.fd);
 					break;
 				case OPENFN:
-					dup2(open(info->in.file, O_RDWR | O_CREAT, 0644), info->out.fd);
+					dup2(open(info->in.file,
+						  O_RDWR | O_CREAT, 0644),
+					     info->out.fd);
 					break;
 			}
 			info = info->next;
@@ -161,12 +172,13 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char 
 int do_run(struct command *arginfo)
 {
 	struct command *info = arginfo;
-	while(1)
+	while (1)
 	{
-		if(info->flag & PIPED)
+		if (info->flag & PIPED)
 			if (pipe(pipe_fd) < 0)
 			{
-				OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
+				OUT2E("%s: pipe failed: %s\n", argv0,
+				      strerror(errno));
 				exit_psh(1);
 			}
 	}
@@ -229,12 +241,12 @@ int do_run(struct command *arginfo)
 
 		if (info->flag & PIPED) /*command is not null*/
 		{
-				close(pipe_fd[0]);
-				close(fileno(stdout));
-				dup2(pipe_fd[1], fileno(stdout));
-				close(pipe_fd[1]);
+			close(pipe_fd[0]);
+			close(fileno(stdout));
+			dup2(pipe_fd[1], fileno(stdout));
+			close(pipe_fd[1]);
 		}
-		
+
 		if (execvp(info->parameters[0], (char **)info->parameters) ==
 		    -1)
 		{

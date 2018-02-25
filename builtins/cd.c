@@ -29,44 +29,50 @@ static int create_new_pwd(char **cd_dir)
 	if ((*cd_dir)[0] == '/') /* cd_dir is an abs path */
 	{
 		char *delim;
-		while((delim = strstr((*cd_dir), "/.")))
+		while ((delim = strstr((*cd_dir), "/.")))
 		{
-			if(*(delim+2) == 0)/* /. */
+			if (*(delim + 2) == 0) /* /. */
 			{
 				*delim = 0;
 			}
-			else if(*(delim+2) == '/')/* /./ */
+			else if (*(delim + 2) == '/') /* /./ */
 			{
-				memmove(delim, delim+2, strlen(delim+2)+1);
+				memmove(delim, delim + 2,
+					strlen(delim + 2) + 1);
 			}
-			else if(delim == *cd_dir)/* root/.. */
+			else if (delim == *cd_dir) /* root/.. */
 			{
-				if(*(delim+3) == 0)
-					*(delim+1) =0;
+				if (*(delim + 3) == 0)
+					*(delim + 1) = 0;
 				else
-					memmove(delim, delim+3, strlen(delim+3)+1);
+					memmove(delim, delim + 3,
+						strlen(delim + 3) + 1);
 			}
-			else if(*(delim+3) == 0) /* /..\0 */
+			else if (*(delim + 3) == 0) /* /..\0 */
 			{
 				char *lastnode;
-				*delim = 0;/* Terminate the string at the current / */
-				
+				*delim = 0; /* Terminate the string at the
+					       current / */
+
 				lastnode = strrchr(*cd_dir, '/');
-				if(lastnode == *cd_dir)/* Root node reached */
-					*(lastnode+1) = 0;
+				if (lastnode == *cd_dir) /* Root node reached */
+					*(lastnode + 1) = 0;
 				else
-					*lastnode = 0;/* Then terminate the string at the last / */
+					*lastnode = 0; /* Then terminate the
+							  string at the last /
+							*/
 			}
 			else /* /../ */
 			{
-				char oldval=*delim;
+				char oldval = *delim;
 				char *lastnode;
 				*delim = 0;
 				lastnode = strrchr(*cd_dir, '/');
 				*delim = oldval;
-				memmove(lastnode, delim+3, strlen(delim+3)+1);
+				memmove(lastnode, delim + 3,
+					strlen(delim + 3) + 1);
 			}
-		}/* while */
+		} /* while */
 	}
 	else
 	{

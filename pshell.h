@@ -50,31 +50,31 @@ struct command /* Everything about a command */
 		PIPED,
 		RUN_AND,
 		RUN_OR
-	}flag;
+	} flag;
 	struct redirect
 	{
 		enum redir_type
 		{
 			FD2FD = 1, /* fd to fd, n>&n; n<&n */
-			OUT_REDIR, /* fd to filename, 
+			OUT_REDIR, /* fd to filename,
 			n>name; n<name; &>name;  */
 			OUT_APPN,
 			IN_REDIR, /* filename to fd */
-			CLOSEFD, /* n>&-; n<&- */
-			OPENFN /* n<>name */
-		}type;
+			CLOSEFD,  /* n>&-; n<&- */
+			OPENFN    /* n<>name */
+		} type;
 		union in /* file that redirect from */
 		{
 			int fd;
 			char *file;
-		}in;
+		} in;
 		union out /* file than redirect to */
 		{
 			int fd;
 			char *file;
-		}out;
+		} out;
 		struct redirect *next;
-	}*rlist;
+	} * rlist;
 	char **parameters; /*argv*/
 	struct command *next;
 };

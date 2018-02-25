@@ -43,7 +43,7 @@ int builtin_history(ARGS)
 		char *filename = malloc(sizeof(char) * MAXEACHARG);
 		struct option longopts[] = {{"help", no_argument, NULL, 'h'},
 					    {NULL, 0, NULL, 0}};
-		if(!filename)
+		if (!filename)
 		{
 			OUT2E("%s: %s: malloc failed\n", argv0, b_command);
 			return 2;

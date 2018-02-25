@@ -65,7 +65,7 @@ int read_command(char *prompt, struct command *info)
 		}
 #ifdef NO_READLINE
 		/* mallocked by malloc */
-		strncpy(buffer, expans, MAXLINE-1);
+		strncpy(buffer, expans, MAXLINE - 1);
 #else
 		/* mallocked by readline */
 		strncpy(buffer, expans, strlen(buffer));
