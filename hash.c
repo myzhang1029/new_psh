@@ -122,8 +122,7 @@ int add_hash(PSH_HASH *table, char *key, char *val)
 		hash_result = search_hash_empty(table);
 		if (hash_result == -1)
 		{
-			OUT2E("%s: add_hash: Unable to add more element\n",
-			      argv0);
+			OUT2E("%s: add_hash: Unable to add more element\n", argv0);
 			return 1;
 		}
 	}

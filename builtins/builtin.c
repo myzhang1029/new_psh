@@ -26,8 +26,7 @@ int builtin_builtin(ARGS)
 	if (run_builtin(info) == 0)
 	{
 		info->parameters--;
-		OUT2E("%s: %s: %s: not a shell builtin\n", argv0,
-		      info->parameters[0], info->parameters[1]);
+		OUT2E("%s: %s: %s: not a shell builtin\n", argv0, info->parameters[0], info->parameters[1]);
 		return 2;
 	}
 	info->parameters--;

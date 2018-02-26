@@ -35,12 +35,11 @@ void type_prompt(char *prompt)
 	else
 		sprintf(prompt, "%s@unknown:", username);
 #ifdef DEBUG
-	printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n", pathname,
-	       strlen(pathname), pwd->pw_dir, strlen(pwd->pw_dir));
+	printf("pathname: %s,length:%d\npw_dir:%s,length:%d\n", pathname, strlen(pathname), pwd->pw_dir,
+	       strlen(pwd->pw_dir));
 #endif
 	length = strlen(prompt);
-	if (strlen(pathname) < strlen(hdir) ||
-	    strncmp(pathname, hdir, strlen(hdir)) != 0)
+	if (strlen(pathname) < strlen(hdir) || strncmp(pathname, hdir, strlen(hdir)) != 0)
 		sprintf(prompt + length, "%s", pathname);
 	else
 		sprintf(prompt + length, "~%s", pathname + strlen(hdir));

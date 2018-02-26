@@ -45,8 +45,7 @@ int builtin_echo(ARGS)
 					printf("%s", b_parameters[cnt]);
 					while (b_parameters[++cnt] != NULL)
 					{
-						printf(" %s",
-						       b_parameters[cnt]);
+						printf(" %s", b_parameters[cnt]);
 					}
 					return 1;
 				}

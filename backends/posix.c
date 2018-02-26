@@ -48,8 +48,7 @@ void sigchld_handler(int sig)
 			else if (pid < 0)
 			{
 				if (errno != ECHILD)
-					OUT2E("%s: waitpid error: %s", argv0,
-					      strerror(errno));
+					OUT2E("%s: waitpid error: %s", argv0, strerror(errno));
 			}
 			/*else:do nothing.*/
 			/*Not background processses has their waitpid() in
@@ -111,17 +110,13 @@ char *pshgetcwd(void)
 	return cwd;
 }
 
-int pshgethostname(char *hstnme, size_t len)
-{
-	return gethostname(hstnme, len);
-}
+int pshgethostname(char *hstnme, size_t len) { return gethostname(hstnme, len); }
 
 int pshgetuid(void) { return geteuid(); }
 
 int pshchdir(char *dir) { return chdir(dir); }
 
-static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
-			 char **env)
+static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char **env)
 {
 	pid_t pid;
 	struct redirect *info = arginfo;
@@ -136,29 +131,19 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
 					close(info->in.fd);
 					break;
 				case OUT_REDIR:
-					dup2(open(info->out.file,
-						  O_WRONLY | O_CREAT | O_TRUNC,
-						  0644),
-					     info->in.fd);
+					dup2(open(info->out.file, O_WRONLY | O_CREAT | O_TRUNC, 0644), info->in.fd);
 					break;
 				case OUT_APPN:
-					dup2(open(info->out.file,
-						  O_WRONLY | O_CREAT | O_APPEND,
-						  0644),
-					     info->in.fd);
+					dup2(open(info->out.file, O_WRONLY | O_CREAT | O_APPEND, 0644), info->in.fd);
 					break;
 				case IN_REDIR:
-					dup2(open(info->in.file,
-						  O_RDONLY | O_CREAT, 0644),
-					     info->out.fd);
+					dup2(open(info->in.file, O_RDONLY | O_CREAT, 0644), info->out.fd);
 					break;
 				case CLOSEFD:
 					close(info->in.fd);
 					break;
 				case OPENFN:
-					dup2(open(info->in.file,
-						  O_RDWR | O_CREAT, 0644),
-					     info->out.fd);
+					dup2(open(info->in.file, O_RDWR | O_CREAT, 0644), info->out.fd);
 					break;
 			}
 			info = info->next;
@@ -177,8 +162,7 @@ int do_run(struct command *arginfo)
 		if (info->flag & PIPED)
 			if (pipe(pipe_fd) < 0)
 			{
-				OUT2E("%s: pipe failed: %s\n", argv0,
-				      strerror(errno));
+				OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
 				exit_psh(1);
 			}
 	}
@@ -200,15 +184,13 @@ int do_run(struct command *arginfo)
 				close(fileno(stdin));
 				dup2(pipe_fd[0], fileno(stdin));
 				close(pipe_fd[0]);
-				execvp(info->parameters[0],
-				       (char **)info->parameters);
+				execvp(info->parameters[0], (char **)info->parameters);
 			}
 			else
 			{
 				close(pipe_fd[0]);
 				close(pipe_fd[1]);
-				waitpid(ChdPid2, &last_command_status,
-					0); /*wait command*/
+				waitpid(ChdPid2, &last_command_status, 0); /*wait command*/
 			}
 		}
 
@@ -226,14 +208,12 @@ int do_run(struct command *arginfo)
 
 			printf("[%d] %u\n", i + 1, ChdPid);
 			if (i == MAXPIDTABLE)
-				OUT2E("%s: Too much background processes\n",
-				      argv0);
+				OUT2E("%s: Too much background processes\n", argv0);
 			usleep(5000);
 		}
 		else
 		{
-			waitpid(ChdPid, &last_command_status,
-				0); /*wait command1*/
+			waitpid(ChdPid, &last_command_status, 0); /*wait command1*/
 		}
 	}
 	else /*command1*/
@@ -247,19 +227,16 @@ int do_run(struct command *arginfo)
 			close(pipe_fd[1]);
 		}
 
-		if (execvp(info->parameters[0], (char **)info->parameters) ==
-		    -1)
+		if (execvp(info->parameters[0], (char **)info->parameters) == -1)
 		{
 			if (errno == ENOENT)
 			{
-				OUT2E("%s: %s: command not found\n", argv0,
-				      info->parameters[0]);
+				OUT2E("%s: %s: command not found\n", argv0, info->parameters[0]);
 				last_command_status = 127;
 			}
 			else
 			{
-				OUT2E("%s: %s: %s\n", argv0,
-				      info->parameters[0], strerror(errno));
+				OUT2E("%s: %s: %s\n", argv0, info->parameters[0], strerror(errno));
 				/* Exit the failed command child process */
 				last_command_status = 126;
 			}

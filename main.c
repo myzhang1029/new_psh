@@ -66,9 +66,7 @@ void proc(void)
 
 int main(int argc, char **argv)
 {
-	argv0 =
-	    strdup((strrchr(argv[0], '/') == NULL ? argv[0]
-						  : strrchr(argv[0], '/') + 1));
+	argv0 = strdup((strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
 	if (argv0 == NULL)
 	{

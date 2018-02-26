@@ -27,8 +27,7 @@ int builtin_pwd(ARGS)
 	unless it is started by '-' as in bash */
 	{
 		int argc;
-		for (argc = 1;
-		     b_parameters[argc] && b_parameters[argc][0] == '-'; ++argc)
+		for (argc = 1; b_parameters[argc] && b_parameters[argc][0] == '-'; ++argc)
 		{
 			switch (b_parameters[argc][1])
 			{
@@ -38,9 +37,7 @@ int builtin_pwd(ARGS)
 				case 'L':
 					break;
 				default: /* Invalid option */
-					OUT2E("%s: %s: -%c: invalid option\n",
-					      argv0, b_command,
-					      b_parameters[argc][1]);
+					OUT2E("%s: %s: -%c: invalid option\n", argv0, b_command, b_parameters[argc][1]);
 					return 2;
 			}
 		}
@@ -56,8 +53,7 @@ int builtin_pwd(ARGS)
 		p = wd;
 		while ((p = strstr(p, "/.")))
 		{
-			if (!p[2] || p[2] == '/' ||
-			    (p[2] == '.' && (!p[3] || p[3] == '/')))
+			if (!p[2] || p[2] == '/' || (p[2] == '.' && (!p[3] || p[3] == '/')))
 				use_logical = 0;
 			p++;
 		}

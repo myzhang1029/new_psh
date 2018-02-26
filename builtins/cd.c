@@ -37,16 +37,14 @@ static int create_new_pwd(char **cd_dir)
 			}
 			else if (*(delim + 2) == '/') /* /./ */
 			{
-				memmove(delim, delim + 2,
-					strlen(delim + 2) + 1);
+				memmove(delim, delim + 2, strlen(delim + 2) + 1);
 			}
 			else if (delim == *cd_dir) /* root/.. */
 			{
 				if (*(delim + 3) == 0)
 					*(delim + 1) = 0;
 				else
-					memmove(delim, delim + 3,
-						strlen(delim + 3) + 1);
+					memmove(delim, delim + 3, strlen(delim + 3) + 1);
 			}
 			else if (*(delim + 3) == 0) /* /..\0 */
 			{
@@ -69,16 +67,14 @@ static int create_new_pwd(char **cd_dir)
 				*delim = 0;
 				lastnode = strrchr(*cd_dir, '/');
 				*delim = oldval;
-				memmove(lastnode, delim + 3,
-					strlen(delim + 3) + 1);
+				memmove(lastnode, delim + 3, strlen(delim + 3) + 1);
 			}
 		} /* while */
 	}
 	else
 	{
 		char *oldpwd = getenv("PWD");
-		*cd_dir = realloc(*cd_dir, strlen(*cd_dir) + 1 /*\0*/ +
-					       strlen(oldpwd) + 1 /*'/'*/);
+		*cd_dir = realloc(*cd_dir, strlen(*cd_dir) + 1 /*\0*/ + strlen(oldpwd) + 1 /*'/'*/);
 		if (!cd_dir)
 		{
 			OUT2E("%s: create_new_pwd: realloc failed\n", argv0);
@@ -86,8 +82,7 @@ static int create_new_pwd(char **cd_dir)
 		}
 		{
 			int count = strlen(*cd_dir) + 1 /*\0*/;
-			char *d =
-			    (*cd_dir) + strlen(oldpwd) + 1 /*'/'*/ + count - 1;
+			char *d = (*cd_dir) + strlen(oldpwd) + 1 /*'/'*/ + count - 1;
 			char *s = (*cd_dir) + count - 1;
 			while (count--)
 				*d-- = *s--;
@@ -112,14 +107,12 @@ int builtin_cd(ARGS)
 		cd_path = malloc(strlen(homedir) + 1);
 		if (cd_path == NULL)
 		{
-			OUT2E("%s: malloc failed: %s\n", b_command,
-			      strerror(errno));
+			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
 			return 2;
 		}
 		strcpy(cd_path, homedir);
 	}
-	else if (strcmp(b_parameters[1], "-") ==
-		 0) /* 'cd -', the same as cd $OLDPWD*/
+	else if (strcmp(b_parameters[1], "-") == 0) /* 'cd -', the same as cd $OLDPWD*/
 	{
 		char *oldpwd = getenv("OLDPWD");
 		if (!oldpwd)
@@ -130,8 +123,7 @@ int builtin_cd(ARGS)
 		cd_path = malloc(strlen(oldpwd) + 1);
 		if (cd_path == NULL)
 		{
-			OUT2E("%s: malloc failed: %s\n", b_command,
-			      strerror(errno));
+			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
 			return 2;
 		}
 		puts(oldpwd);
@@ -142,8 +134,7 @@ int builtin_cd(ARGS)
 		cd_path = malloc(strlen(b_parameters[1]) + 1);
 		if (cd_path == NULL)
 		{
-			OUT2E("%s: malloc failed: %s\n", b_command,
-			      strerror(errno));
+			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
 			return 2;
 		}
 		strncpy(cd_path, b_parameters[1], strlen(b_parameters[1]));
