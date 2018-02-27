@@ -150,15 +150,15 @@ int filpinfo(char *buffer, struct command *info)
 	} while (0)
 
 #define malloc_one(n)                                                                                                  \
-	(lastnode->parameters[n]) = malloc(sizeof(char) * MAXEACHARG);                              \
-	memset(lastnode->parameters[n], 0, MAXEACHARG)
+	(cmd_lastnode->parameters[n]) = malloc(sizeof(char) * MAXEACHARG);                              \
+	memset(cmd_lastnode->parameters[n], 0, MAXEACHARG)
 
 /* Write the current char in buffer to current command, increase cnt_return
  * only if current not blank or 0 */
 #define write_current()                                                                                                \
 	do                                                                                                             \
 	{                                                                                                              \
-		lastnode->parameters[cnt_argument_element][cnt_argument_char++] =                   \
+		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] =                   \
 		    buffer[cnt_buffer];                                                                                \
 		if (strchr(" \t", buffer[cnt_buffer]) == NULL && buffer[cnt_buffer] != 0) /* current char not blank */ \
 			cnt_return++;                                                                                  \
@@ -168,7 +168,7 @@ int filpinfo(char *buffer, struct command *info)
 #define write_char(c)                                                                                                  \
 	do                                                                                                             \
 	{                                                                                                              \
-		lastnode->parameters[cnt_argument_element][cnt_argument_char++] = c;                \
+		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = c;                \
 		if (strchr(" \t", c) == NULL && c != 0)                                                                \
 			cnt_return++;                                                                                  \
 	} while (0)
@@ -180,8 +180,9 @@ int filpinfo(char *buffer, struct command *info)
 		ignore: determine whether a meta character should be ignored(not
 	   for a dollar)
 	*/
-	struct command *lastnode = info/* The last node of the command list */;
-	int stat_in_squote = 0, stat_in_dquote = 0;
+	struct command *cmd_lastnode = info/* The last node of the command list */;
+	struct redirect *redir_lastnode = info?info->rlist:NULL;
+	int stat_in_squote = 0, stat_in_dquote = 0, stat_parsing_redirect = 0;
 	int cnt_buffer = 0, cnt_argument_char = 0, cnt_argument_element = 0, cnt_return = 0, cnt_old_parameter = 0,
 	    cnt_first_nonIFS = 0;
 	/*
@@ -190,7 +191,11 @@ int filpinfo(char *buffer, struct command *info)
 		- stat: status.
 	-- Variable description:
 		- stat_in_squote: whether in a '' quote;
-		- stat_in_dquote: whether in a "" quote;;
+		- stat_in_dquote: whether in a "" quote;
+		- stat_parsing_redirect:
+		> 0: Not parsing for redirect;
+		> 1: Parsing for a fd (like 3>&1, 2<&7);
+		> 2: Parsing for a filename (like 1>output, 2>/dev/null);
 		- cnt_buffer: count for buffer;
 		- cnt_argument_char: count for current parameter element;
 		- cnt_argument_element: count representing how many elements are there in parameter;
@@ -268,8 +273,8 @@ int filpinfo(char *buffer, struct command *info)
 					if (cnt_argument_char == 0) /* Previously a blank reached */
 					{
 						cnt_argument_char = cnt_old_parameter;
-						free(lastnode->parameters[cnt_argument_element]);
-						lastnode->parameters[cnt_argument_element] = NULL;
+						free(cmd_lastnode->parameters[cnt_argument_element]);
+						cmd_lastnode->parameters[cnt_argument_element] = NULL;
 						cnt_argument_element--;
 					}
 					if (ignore_IFSs(buffer, cnt_buffer + 1 /* the char after & */) == -5) /* EOL */
@@ -287,7 +292,7 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else if (buffer[cnt_buffer + 1] == '&')
 					{
-						if (new_command(&(lastnode->next)) == -1)
+						if (new_command(&(cmd_lastnode->next)) == -1)
 						{
 							OUT2E("%s: filpinfo: "
 							      "malloc failed\n",
@@ -324,7 +329,7 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else
 					{
-						if (new_command(&(lastnode->next)) == -1)
+						if (new_command(&(cmd_lastnode->next)) == -1)
 						{
 							/* malloc failed,
 							 * cleanup */
@@ -343,7 +348,7 @@ int filpinfo(char *buffer, struct command *info)
 							goto done;
 						}
 					}
-					lastnode = lastnode->next;
+					cmd_lastnode = cmd_lastnode->next;
 					cnt_argument_element = 0;
 					cnt_argument_char = 0;
 					ignIFS_from_next_char();
@@ -357,10 +362,10 @@ int filpinfo(char *buffer, struct command *info)
 					if (cnt_argument_char == 0) /* Previously a blank reached */
 					{
 						cnt_argument_char = cnt_old_parameter;
-						free(lastnode->parameters[cnt_argument_element]);
-						lastnode->parameters[cnt_argument_element] = NULL;
+						free(cmd_lastnode->parameters[cnt_argument_element]);
+						cmd_lastnode->parameters[cnt_argument_element] = NULL;
 					}
-					if (new_command(&(lastnode->next)) == -1)
+					if (new_command(&(cmd_lastnode->next)) == -1)
 					{
 						/* malloc failed, cleanup */
 						OUT2E("%s: filpinfo: malloc "
@@ -426,7 +431,7 @@ int filpinfo(char *buffer, struct command *info)
 							free(pipe_buf);
 						}
 					}
-					lastnode =  lastnode->next;
+					cmd_lastnode = cmd_lastnode->next;
 					cnt_argument_element = 0;
 					cnt_argument_char = 0;
 					ignIFS_from_next_char();
@@ -543,6 +548,42 @@ int filpinfo(char *buffer, struct command *info)
 					write_current();
 					break;
 				}
+				if(cnt_buffer == cnt_first_nonIFS)
+					redir_lastnode->in.fd = 1/* stdout */;
+				else
+				{
+					int case_count = cnt_buffer, case_buf_cnt = 0;
+					char buf[MAXLINE] = {0};
+					while(--case_count,1/* infinity loop */)
+					{
+						if(case_count == cnt_first_nonIFS || !isdigit(buffer[case_count]))
+						{
+							if(buf[0] == 0)
+								buf[0] = 1/* stdout */;
+							break;
+						}
+						else/* digit */
+							buf[case_buf_cnt++] = buffer[case_count];
+					}
+					int len=strlen(buf);
+					char temp;
+					for (int i=0;i<len/2;i++)/* reverse buf */
+					{
+						temp=buf[i];
+						buf[i]=buf[len-i-1];
+						buf[len-i-1]=temp;
+					}
+					redir_lastnode->in.fd = atoi(buf);
+				}
+				switch(buffer[cnt_buffer+1])
+				{
+					case '&':
+					case ' ':
+					case '\t':
+					case '>':
+						/* TODO */break;
+				}
+				break;
 			case '<':
 				/* TODO: Write input redirect and heredoc code
 				 * here */
@@ -558,8 +599,8 @@ int filpinfo(char *buffer, struct command *info)
 				if (cnt_argument_char == 0) /* Previously a blank reached */
 				{
 					cnt_argument_char = cnt_old_parameter;
-					free(lastnode->parameters[cnt_argument_element]);
-					lastnode->parameters[cnt_argument_element] = NULL;
+					free(cmd_lastnode->parameters[cnt_argument_element]);
+					cmd_lastnode->parameters[cnt_argument_element] = NULL;
 					cnt_argument_element--;
 				}
 				write_char(0);
