@@ -15,16 +15,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
-#include "../pshell.h"
+#ifndef BUILTIN_INCLUDED
+#define BUILTIN_INCLUDED
+#include "pshell.h"
 
 #define ARGS struct command *info
 #define b_command (info->parameters[0])
 #define b_parameters (info->parameters)
 
+typedef int (*builtin_function)(ARGS);
+
 int builtin_exec(ARGS);
 int builtin_echo(ARGS);
+int builtin_exit(ARGS);
+int builtin_true(ARGS);
+int builtin_false(ARGS);
 int builtin_cd(ARGS);
 int builtin_pwd(ARGS);
 int builtin_history(ARGS);
 int builtin_builtin(ARGS);
+builtin_function find_builtin(char *name);
+
+struct builtin
+{
+	char *name;
+	builtin_function proc; 
+};
+
+extern const struct builtin builtins[]; 
+
+#endif
