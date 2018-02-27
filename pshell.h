@@ -2,7 +2,7 @@
    pshell.h - Psh main header
 
    Copyright 2013 wuyve.
-   Copyright 2017 Zhang Maiyun.
+   Copyright 2017-2018 Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 #undef strncpy
 #define strncpy p_sstrncpy
-#define PSH_VERSION "0.12.7"
+#define PSH_VERSION "0.12.8"
 
 struct command /* Everything about a command */
 {
