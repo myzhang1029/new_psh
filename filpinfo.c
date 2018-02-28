@@ -548,6 +548,13 @@ int filpinfo(char *buffer, struct command *info)
 					write_current();
 					break;
 				}
+				if(buffer[cnt_buffer+1] != '>')
+				{
+					if(redir_lastnode->type != 0)
+						code_fault(__FILE__, __LINE__);
+					else
+						redir_lastnode->type = OUT_REDIR;
+				}
 				if(cnt_buffer == cnt_first_nonIFS)
 					redir_lastnode->in.fd = 1/* stdout */;
 				else
@@ -578,10 +585,76 @@ int filpinfo(char *buffer, struct command *info)
 				switch(buffer[cnt_buffer+1])
 				{
 					case '&':
+						++cnt_buffer;/* Increase cnt_buffer to the '&' */
+						if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+						{
+							synerr("newline"); /* if EOL met, report error */
+							cnt_return = -2;
+							goto done;
+						}
+						stat_parsing_redirect = 1;/* Parsing for fd */
+						break;
 					case ' ':
 					case '\t':
-					case '>':
-						/* TODO */break;
+					case '|':
+						++cnt_buffer;/* Increase cnt_buffer to the [' ''\t''|'] */
+						if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+						{
+							synerr("newline"); /* if EOL met, report error */
+							cnt_return = -2;
+							goto done;
+						}
+						stat_parsing_redirect = 2;/* Parsing for filename */
+						break;
+					case '>': /* Out append */
+						if(redir_lastnode->type != 0)
+							code_fault(__FILE__, __LINE__);
+						redir_lastnode->type = OUT_APPN;
+						++cnt_buffer;
+						switch(buffer[cnt_buffer+1])
+						{
+							case '&':
+								++cnt_buffer;/* Increase cnt_buffer to the '&' */
+								if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+								{
+									synerr("newline"); /* if EOL met, report error */
+									cnt_return = -2;
+									goto done;
+								}
+								stat_parsing_redirect = 1;/* Parsing for fd */
+								break;
+							case ' ':
+							case '\t':
+							case '|':
+								++cnt_buffer;/* Increase cnt_buffer to the [' ''\t''|'] */
+								if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+								{
+									synerr("newline"); /* if EOL met, report error */
+									cnt_return = -2;
+									goto done;
+								}
+								stat_parsing_redirect = 2;/* Parsing for filename */
+								break;
+							case '>': /* >>> */
+								synerr(">");
+								cnt_return = -2;
+								goto done;
+								break;
+							case 0: /* EOL */
+								synerr("newline");
+								cnt_return = -2;
+								goto done;
+							default:
+								stat_parsing_redirect = 2;
+						}
+						break;
+					case 0:
+						synerr("newline");
+						cnt_return = -2;
+						goto done;
+					default:/* I don't need to handle the rest */
+						stat_parsing_redirect = 2;/* Parsing for filename */
+						break;
 				}
 				break;
 			case '<':
