@@ -31,14 +31,7 @@ int read_command(char *prompt, struct command *info)
 {
 	int count;
 	char *buffer;
-#ifndef NO_READLINE
-	buffer = readline(prompt);
-#else
-	buffer = malloc(sizeof(char) * MAXLINE);
-	memset(buffer, 0, sizeof(char) * MAXLINE);
-	printf(prompt);
-	fgets(buffer, MAXLINE, stdin);
-#endif
+	buffer = p_gets(prompt);
 	if (feof(stdin) || !buffer) /* EOF reached */
 	{
 		printf("\n");
@@ -64,10 +57,8 @@ int read_command(char *prompt, struct command *info)
 			return -2;
 		}
 #ifdef NO_READLINE
-		/* mallocked by malloc */
 		strncpy(buffer, expans, MAXLINE - 1);
 #else
-		/* mallocked by readline */
 		strncpy(buffer, expans, strlen(buffer));
 #endif
 		free(expans);
@@ -79,3 +70,4 @@ int read_command(char *prompt, struct command *info)
 	count = filpinfo(buffer, info);
 	return count;
 }
+

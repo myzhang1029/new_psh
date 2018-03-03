@@ -308,21 +308,14 @@ int filpinfo(char *buffer, struct command *info)
 							cnt_return = -2;
 							goto done;
 						}
-						if (ignore_IFSs(buffer, cnt_buffer + 2 /* the char after || */) ==
+						if (ignore_IFSs(buffer, cnt_buffer + 2 /* the char after && */) ==
 						    -5) /* EOL */
 						{
 							char *cmdand_buf;
-#ifdef NO_READLINE
-							cmdand_buf = malloc(MAXLINE);
-							printf("> ");
-							fgets(cmdand_buf, MAXLINE, stdin);
-							strncat(buffer, cmdand_buf, MAXLINE - cnt_buffer - 1);
-#else
-							cmdand_buf = readline("> ");
+							cmdand_buf = p_gets("> ");
 							buffer = realloc(buffer, strlen(buffer) + strlen(cmdand_buf) +
 										     1 /* \0 */);
 							strncat(buffer, cmdand_buf, strlen(cmdand_buf));
-#endif
 							free(cmdand_buf);
 						}
 						++cnt_buffer;
@@ -388,17 +381,10 @@ int filpinfo(char *buffer, struct command *info)
 						    -5) /* EOL */
 						{
 							char *cmdor_buf;
-#ifdef NO_READLINE
-							cmdor_buf = malloc(MAXLINE);
-							printf("> ");
-							fgets(cmdor_buf, MAXLINE, stdin);
-							strncat(buffer, cmdor_buf, MAXLINE - cnt_buffer - 1) /*\0*/;
-#else
-							cmdor_buf = readline("> ");
+							cmdor_buf = p_gets("> ");
 							buffer = realloc(buffer, strlen(buffer) + strlen(cmdor_buf) +
 										     1 /* \0 */);
 							strncat(buffer, cmdor_buf, strlen(cmdor_buf));
-#endif
 							free(cmdor_buf);
 						}
 						++cnt_buffer;
@@ -417,17 +403,10 @@ int filpinfo(char *buffer, struct command *info)
 						    -5) /* EOL */
 						{
 							char *pipe_buf;
-#ifdef NO_READLINE
-							pipe_buf = malloc(MAXLINE);
-							printf("> ");
-							fgets(pipe_buf, MAXLINE, stdin);
-							strncat(buffer, pipe_buf, MAXLINE - cnt_buffer - 1);
-#else
-							pipe_buf = readline("> ");
+							pipe_buf = p_gets("> ");
 							buffer = realloc(buffer, strlen(buffer) + strlen(pipe_buf) +
 										     1 /* \0 */);
 							strncat(buffer, pipe_buf, strlen(pipe_buf));
-#endif
 							free(pipe_buf);
 						}
 					}
@@ -524,17 +503,12 @@ int filpinfo(char *buffer, struct command *info)
 				/* Line: command args... \
 				 */
 				char *newline_buf;
-#ifdef NO_READLINE
-				newline_buf = malloc(MAXLINE);
-				printf("> ");
-				fgets(newline_buf, MAXLINE, stdin);
-				strncat(buffer, newline_buf, MAXLINE - cnt_buffer - 1);
-#else
-				newline_buf = readline("> ");
-				buffer = realloc(buffer, strlen(buffer) + strlen(newline_buf) + 1 /* \0 */);
+				newline_buf = p_gets("> ");
+				buffer = realloc(buffer, strlen(buffer) + strlen(newline_buf) +
+										     1 /* \0 */);
 				strncat(buffer, newline_buf, strlen(newline_buf));
-#endif
 				free(newline_buf);
+				break;
 			case '`':
 				/* TODO: Write command substitude code here */
 

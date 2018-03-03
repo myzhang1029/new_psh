@@ -39,7 +39,7 @@
 #define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 #undef strncpy
-#define strncpy p_sstrncpy
+#define strncpy p_strncpy
 #define PSH_VERSION "0.13.0"
 
 struct command /* Everything about a command */
@@ -85,7 +85,9 @@ void type_prompt(char *);
 int read_command(char *prompt, struct command *info);
 int run_builtin(struct command *info);
 int filpinfo(char *buffer, struct command *info);
-size_t p_sstrncpy(char *dst, const char *src, size_t size);
+size_t p_strncpy(char *dst, const char *src, size_t size);
+char *p_fgets(char *prompt, FILE *fp);
+char *p_gets(char *prompt);
 int new_command(struct command **info);
 void free_command(struct command *info);
 void code_fault(char *file, int line);
