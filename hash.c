@@ -46,19 +46,6 @@ int realloc_hash(PSH_HASH *table, int newlen)
 	return 0;
 }
 
-/* Search for empty hash slot, malloc more in case of table is full, return the
- * found position, -1 if failed */
-static int search_hash_empty(PSH_HASH *table)
-{
-	int i;
-	for (i = 0; i < table->len; ++i)
-		if (table[i].used == 0)
-			return i;
-	if (realloc_hash(table, table->len + 8))
-		return -1;
-	return table->len - 7;
-}
-
 /* Allocate a new hash table, return the table if success, NULL if not */
 PSH_HASH *new_hash(int len)
 {
@@ -71,14 +58,30 @@ PSH_HASH *new_hash(int len)
 	}
 
 	table[0].len = len;
+	table[0].count = 0;
 
 	for (i = 0; i < len; ++i)
 	{
 		table[i].key = table[i].val = NULL;
 		table[i].used = 0;
+		table[i].next_count =0;
 	}
 
 	return table;
+}
+
+/* allocate an element */
+static PSH_HASH alloc_elem()
+{
+	PSH_HASH elem = malloc(sizeof(PSH_HASH));
+	if(!elem)
+	{
+		OUT2E("%s: Unanle to malloc: %s\n", argv0, strerror(errno));
+		return NULL;
+	}
+	elem.key=elem.val=NULL;
+	elem.used=0;
+	return elem;
 }
 
 /* Edit the vaule of an element, return 0 if success, 1 if not */
@@ -117,14 +120,15 @@ int add_hash(PSH_HASH *table, char *key, char *val)
 		{
 			return edit_hash_elem(&table[hash_result], val);
 		}
-		if ((i = search_for_element_by_key(table, key)) >= 0)
-			return edit_hash_elem(&table[i], val);
-		hash_result = search_hash_empty(table);
-		if (hash_result == -1)
-		{
-			OUT2E("%s: add_hash: Unable to add more element\n", argv0);
-			return 1;
-		}
+		/* else */
+		/* save to nexts */
+		if(next_count + 1 == 64)/*maximum exceeded*/
+			realloc_hash(table, (table[0].len<<1)+1);/*get an approx twice bigger table */
+		PSH_HASH avail=table[hash_result].nexts[next_count++] = alloc_elem();
+		avail.used=1;
+		avail.key=malloc(strlen(key)+1);
+		strcpy(avail.key, key);
+		return edit_hash_elem(avail, val);
 	}
 	table[hash_result].used = 1;
 	table[hash_result].key = malloc(strlen(key) + 1);
@@ -138,12 +142,20 @@ char *get_hash(PSH_HASH *table, char *key)
 {
 	int hash_result = hasher(key, table->len);
 	if (table[hash_result].key != NULL)
+	{
 		if (strcmp(table[hash_result].key, key) == 0)
 			return table[hash_result].val;
-	hash_result = search_for_element_by_key(table, key);
-	if (hash_result == -1 || table[hash_result].used == 0)
-		return NULL;
-	return table[hash_result].val;
+		else
+		{
+			int i;
+			for(i=0;i<table[hash_result].next_count;++i)
+			{
+				if(strcmp(table[hash_result].nexts[i].key, key)==0)
+					return table[hash_result].nexts[i].val;
+			}
+		}
+	}
+	return NULL;
 }
 
 /* Remove an element from the hash table, return 0 if success, 1 if specified
@@ -162,7 +174,7 @@ int rm_hash(PSH_HASH *table, char *key)
 		table[hash_result].val = NULL;
 		return 0;
 	}
-	hash_result = search_for_element_by_key(table, key);
+
 	if (hash_result == -1 || table[hash_result].used == 0)
 		return 1;
 	table[hash_result].used = 0;
@@ -181,6 +193,12 @@ void del_hash(PSH_HASH *table)
 		{
 			free(table[i].key);
 			free(table[i].val);
+			int j;
+			for(j=0; j<table[i].next_count; ++j)
+			{
+				free(table[i].nexts[j].key);
+				free(table[i].nexts[j].val);
+			}
 		}
 	}
 	free(table);
