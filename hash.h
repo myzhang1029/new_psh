@@ -22,7 +22,9 @@ typedef struct psh_hash_struct
 	char *key;
 	char *val;
 	unsigned used : 1;
-	int len;
+	int len;/* Only used in the first element */
+	unsigned next_count : 6;/* count for nexts */
+	struct psh_hash_struct nexts[64];/* sorted list */
 } PSH_HASH;
 
 int realloc_hash(PSH_HASH *, int);
