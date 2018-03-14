@@ -1,4 +1,4 @@
-/*
+</*
    hash.c - hash table manage functions of the psh
 
    Copyright 2017 Zhang Maiyun.
@@ -25,24 +25,30 @@
 
 /* Resize the hash table, the new size cannot be lower than the old size,
  * otherwise return 1. return 2 if realloc failed, 0 if success */
-int realloc_hash(PSH_HASH *table, int newlen)
+int realloc_hash(PSH_HASH **table, int newlen)
 {
-	int oldlen = table->len;
-
-	if (!(newlen > oldlen))
-		return 1;
-
-	if (realloc(table, newlen) == NULL)
-	{
-		OUT2E("%s: realloc_hash: %s\n", argv0, strerror(errno));
-		return 2;
-	}
-	else
-		table->len = newlen;
-
-	for (; oldlen < newlen; ++oldlen)
-		table[oldlen].used = 0;
-
+    /* XXX: This algorithm uses a helping table */
+	PSH_HASH *newtable = new_hash(newlen);
+    int i;
+    if(table == NULL)
+    {
+        OUT2E("%s: realloc_hash: %s\n", argv0, strerror(errno));
+    }
+    for(i=0; i<(**table).len; ++i)
+    {
+        int j;
+        if((*table)[i].key != NULL)
+        {
+            /* rehash */
+            add_hash(newtable, (*table)[i].key, (*table)[i].val);
+        }
+        for(j=0;j<next_count;++j)
+        {
+            add_hash(newtable, (*table)[i].nexts[j].key,(*table)[i].nexts[j].val);
+        }
+    }
+    free(*table);
+    *table = newtable;
 	return 0;
 }
 
@@ -76,7 +82,7 @@ static PSH_HASH alloc_elem()
 	PSH_HASH elem = malloc(sizeof(PSH_HASH));
 	if(!elem)
 	{
-		OUT2E("%s: Unanle to malloc: %s\n", argv0, strerror(errno));
+		OUT2E("%s: Unable to malloc: %s\n", argv0, strerror(errno));
 		return NULL;
 	}
 	elem.key=elem.val=NULL;
@@ -123,7 +129,7 @@ int add_hash(PSH_HASH *table, char *key, char *val)
 		/* else */
 		/* save to nexts */
 		if(next_count + 1 == 64)/*maximum exceeded*/
-			realloc_hash(table, (table[0].len<<1)+1);/*get an approx twice bigger table */
+			realloc_hash(table, (table[0].len<<1)+1);/*get an approx. twice bigger table */
 		PSH_HASH avail=table[hash_result].nexts[next_count++] = alloc_elem();
 		avail.used=1;
 		avail.key=malloc(strlen(key)+1);
@@ -172,6 +178,19 @@ int rm_hash(PSH_HASH *table, char *key)
 		table[hash_result].key = NULL;
 		free(table[hash_result].val);
 		table[hash_result].val = NULL;
+        if (table[hash_result].next_count != 0)
+        {
+            int i;
+            for (i=0;i<table[hash_result].next_count; ++i)
+            {
+                add_hash(table, table[hash_result].nexts[i].key, table[hash_result].nexts[i].val);
+                table[hash_result].nexts[i].used = 0;
+	    	    free(table[hash_result].nexts[i].key);
+	        	table[hash_result].nexts[i].key = NULL;
+	        	free(table[hash_result].nexts[i].val);
+	        	table[hash_result].nexts[i].val = NULL;
+            }
+        }
 		return 0;
 	}
 
