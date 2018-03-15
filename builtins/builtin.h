@@ -39,9 +39,9 @@ builtin_function find_builtin(char *name);
 struct builtin
 {
 	char *name;
-	builtin_function proc; 
+	builtin_function proc;
 };
 
-extern const struct builtin builtins[]; 
+extern const struct builtin builtins[];
 
 #endif

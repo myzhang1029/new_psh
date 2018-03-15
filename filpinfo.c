@@ -150,7 +150,7 @@ int filpinfo(char *buffer, struct command *info)
 	} while (0)
 
 #define malloc_one(n)                                                                                                  \
-	(cmd_lastnode->parameters[n]) = malloc(sizeof(char) * MAXEACHARG);                              \
+	(cmd_lastnode->parameters[n]) = malloc(sizeof(char) * MAXEACHARG);                                             \
 	memset(cmd_lastnode->parameters[n], 0, MAXEACHARG)
 
 /* Write the current char in buffer to current command, increase cnt_return
@@ -158,8 +158,7 @@ int filpinfo(char *buffer, struct command *info)
 #define write_current()                                                                                                \
 	do                                                                                                             \
 	{                                                                                                              \
-		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] =                   \
-		    buffer[cnt_buffer];                                                                                \
+		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = buffer[cnt_buffer];              \
 		if (strchr(" \t", buffer[cnt_buffer]) == NULL && buffer[cnt_buffer] != 0) /* current char not blank */ \
 			cnt_return++;                                                                                  \
 	} /* Make the semicolon happy */ while (0)
@@ -168,7 +167,7 @@ int filpinfo(char *buffer, struct command *info)
 #define write_char(c)                                                                                                  \
 	do                                                                                                             \
 	{                                                                                                              \
-		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = c;                \
+		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = c;                               \
 		if (strchr(" \t", c) == NULL && c != 0)                                                                \
 			cnt_return++;                                                                                  \
 	} while (0)
@@ -180,8 +179,8 @@ int filpinfo(char *buffer, struct command *info)
 		ignore: determine whether a meta character should be ignored(not
 	   for a dollar)
 	*/
-	struct command *cmd_lastnode = info/* The last node of the command list */;
-	struct redirect *redir_lastnode = info?info->rlist:NULL;
+	struct command *cmd_lastnode = info /* The last node of the command list */;
+	struct redirect *redir_lastnode = info ? info->rlist : NULL;
 	int stat_in_squote = 0, stat_in_dquote = 0, stat_parsing_redirect = 0;
 	int cnt_buffer = 0, cnt_argument_char = 0, cnt_argument_element = 0, cnt_return = 0, cnt_old_parameter = 0,
 	    cnt_first_nonIFS = 0;
@@ -497,15 +496,14 @@ int filpinfo(char *buffer, struct command *info)
 					}
 				}
 			}
-			case 0:/* final EOL reached*/
-				if(cnt_buffer == cnt_first_nonIFS || !ignore)
+			case 0: /* final EOL reached*/
+				if (cnt_buffer == cnt_first_nonIFS || !ignore)
 					goto done;
 				/* Line: command args... \
 				 */
 				char *newline_buf;
 				newline_buf = p_gets("> ");
-				buffer = realloc(buffer, strlen(buffer) + strlen(newline_buf) +
-										     1 /* \0 */);
+				buffer = realloc(buffer, strlen(buffer) + strlen(newline_buf) + 1 /* \0 */);
 				strncat(buffer, newline_buf, strlen(newline_buf));
 				free(newline_buf);
 				break;
@@ -522,93 +520,100 @@ int filpinfo(char *buffer, struct command *info)
 					write_current();
 					break;
 				}
-				if(buffer[cnt_buffer+1] != '>')
+				if (buffer[cnt_buffer + 1] != '>')
 				{
-					if(redir_lastnode->type != 0)
+					if (redir_lastnode->type != 0)
 						code_fault(__FILE__, __LINE__);
 					else
 						redir_lastnode->type = OUT_REDIR;
 				}
-				if(cnt_buffer == cnt_first_nonIFS)
-					redir_lastnode->in.fd = 1/* stdout */;
+				if (cnt_buffer == cnt_first_nonIFS)
+					redir_lastnode->in.fd = 1 /* stdout */;
 				else
 				{
 					int case_count = cnt_buffer, case_buf_cnt = 0;
 					char buf[MAXLINE] = {0};
-					while(--case_count,1/* infinity loop */)
+					while (--case_count, 1 /* infinity loop */)
 					{
-						if(case_count == cnt_first_nonIFS || !isdigit(buffer[case_count]))
+						if (case_count == cnt_first_nonIFS || !isdigit(buffer[case_count]))
 						{
-							if(buf[0] == 0)
-								buf[0] = 1/* stdout */;
+							if (buf[0] == 0)
+								buf[0] = 1 /* stdout */;
 							break;
 						}
-						else/* digit */
+						else /* digit */
 							buf[case_buf_cnt++] = buffer[case_count];
 					}
-					int len=strlen(buf);
+					int len = strlen(buf);
 					char temp;
 					int i;
-					for (i=0;i<len/2;i++)/* reverse buf */
+					for (i = 0; i < len / 2; i++) /* reverse buf */
 					{
-						temp=buf[i];
-						buf[i]=buf[len-i-1];
-						buf[len-i-1]=temp;
+						temp = buf[i];
+						buf[i] = buf[len - i - 1];
+						buf[len - i - 1] = temp;
 					}
 					redir_lastnode->in.fd = atoi(buf);
 				}
-				switch(buffer[cnt_buffer+1])
+				switch (buffer[cnt_buffer + 1])
 				{
 					case '&':
-						++cnt_buffer;/* Increase cnt_buffer to the '&' */
-						if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+						++cnt_buffer; /* Increase cnt_buffer to the '&' */
+						if (ignore_IFSs(buffer, ++cnt_buffer) ==
+						    -5) /* and remove all following blanks */
 						{
 							synerr("newline"); /* if EOL met, report error */
 							cnt_return = -2;
 							goto done;
 						}
-						stat_parsing_redirect = 1;/* Parsing for fd */
+						stat_parsing_redirect = 1; /* Parsing for fd */
 						break;
 					case ' ':
 					case '\t':
 					case '|':
-						++cnt_buffer;/* Increase cnt_buffer to the [' ''\t''|'] */
-						if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+						++cnt_buffer; /* Increase cnt_buffer to the [' ''\t''|'] */
+						if (ignore_IFSs(buffer, ++cnt_buffer) ==
+						    -5) /* and remove all following blanks */
 						{
 							synerr("newline"); /* if EOL met, report error */
 							cnt_return = -2;
 							goto done;
 						}
-						stat_parsing_redirect = 2;/* Parsing for filename */
+						stat_parsing_redirect = 2; /* Parsing for filename */
 						break;
 					case '>': /* Out append */
-						if(redir_lastnode->type != 0)
+						if (redir_lastnode->type != 0)
 							code_fault(__FILE__, __LINE__);
 						redir_lastnode->type = OUT_APPN;
 						++cnt_buffer;
-						switch(buffer[cnt_buffer+1])
+						switch (buffer[cnt_buffer + 1])
 						{
 							case '&':
-								++cnt_buffer;/* Increase cnt_buffer to the '&' */
-								if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+								++cnt_buffer; /* Increase cnt_buffer to the '&' */
+								if (ignore_IFSs(buffer, ++cnt_buffer) ==
+								    -5) /* and remove all following blanks */
 								{
-									synerr("newline"); /* if EOL met, report error */
+									synerr(
+									    "newline"); /* if EOL met, report error */
 									cnt_return = -2;
 									goto done;
 								}
-								stat_parsing_redirect = 1;/* Parsing for fd */
+								stat_parsing_redirect = 1; /* Parsing for fd */
 								break;
 							case ' ':
 							case '\t':
 							case '|':
-								++cnt_buffer;/* Increase cnt_buffer to the [' ''\t''|'] */
-								if(ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+								++cnt_buffer; /* Increase cnt_buffer to the [' ''\t''|']
+									       */
+								if (ignore_IFSs(buffer, ++cnt_buffer) ==
+								    -5) /* and remove all following blanks */
 								{
-									synerr("newline"); /* if EOL met, report error */
+									synerr(
+									    "newline"); /* if EOL met, report error */
 									cnt_return = -2;
 									goto done;
 								}
-								stat_parsing_redirect = 2;/* Parsing for filename */
+								stat_parsing_redirect = 2; /* Parsing for filename */
 								break;
 							case '>': /* >>> */
 								synerr(">");
@@ -627,8 +632,8 @@ int filpinfo(char *buffer, struct command *info)
 						synerr("newline");
 						cnt_return = -2;
 						goto done;
-					default:/* I don't need to handle the rest */
-						stat_parsing_redirect = 2;/* Parsing for filename */
+					default:			   /* I don't need to handle the rest */
+						stat_parsing_redirect = 2; /* Parsing for filename */
 						break;
 				}
 				break;
@@ -661,7 +666,7 @@ int filpinfo(char *buffer, struct command *info)
 			default:
 				write_current();
 		}
-	}while(++cnt_buffer);
+	} while (++cnt_buffer);
 done:
 	if (cnt_return > 0)
 		write_char(0);

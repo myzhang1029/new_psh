@@ -31,5 +31,5 @@ int builtin_exit(ARGS)
 		int i = atoi(b_parameters[1]);
 		exit_psh(i);
 	}
-	return 2;/* Noreturn */
+	return 2; /* Noreturn */
 }

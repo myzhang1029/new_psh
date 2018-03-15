@@ -21,56 +21,54 @@
 char *p_fgets(char *prompt, FILE *fp)
 {
 	char *result;
-	if(fp == NULL)
+	if (fp == NULL)
 		return NULL;
-#ifndef NO_READLINE	
-	if(fp == stdin)
+#ifndef NO_READLINE
+	if (fp == stdin)
 	{
-		result = readline(prompt);	
+		result = readline(prompt);
 		return result;
 	}
 #endif
 	result = malloc(sizeof(char) * MAXLINE);
-	if(result == NULL)
+	if (result == NULL)
 		return NULL;
-	if(fp == stdin)
+	if (fp == stdin)
 		printf("%s", prompt);
 	{
 		char *ptr = result;
 		size_t charcount = 0, totalsize = MAXLINE;
-		while(1)
+		while (1)
 		{
 			*ptr = fgetc(fp);
-			if(*ptr == EOF)
+			if (*ptr == EOF)
 			{
-				if(ptr ==result)/* nothing read */
+				if (ptr == result) /* nothing read */
 				{
 					free(result);
 					return NULL;
 				}
-				*ptr = 0;/* Terminate here */
-				result = realloc(result, strlen(result)-1);/* Resize the array to minimum */
+				*ptr = 0;				      /* Terminate here */
+				result = realloc(result, strlen(result) - 1); /* Resize the array to minimum */
 				return result;
 			}
-			if(*ptr == '\n')
+			if (*ptr == '\n')
 			{
 				*ptr = 0;
-				result = realloc(result, strlen(result)-1);/* Resize the array to minimum */
+				result = realloc(result, strlen(result) - 1); /* Resize the array to minimum */
 				return result;
 			}
 			++ptr;
-			if((++charcount) == totalsize)
-				if((result = realloc(result, (totalsize = totalsize << 1))) == NULL)/* malloc more mem */
+			if ((++charcount) == totalsize)
+				if ((result = realloc(result, (totalsize = totalsize << 1))) ==
+				    NULL) /* malloc more mem */
 					return NULL;
 		}
 	}
 	return result;
 }
 
-char *p_gets(char *prompt)
-{
-	return p_fgets(prompt, stdin);
-}
+char *p_gets(char *prompt) { return p_fgets(prompt, stdin); }
 
 void code_fault(char *file, int line)
 {

@@ -16,12 +16,6 @@
    limitations under the License.
 */
 #include "builtin.h"
-int builtin_true(ARGS)
-{
-	return 1;
-}
+int builtin_true(ARGS) { return 1; }
 
-int builtin_false(ARGS)
-{
-	return 2;
-}
+int builtin_false(ARGS) { return 2; }

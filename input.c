@@ -70,4 +70,3 @@ int read_command(char *prompt, struct command *info)
 	count = filpinfo(buffer, info);
 	return count;
 }
-
