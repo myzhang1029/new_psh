@@ -548,7 +548,8 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					int len=strlen(buf);
 					char temp;
-					for (int i=0;i<len/2;i++)/* reverse buf */
+					int i;
+					for (i=0;i<len/2;i++)/* reverse buf */
 					{
 						temp=buf[i];
 						buf[i]=buf[len-i-1];
