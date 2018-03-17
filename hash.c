@@ -23,9 +23,9 @@
 #include <string.h>
 #include "pshell.h"
 
-    /* Resize the hash table, the new size cannot be lower than the old size,
-     * otherwise return 1. return 2 if realloc failed, 0 if success */
-    int realloc_hash(PSH_HASH **table, int newlen)
+/* Resize the hash table, the new size cannot be lower than the old size,
+ * otherwise return 1. return 2 if realloc failed, 0 if success */
+int realloc_hash(PSH_HASH **table, int newlen)
 {
 	/* XXX: This algorithm uses a helping table */
 	PSH_HASH *newtable = new_hash(newlen);
@@ -42,7 +42,7 @@
 			/* rehash */
 			add_hash(newtable, (*table)[i].key, (*table)[i].val);
 		}
-		for (j = 0; j < next_count; ++j)
+		for (j = 0; j < (*table)[i].next_count; ++j)
 		{
 			add_hash(newtable, (*table)[i].nexts[j].key, (*table)[i].nexts[j].val);
 		}
@@ -89,16 +89,6 @@ static int edit_hash_elem(PSH_HASH *elem, char *val)
 	return 0;
 }
 
-/* Search for an element by key, return position if found, -1 if not */
-static int search_for_element_by_key(PSH_HASH *table, char *key)
-{
-	int i;
-	for (i = 0; i < (table->len); ++i)
-		if (table[i].key != NULL && strcmp(table[i].key, key) == 0)
-			return i;
-	return -1;
-}
-
 /* Add or edit a hash element, return 0 if success, 1 if not */
 int add_hash(PSH_HASH *table, char *key, char *val)
 {
@@ -113,13 +103,20 @@ int add_hash(PSH_HASH *table, char *key, char *val)
 		}
 		/* else */
 		/* save to nexts */
-		if (table[hash_result].next_count + 1 == 64)			      /*maximum exceeded*/
-			realloc_hash(table, (table[0].len << 1) + 1); /*get an approx. twice bigger table */
-		PSH_HASH avail = table[hash_result].nexts[next_count++] = alloc_elem();
+		if (table[hash_result].next_count + 1 == 64)	   /*maximum exceeded*/
+			realloc_hash(&table, (table[0].len << 1) + 1); /*get an approx. twice bigger table */
+		if (table[hash_result].next_count == 0)		       /* No elements in nexts */
+		{
+			if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) == NULL)
+				OUT2E("%s: add_hash: malloc failed\n", argv0);
+			return 1;
+		}
+		PSH_HASH avail =
+		    table[hash_result].nexts[(table[hash_result].next_count)++]; /* The first blank element */
 		avail.used = 1;
 		avail.key = malloc(strlen(key) + 1);
 		strcpy(avail.key, key);
-		return edit_hash_elem(avail, val);
+		return edit_hash_elem(&avail, val);
 	}
 	table[hash_result].used = 1;
 	table[hash_result].key = malloc(strlen(key) + 1);
@@ -154,7 +151,7 @@ char *get_hash(PSH_HASH *table, char *key)
 int rm_hash(PSH_HASH *table, char *key)
 {
 	int hash_result = hasher(key, table->len);
-	if (strcmp(table[hash_result].key, key) == 0)
+	if (strcmp(table[hash_result].key, key) == 0) /* Deleting the first element */
 	{
 		if (table[hash_result].used == 0)
 			return 1;
@@ -165,25 +162,37 @@ int rm_hash(PSH_HASH *table, char *key)
 		table[hash_result].val = NULL;
 		if (table[hash_result].next_count != 0)
 		{
-			int i;
-			for (i = 0; i < table[hash_result].next_count; ++i)
+			/* Move the last element in nexts here */
+			int i = table[hash_result].next_count - 1;
+			add_hash(table, table[hash_result].nexts[i].key, table[hash_result].nexts[i].val);
+			table[hash_result].nexts[i].used = 0;
+			table[hash_result].next_count--;
+		}
+		return 0;
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < table[hash_result].next_count; ++i)
+		{
+			if (strcmp(table[hash_result].nexts[i].key, key) == 0)
 			{
-				add_hash(table, table[hash_result].nexts[i].key, table[hash_result].nexts[i].val);
-				table[hash_result].nexts[i].used = 0;
 				free(table[hash_result].nexts[i].key);
 				table[hash_result].nexts[i].key = NULL;
 				free(table[hash_result].nexts[i].val);
 				table[hash_result].nexts[i].val = NULL;
+				if ((i + 1) != table[hash_result].next_count)
+				{
+					/* Move the last element in nexts here */
+					i = table[hash_result].next_count - 1;
+					add_hash(table, table[hash_result].nexts[i].key,
+						 table[hash_result].nexts[i].val);
+					table[hash_result].nexts[i].used = 0;
+					table[hash_result].next_count--;
+				}
 			}
 		}
-		return 0;
 	}
-
-	if (hash_result == -1 || table[hash_result].used == 0)
-		return 1;
-	table[hash_result].used = 0;
-	free(table[hash_result].key);
-	free(table[hash_result].val);
 	return 0;
 }
 
