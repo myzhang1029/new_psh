@@ -1,4 +1,4 @@
-< /*
+/*
     hash.c - hash table manage functions of the psh
 
     Copyright 2017 Zhang Maiyun.
@@ -64,7 +64,6 @@ PSH_HASH *new_hash(int len)
 	}
 
 	table[0].len = len;
-	table[0].count = 0;
 
 	for (i = 0; i < len; ++i)
 	{
@@ -74,20 +73,6 @@ PSH_HASH *new_hash(int len)
 	}
 
 	return table;
-}
-
-/* allocate an element */
-static PSH_HASH alloc_elem()
-{
-	PSH_HASH elem = malloc(sizeof(PSH_HASH));
-	if (!elem)
-	{
-		OUT2E("%s: Unable to malloc: %s\n", argv0, strerror(errno));
-		return NULL;
-	}
-	elem.key = elem.val = NULL;
-	elem.used = 0;
-	return elem;
 }
 
 /* Edit the vaule of an element, return 0 if success, 1 if not */
@@ -128,7 +113,7 @@ int add_hash(PSH_HASH *table, char *key, char *val)
 		}
 		/* else */
 		/* save to nexts */
-		if (next_count + 1 == 64)			      /*maximum exceeded*/
+		if (table[hash_result].next_count + 1 == 64)			      /*maximum exceeded*/
 			realloc_hash(table, (table[0].len << 1) + 1); /*get an approx. twice bigger table */
 		PSH_HASH avail = table[hash_result].nexts[next_count++] = alloc_elem();
 		avail.used = 1;
