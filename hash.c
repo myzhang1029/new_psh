@@ -57,9 +57,9 @@ PSH_HASH *new_hash(unsigned int len)
 {
 	unsigned int i;
 	PSH_HASH *table;
-	if(len==0)
-		return malloc(0);/* Ask the libc malloc for a value */
-		
+	if (len == 0)
+		return malloc(0); /* Ask the libc malloc for a value */
+
 	table = malloc(sizeof(PSH_HASH) * len);
 	if (table == NULL)
 	{
@@ -95,7 +95,7 @@ static int edit_hash_elem(PSH_HASH *elem, char *val)
 /* Add or edit a hash element, return 0 if success, 1 if not */
 int add_hash(PSH_HASH **arg_table, char *key, char *val)
 {
-	PSH_HASH *avail, *table=*arg_table;
+	PSH_HASH *avail, *table = *arg_table;
 	int i;
 	int hash_result = hasher(key, table->len);
 	if (table[hash_result].used != 0)
@@ -112,8 +112,10 @@ int add_hash(PSH_HASH **arg_table, char *key, char *val)
 		if (table[hash_result].next_count == 0)		       /* No elements in nexts */
 		{
 			if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) == NULL)
+			{
 				OUT2E("%s: add_hash: malloc failed\n", argv0);
-			return 1;
+				return 1;
+			}
 		}
 		avail = &(table[hash_result].nexts[(table[hash_result].next_count)++]); /* The first blank element */
 		avail->used = 1;
@@ -126,7 +128,7 @@ int add_hash(PSH_HASH **arg_table, char *key, char *val)
 	strcpy(table[hash_result].key, key);
 	/* Write element */
 	i = edit_hash_elem(&table[hash_result], val);
-	*arg_table=table;/* Apply changes to the pointer if there are any */
+	*arg_table = table; /* Apply changes to the pointer if there are any */
 	return i;
 }
 
