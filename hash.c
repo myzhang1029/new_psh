@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "pshell.h"
+#include "pshell.h"
 
 /* Resize the hash table, the new size cannot be lower than the old size,
  * otherwise return 1. return 2 if realloc failed, 0 if success */
