@@ -23,8 +23,8 @@
 
 int hasher(const char *s, int ulimit)
 {
-	int i;
-	for (i = 0; *s; s++)
+	unsigned int i;
+	for (i = 0; *s; ++s)
 	{
 		i *= 16777619;
 		i ^= *s;
