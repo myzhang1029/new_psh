@@ -21,7 +21,7 @@
 */
 #include <stdio.h>
 
-int hasher(const char *s, int ulimit)
+unsigned int hasher(const char *s, unsigned int ulimit)
 {
 	unsigned int i;
 	for (i = 0; *s; ++s)

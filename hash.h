@@ -27,11 +27,11 @@ typedef struct psh_hash_struct
 	struct psh_hash_struct *nexts; /* array with 64 elements */
 } PSH_HASH;
 
-int realloc_hash(PSH_HASH **, unsigned int);
+PSH_HASH *realloc_hash(PSH_HASH *, unsigned int);
 PSH_HASH *new_hash(unsigned int);
 int add_hash(PSH_HASH **, char *, char *);
 char *get_hash(PSH_HASH *, char *);
 int rm_hash(PSH_HASH *, char *);
 void del_hash(PSH_HASH *);
 
-int hasher(const char *s, int ulimit);
+unsigned int hasher(const char *s, unsigned int ulimit);

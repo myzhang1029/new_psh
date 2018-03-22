@@ -25,31 +25,30 @@
 
 /* Resize the hash table, the new size cannot be lower than the old size,
  * otherwise return 1. return 2 if realloc failed, 0 if success */
-int realloc_hash(PSH_HASH **table, unsigned int newlen)
+PSH_HASH *realloc_hash(PSH_HASH *table, unsigned int newlen)
 {
 	/* XXX: This algorithm uses a helping table */
 	PSH_HASH *newtable = new_hash(newlen);
 	unsigned int i;
-	if (table == NULL)
+	if (newtable == NULL)
 	{
 		OUT2E("%s: realloc_hash: %s\n", argv0, strerror(errno));
 	}
-	for (i = 0; i < (**table).len; ++i)
+	for (i = 0; i < table->len; ++i)
 	{
 		unsigned int j;
-		if ((*table)[i].key != NULL)
+		if (table[i].key != NULL)
 		{
 			/* rehash */
-			add_hash(&newtable, (*table)[i].key, (*table)[i].val);
+			add_hash(&newtable, table[i].key, table[i].val);
 		}
-		for (j = 0; j < (*table)[i].next_count; ++j)
+		for (j = 0; j < table[i].next_count; ++j)
 		{
-			add_hash(&newtable, (*table)[i].nexts[j].key, (*table)[i].nexts[j].val);
+			add_hash(&newtable, table[i].nexts[j].key, table[i].nexts[j].val);
 		}
 	}
-	free(*table);
-	*table = newtable;
-	return 0;
+	del_hash(table);
+	return newtable;
 }
 
 /* Allocate a new hash table, return the table if success, NULL if not */
@@ -82,13 +81,15 @@ PSH_HASH *new_hash(unsigned int len)
 /* Edit the vaule of an element, return 0 if success, 1 if not */
 static int edit_hash_elem(PSH_HASH *elem, char *val)
 {
+	char *tmp;
 	/* Need more space/free extra space */
-	if ((elem->val = realloc(elem->val, strlen(val) + 1)) == NULL)
+	if ((tmp = realloc(elem->val, strlen(val) + 1)) == NULL)
 	{
 		OUT2E("%s: Unable to realloc: %s\n", argv0, strerror(errno));
 		return 1;
 	}
-	strcpy((*elem).val, val);
+	elem->val=tmp;
+	strcpy(elem->val, val);
 	return 0;
 }
 
@@ -97,7 +98,9 @@ int add_hash(PSH_HASH **arg_table, char *key, char *val)
 {
 	PSH_HASH *avail, *table = *arg_table;
 	int i;
-	int hash_result = hasher(key, table->len);
+	unsigned int hash_result;
+recheck:
+	hash_result = hasher(key, table->len);
 	if (table[hash_result].used != 0)
 	{
 		/* Doing edit */
@@ -108,7 +111,14 @@ int add_hash(PSH_HASH **arg_table, char *key, char *val)
 		/* else */
 		/* save to nexts */
 		if (table[hash_result].next_count + 1 == 64)	   /*maximum exceeded*/
-			realloc_hash(&table, (table[0].len << 1) + 1); /*get an approx. twice bigger table */
+		{
+			PSH_HASH *tmp;
+			tmp = realloc_hash(table, ((table->len) << 1) + 1); /*get an approx. twice bigger table */
+			if(tmp == NULL)
+				return 1;
+			table = tmp;
+			goto recheck;
+		}
 		if (table[hash_result].next_count == 0)		       /* No elements in nexts */
 		{
 			if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) == NULL)
@@ -135,14 +145,14 @@ int add_hash(PSH_HASH **arg_table, char *key, char *val)
 /* Get a hash value by key, return value if success, NULL if not */
 char *get_hash(PSH_HASH *table, char *key)
 {
-	int hash_result = hasher(key, table->len);
+	unsigned int hash_result = hasher(key, table->len);
 	if (table[hash_result].key != NULL)
 	{
 		if (strcmp(table[hash_result].key, key) == 0)
 			return table[hash_result].val;
 		else
 		{
-			int i;
+			unsigned int i;
 			for (i = 0; i < table[hash_result].next_count; ++i)
 			{
 				if (strcmp(table[hash_result].nexts[i].key, key) == 0)
@@ -157,7 +167,7 @@ char *get_hash(PSH_HASH *table, char *key)
  * element not found */
 int rm_hash(PSH_HASH *table, char *key)
 {
-	int hash_result = hasher(key, table->len);
+	unsigned int hash_result = hasher(key, table->len);
 	if (strcmp(table[hash_result].key, key) == 0) /* Deleting the first element */
 	{
 		if (table[hash_result].used == 0)
@@ -170,7 +180,7 @@ int rm_hash(PSH_HASH *table, char *key)
 		if (table[hash_result].next_count != 0)
 		{
 			/* Move the last element in nexts here */
-			int i = table[hash_result].next_count - 1;
+			unsigned int i = table[hash_result].next_count - 1;
 			add_hash(&table, table[hash_result].nexts[i].key, table[hash_result].nexts[i].val);
 			table[hash_result].nexts[i].used = 0;
 			table[hash_result].next_count--;
@@ -179,7 +189,7 @@ int rm_hash(PSH_HASH *table, char *key)
 	}
 	else
 	{
-		int i;
+		unsigned int i;
 		for (i = 0; i < table[hash_result].next_count; ++i)
 		{
 			if (strcmp(table[hash_result].nexts[i].key, key) == 0)
@@ -211,7 +221,7 @@ void del_hash(PSH_HASH *table)
 	{
 		if (table[i].used != 0)
 		{
-			int j;
+			unsigned int j;
 			free(table[i].key);
 			free(table[i].val);
 			for (j = 0; j < table[i].next_count; ++j)
@@ -219,6 +229,8 @@ void del_hash(PSH_HASH *table)
 				free(table[i].nexts[j].key);
 				free(table[i].nexts[j].val);
 			}
+			if(table[i].next_count != 0)
+				free(table[i].nexts);
 		}
 	}
 	free(table);
