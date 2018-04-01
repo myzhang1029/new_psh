@@ -27,10 +27,17 @@ int last_command_status = 0;
 jmp_buf reset_point;
 char *argv0;
 
-void proc(void)
+int main(int argc, char **argv)
 {
 	char prompt[MAX_PROMPT];
 	struct command *info;
+	argv0 = strdup((strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
+
+	if (argv0 == NULL)
+	{
+		OUT2E("psh: strdup: No memory\n");
+		exit(1);
+	}
 	prepare();
 #ifndef NO_HISTORY
 	using_history();
@@ -61,18 +68,7 @@ void proc(void)
 				break;
 		}
 		free_command(info);
-	}
-}
-
-int main(int argc, char **argv)
-{
-	argv0 = strdup((strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
-
-	if (argv0 == NULL)
-	{
-		OUT2E("psh: strdup: No memory\n");
-		exit(1);
-	}
-	proc();
+	
 	return 0;
+	}
 }
