@@ -49,7 +49,8 @@ struct command /* Everything about a command */
 		BG_CMD = 1,
 		PIPED,
 		RUN_AND,
-		RUN_OR
+		RUN_OR,
+        MULTICMD
 	} flag;
 	struct redirect
 	{

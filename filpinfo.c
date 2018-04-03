@@ -638,7 +638,7 @@ int filpinfo(char *buffer, struct command *info)
 				}
 				break;
 			case '<':
-				/* TODO: Write input redirect and heredoc code
+				/* TODO: Write input redirect, here string and here document code
 				 * here */
 				write_current();
 				break;
@@ -663,6 +663,54 @@ int filpinfo(char *buffer, struct command *info)
 			/* TODO: Write command sequence code here */
 			case ';':
 			/* TODO: Write muiltiple command process code here */
+                if (ignore)
+					write_current();
+				else
+				{
+					if (cnt_argument_char == 0) /* Previously a blank reached */
+					{
+						cnt_argument_char = cnt_old_parameter;
+						free(cmd_lastnode->parameters[cnt_argument_element]);
+						cmd_lastnode->parameters[cnt_argument_element] = NULL;
+					}
+					if (new_command(&(cmd_lastnode->next)) == -1)
+					{
+						/* malloc failed, cleanup */
+						OUT2E("%s: filpinfo: malloc "
+						      "failed\n",
+						      argv0);
+						cnt_return = -1;
+						goto done;
+					}
+					if (info->flag == 0)
+						info->flag = MULTICMD;
+					else
+					{
+						synerr(";");
+						cnt_return = -2;
+						goto done;
+					}
+					if (ignore_IFSs(buffer, cnt_buffer + 1 /* the char after ; */) == -5) /* EOL */
+					{
+                        goto done;/* Ending `;', end parsing */
+					}
+					++cnt_buffer;
+				}
+				cmd_lastnode = cmd_lastnode->next;
+				cnt_argument_element = 0;
+				cnt_argument_char = 0;
+				ignIFS_from_next_char();
+                do/* Remove all following `;'s. I'll mess up with case later. TODO */
+               	{
+	            	if (!buffer[cnt_buffer]) /* EOL */
+                        ;/* No new command required */
+                    if (buffer[cnt_buffer] != ';')
+	            	{
+                        --cnt_buffer;
+                        break;
+                    }
+            	} while (++cnt_buffer);
+				break;
 			default:
 				write_current();
 		}
