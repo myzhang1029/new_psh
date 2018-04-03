@@ -22,16 +22,16 @@ typedef struct psh_hash_struct
 	char *key;
 	char *val;
 	unsigned used : 1;
-	int len;		       /* Only used in the first element */
+	unsigned int len;	      /* Only used in the first element */
 	unsigned next_count : 6;       /* count for nexts */
 	struct psh_hash_struct *nexts; /* array with 64 elements */
 } PSH_HASH;
 
-int realloc_hash(PSH_HASH **, int);
-PSH_HASH *new_hash(int);
-int add_hash(PSH_HASH *, char *, char *);
+PSH_HASH *realloc_hash(PSH_HASH *, unsigned int);
+PSH_HASH *new_hash(unsigned int);
+int add_hash(PSH_HASH **, char *, char *);
 char *get_hash(PSH_HASH *, char *);
 int rm_hash(PSH_HASH *, char *);
 void del_hash(PSH_HASH *);
 
-int hasher(const char *s, int ulimit);
+unsigned int hasher(const char *s, unsigned int ulimit);
