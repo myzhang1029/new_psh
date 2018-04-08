@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 		OUT2E("psh: strdup: No memory\n");
 		exit(1);
 	}
+	add_atexit_free(argv0);
 	prepare();
 #ifndef NO_HISTORY
 	using_history();
