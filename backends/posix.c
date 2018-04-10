@@ -157,15 +157,14 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char 
 int do_run(struct command *arginfo)
 {
 	struct command *info = arginfo;
-	while (1)
-	{
-		if (info->flag & PIPED)
-			if (pipe(pipe_fd) < 0)
-			{
-				OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
-				exit_psh(1);
-			}
-	}
+    printf("stub!\n");
+    printf("info position: %p\n", arginfo);
+	if (info->flag & PIPED)
+	    if (pipe(pipe_fd) < 0)
+	    {
+	    	OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
+	    	exit_psh(1);
+	    }
 	if (info->flag & PIPED) /*command is not null*/
 	{
 		if (pipe(pipe_fd) < 0)
@@ -232,15 +231,14 @@ int do_run(struct command *arginfo)
 			if (errno == ENOENT)
 			{
 				OUT2E("%s: %s: command not found\n", argv0, info->parameters[0]);
-				last_command_status = 127;
+				_Exit(127);
 			}
 			else
 			{
 				OUT2E("%s: %s: %s\n", argv0, info->parameters[0], strerror(errno));
 				/* Exit the failed command child process */
-				last_command_status = 126;
+				_Exit(126);
 			}
-			_Exit(1);
 		}
 	}
 	return 0;
