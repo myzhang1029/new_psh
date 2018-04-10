@@ -68,7 +68,6 @@ int main(int argc, char **argv)
 				break;
 		}
 		free_command(info);
-	
-	return 0;
 	}
+	return 0;
 }
