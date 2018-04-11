@@ -279,9 +279,9 @@ int filpinfo(char *buffer, struct command *info)
 					if (ignore_IFSs(buffer, cnt_buffer + 1 /* the char after & */) == -5) /* EOL */
 					{
 						/* done */
-						if (info->flag == 0)
-							info->flag = BG_CMD; /* cmd & \0
-									      */
+						if (cmd_lastnode->flag == 0)
+							cmd_lastnode->flag = BG_CMD; /* cmd & \0
+										      */
 						else
 						{
 							synerr("&");
@@ -299,8 +299,8 @@ int filpinfo(char *buffer, struct command *info)
 							cnt_return = -1;
 							goto done;
 						}
-						if (info->flag == 0)
-							info->flag = RUN_AND;
+						if (cmd_lastnode->flag == 0)
+							cmd_lastnode->flag = RUN_AND;
 						else
 						{
 							synerr("&&");
@@ -331,8 +331,8 @@ int filpinfo(char *buffer, struct command *info)
 							cnt_return = -1;
 							goto done;
 						}
-						if (info->flag == 0)
-							info->flag = BG_CMD;
+						if (cmd_lastnode->flag == 0)
+							cmd_lastnode->flag = BG_CMD;
 						else
 						{
 							synerr("&");
@@ -368,8 +368,8 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					if (buffer[cnt_buffer + 1] == '|')
 					{
-						if (info->flag == 0)
-							info->flag = RUN_OR;
+						if (cmd_lastnode->flag == 0)
+							cmd_lastnode->flag = RUN_OR;
 						else
 						{
 							synerr("||");
@@ -390,8 +390,8 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					else
 					{
-						if (info->flag == 0)
-							info->flag = PIPED;
+						if (cmd_lastnode->flag == 0)
+							cmd_lastnode->flag = PIPED;
 						else
 						{
 							synerr("|");
@@ -462,7 +462,8 @@ int filpinfo(char *buffer, struct command *info)
 						write_current();
 						break;
 					}
-					strncpy(info->parameters[cnt_argument_element], hdir, 4094 - cnt_argument_char);
+					strncpy(cmd_lastnode->parameters[cnt_argument_element], hdir,
+						4094 - cnt_argument_char);
 					cnt_buffer += strlen(username);
 					cnt_argument_char += strlen(hdir);
 					free(username);
@@ -470,7 +471,8 @@ int filpinfo(char *buffer, struct command *info)
 				else /* ~/ and ~ */
 				{
 					char *hdir = gethd();
-					strncpy(info->parameters[cnt_argument_element], hdir, 4094 - cnt_argument_char);
+					strncpy(cmd_lastnode->parameters[cnt_argument_element], hdir,
+						4094 - cnt_argument_char);
 					cnt_argument_char += strlen(hdir);
 				}
 				break;
@@ -682,8 +684,8 @@ int filpinfo(char *buffer, struct command *info)
 						cnt_return = -1;
 						goto done;
 					}
-					if (info->flag == 0)
-						info->flag = MULTICMD;
+					if (cmd_lastnode->flag == 0)
+						cmd_lastnode->flag = MULTICMD;
 					else
 					{
 						synerr(";");
