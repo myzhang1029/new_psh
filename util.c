@@ -22,9 +22,9 @@ void *freeptrs[16] = {NULL};
 
 int add_atexit_free(void *ptr)
 {
-	if((freeptrs[0]=((int)(freeptrs[0])+1))==(void *)16)
+	if ((freeptrs[0] = ((int)(freeptrs[0]) + 1)) == (void *)16)
 		return -1;
-	freeptrs[(int)(freeptrs[0])]=ptr;
+	freeptrs[(int)(freeptrs[0])] = ptr;
 	return (int)freeptrs[0];
 }
 
@@ -91,7 +91,7 @@ void code_fault(char *file, int line)
 void exit_psh(int status)
 {
 	int count;
-	for(count=1;count<(int)freeptrs[0];++count)
+	for (count = 1; count < (int)freeptrs[0]; ++count)
 		free(freeptrs[count]);
 	exit(status);
 }

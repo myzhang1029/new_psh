@@ -662,8 +662,8 @@ int filpinfo(char *buffer, struct command *info)
 			case ')':
 			/* TODO: Write command sequence code here */
 			case ';':
-			/* TODO: Write muiltiple command process code here */
-                if (ignore)
+				/* TODO: Write muiltiple command process code here */
+				if (ignore)
 					write_current();
 				else
 				{
@@ -692,7 +692,7 @@ int filpinfo(char *buffer, struct command *info)
 					}
 					if (ignore_IFSs(buffer, cnt_buffer + 1 /* the char after ; */) == -5) /* EOL */
 					{
-                        goto done;/* Ending `;', end parsing */
+						goto done; /* Ending `;', end parsing */
 					}
 					++cnt_buffer;
 				}
@@ -700,16 +700,16 @@ int filpinfo(char *buffer, struct command *info)
 				cnt_argument_element = 0;
 				cnt_argument_char = 0;
 				ignIFS_from_next_char();
-                do/* Remove all following `;'s. I'll mess up with case later. TODO */
-               	{
-	            	if (!buffer[cnt_buffer]) /* EOL */
-                        ;/* No new command required */
-                    if (buffer[cnt_buffer] != ';')
-	            	{
-                        --cnt_buffer;
-                        break;
-                    }
-            	} while (++cnt_buffer);
+				do /* Remove all following `;'s. I'll mess up with case later. TODO */
+				{
+					if (!buffer[cnt_buffer]) /* EOL */
+						;		 /* No new command required */
+					if (buffer[cnt_buffer] != ';')
+					{
+						--cnt_buffer;
+						break;
+					}
+				} while (++cnt_buffer);
 				break;
 			default:
 				write_current();

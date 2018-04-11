@@ -50,7 +50,7 @@ struct command /* Everything about a command */
 		PIPED,
 		RUN_AND,
 		RUN_OR,
-        MULTICMD
+		MULTICMD
 	} flag;
 	struct redirect
 	{

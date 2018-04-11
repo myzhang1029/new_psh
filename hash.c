@@ -88,7 +88,7 @@ static int edit_hash_elem(PSH_HASH *elem, char *val)
 		OUT2E("%s: Unable to realloc: %s\n", argv0, strerror(errno));
 		return 1;
 	}
-	elem->val=tmp;
+	elem->val = tmp;
 	strcpy(elem->val, val);
 	return 0;
 }
@@ -110,16 +110,16 @@ recheck:
 		}
 		/* else */
 		/* save to nexts */
-		if (table[hash_result].next_count + 1 == 64)	   /*maximum exceeded*/
+		if (table[hash_result].next_count + 1 == 64) /*maximum exceeded*/
 		{
 			PSH_HASH *tmp;
 			tmp = realloc_hash(table, ((table->len) << 1) + 1); /*get an approx. twice bigger table */
-			if(tmp == NULL)
+			if (tmp == NULL)
 				return 1;
 			table = tmp;
 			goto recheck;
 		}
-		if (table[hash_result].next_count == 0)		       /* No elements in nexts */
+		if (table[hash_result].next_count == 0) /* No elements in nexts */
 		{
 			if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) == NULL)
 			{
@@ -229,7 +229,7 @@ void del_hash(PSH_HASH *table)
 				free(table[i].nexts[j].key);
 				free(table[i].nexts[j].val);
 			}
-			if(table[i].next_count != 0)
+			if (table[i].next_count != 0)
 				free(table[i].nexts);
 		}
 	}

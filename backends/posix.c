@@ -157,14 +157,14 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char 
 int do_run(struct command *arginfo)
 {
 	struct command *info = arginfo;
-    printf("stub!\n");
-    printf("info position: %p\n", arginfo);
+	printf("stub!\n");
+	printf("info position: %p\n", arginfo);
 	if (info->flag & PIPED)
-	    if (pipe(pipe_fd) < 0)
-	    {
-	    	OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
-	    	exit_psh(1);
-	    }
+		if (pipe(pipe_fd) < 0)
+		{
+			OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
+			exit_psh(1);
+		}
 	if (info->flag & PIPED) /*command is not null*/
 	{
 		if (pipe(pipe_fd) < 0)
