@@ -157,78 +157,35 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char 
 int do_run(struct command *arginfo)
 {
 	struct command *info = arginfo;
-	printf("stub!\n");
+	int i = 0;
+	printf("--**--\nstub!\nflags won't be read\n");
 	printf("info position: %p\n", arginfo);
-	if (info->flag & PIPED)
-		if (pipe(pipe_fd) < 0)
-		{
-			OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
-			exit_psh(1);
-		}
-	if (info->flag & PIPED) /*command is not null*/
+	while (++i)
 	{
-		if (pipe(pipe_fd) < 0)
-		{
-			OUT2E("%s: pipe failed: %s\n", argv0, strerror(errno));
-			exit(0);
-		}
+		int j;
+		printf("part %d:\n"
+		       "command: %s\n"
+		       "params:\n",
+		       i, info->parameters[0]);
+		for (j = 0; info->parameters[j]; ++j)
+			printf("%s\n", info->parameters[j]);
+		printf("flag: %d\n", info->flag);
+		printf("redir type: %d\n", (info->rlist != NULL) ? info->rlist->type : 0);
+
+		if (info->next == NULL)
+			break;
+		info = info->next;
 	}
+	printf("--*END*--\n");
 	if ((ChdPid = fork()) != 0) /*shell*/
 	{
-		if (info->flag & PIPED)
-		{
-			if ((ChdPid2 = fork()) == 0) /*command*/
-			{
-				close(pipe_fd[1]);
-				close(fileno(stdin));
-				dup2(pipe_fd[0], fileno(stdin));
-				close(pipe_fd[0]);
-				execvp(info->parameters[0], (char **)info->parameters);
-			}
-			else
-			{
-				close(pipe_fd[0]);
-				close(pipe_fd[1]);
-				waitpid(ChdPid2, &last_command_status, 0); /*wait command*/
-			}
-		}
-
-		if (info->flag & BG_CMD)
-		{
-			int i;
-			for (i = 0; i < MAXPIDTABLE; i++)
-				if (BPTable[i] == 0)
-				{
-					BPTable[i] = ChdPid; /*register a
-								background
-								process*/
-					break;
-				}
-
-			printf("[%d] %u\n", i + 1, ChdPid);
-			if (i == MAXPIDTABLE)
-				OUT2E("%s: Too much background processes\n", argv0);
-			usleep(5000);
-		}
-		else
-		{
-			waitpid(ChdPid, &last_command_status, 0); /*wait command1*/
-		}
+		waitpid(ChdPid, &last_command_status, 0); /*wait command1*/
 	}
 	else /*command1*/
 	{
-
-		if (info->flag & PIPED) /*command is not null*/
-		{
-			close(pipe_fd[0]);
-			close(fileno(stdout));
-			dup2(pipe_fd[1], fileno(stdout));
-			close(pipe_fd[1]);
-		}
-
 		if (execvp(info->parameters[0], (char **)info->parameters) == -1)
 		{
-			if (errno == ENOENT)
+			if (errno == ENOENT && !strchr(info->parameters[0], '/'))
 			{
 				OUT2E("%s: %s: command not found\n", argv0, info->parameters[0]);
 				_Exit(127);
