@@ -62,12 +62,14 @@ struct command /* Everything about a command */
 			OUT_APPN,
 			IN_REDIR, /* filename to fd */
 			CLOSEFD,  /* n>&-; n<&- */
-			OPENFN    /* n<>name */
+			OPENFN,   /* n<>name */
+			HEREXX    /* heredoc, herestring */
 		} type;
 		union in /* file that redirect from */
 		{
 			int fd;
 			char *file;
+			FILE *herexx;/* temporary file created to store here document and here string values */
 		} in;
 		union out /* file than redirect to */
 		{
