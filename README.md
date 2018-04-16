@@ -13,7 +13,7 @@ for psh with readline library. It will require libreadline.
 typing file's names such as "example.[oa]" are not supported.
 
 # File List
-### pshell.c
+### main.c
 	main prog
 
 ### show.c
@@ -25,5 +25,8 @@ typing file's names such as "example.[oa]" are not supported.
 ### builtins.c builtins/
 	part of the builtins
 
-### parser.c
-	translates input
+### filpinfo.c
+	parser
+
+### util.c
+	utilities

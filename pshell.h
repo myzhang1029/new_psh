@@ -69,7 +69,7 @@ struct command /* Everything about a command */
 		{
 			int fd;
 			char *file;
-			FILE *herexx;/* temporary file created to store here document and here string values */
+			FILE *herexx; /* temporary file created to store here document and here string values */
 		} in;
 		union out /* file than redirect to */
 		{
