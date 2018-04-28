@@ -129,8 +129,10 @@ void free_command(struct command *info)
  * processed */
 int filpinfo(char *buffer, struct command *info)
 {
+/* Report a syntax error bashly */
 #define synerr(token) OUT2E("%s: syntax error near unexpected token `%s'\n", argv0, (token))
 
+/* Increase cnt_buffer to the last space from buffer[cnt_buffer] */
 #define ignIFS()                                                                                                       \
 	do                                                                                                             \
 	{                                                                                                              \
@@ -140,6 +142,7 @@ int filpinfo(char *buffer, struct command *info)
 		cnt_buffer = tmp;                                                                                      \
 	} while (0)
 
+/* Increase cnt_buffer to the last space from buffer[cnt_buffer+1] */
 #define ignIFS_from_next_char()                                                                                        \
 	do                                                                                                             \
 	{                                                                                                              \
@@ -149,19 +152,34 @@ int filpinfo(char *buffer, struct command *info)
 		cnt_buffer = tmp;                                                                                      \
 	} while (0)
 
-#define malloc_one(n)                                                                                                  \
-	(cmd_lastnode->parameters[n]) = malloc(sizeof(char) * MAXEACHARG);                                             \
-	memset(cmd_lastnode->parameters[n], 0, MAXEACHARG)
+/* malloc() and zero-initialize an element in parameters[][] */
+#define malloc_one(n) (cmd_lastnode->parameters[n]) = calloc(MAXEACHARG, sizeof(char))
 
 /* Write the current char in buffer to current command, increase cnt_return
- * only if current not blank or 0 */
+ * only if current is neither blank nor 0 */
 #define write_current()                                                                                                \
 	do                                                                                                             \
 	{                                                                                                              \
-		cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = buffer[cnt_buffer];              \
-		if (strchr(" \t", buffer[cnt_buffer]) == NULL && buffer[cnt_buffer] != 0) /* current char not blank */ \
-			cnt_return++;                                                                                  \
-	} /* Make the semicolon happy */ while (0)
+		if (stat_parsing_redirect == 0)                                                                        \
+			cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = buffer[cnt_buffer];      \
+		if (stat_parsing_redirect == 1)                                                                        \
+		{                                                                                                      \
+			if (redir_lastnode == NULL)                                                                    \
+			{                                                                                              \
+				redir_lastnode = malloc(sizeof(struct redirect));                                      \
+				redirect_init(redir_lastnode);                                                         \
+			}                                                                                              \
+			if (!isdigit(buffer[cnt_buffer]))                                                              \
+			{                                                                                              \
+				OUT2E("%s: %c: Digit input required\n", argv0, buffer[cnt_buffer]);                    \
+				cnt_return = -2;                                                                       \
+				goto done;                                                                             \
+			}                                                                                              \
+			if (strchr(" \t", buffer[cnt_buffer]) == NULL &&                                               \
+			    buffer[cnt_buffer] != 0) /* current char not blank */                                      \
+				cnt_return++;                                                                          \
+		} /* Make the semicolon happy */                                                                       \
+	} while (0)
 
 /* Write any char to current command, increase cnt_return only if c != 0 */
 #define write_char(c)                                                                                                  \
@@ -175,9 +193,9 @@ int filpinfo(char *buffer, struct command *info)
 #define escape (cnt_buffer != 0 && buffer[cnt_buffer - 1] == '\\')
 #define ignore (stat_in_dquote == 1 || stat_in_squote == 1 || escape)
 	/*
-		escape: determine whether the last character is '\\'
+		escape: determine whether last character is '\\'
 		ignore: determine whether a meta character should be ignored(not
-	   for a dollar)
+	   for a dollar sign)
 	*/
 	struct command *cmd_lastnode = info /* The last node of the command list */;
 	struct redirect *redir_lastnode = info ? info->rlist : NULL;
@@ -192,9 +210,9 @@ int filpinfo(char *buffer, struct command *info)
 		- stat_in_squote: whether in a '' quote;
 		- stat_in_dquote: whether in a "" quote;
 		- stat_parsing_redirect:
-		> 0: Not parsing for redirect;
-		> 1: Parsing for a fd (like 3>&1, 2<&7);
-		> 2: Parsing for a filename (like 1>output, 2>/dev/null);
+		x = 0: Not parsing for redirect;
+		x = 1: Parsing for a fd (like 3>&1, 2<&7);
+		x = 2: Parsing for a filename (like 1>output, 2>/dev/null);
 		- cnt_buffer: count for buffer;
 		- cnt_argument_char: count for current parameter element;
 		- cnt_argument_element: count representing how many elements are there in parameter;
@@ -202,14 +220,11 @@ int filpinfo(char *buffer, struct command *info)
 		- cnt_old_parameter: saved cnt_argument_char for undo IFS delim;
 		- cnt_first_nonIFS: the first non-IFS char in buffer.
 	*/
+	/* The input command should be initialized in main.c, otherwise report a programming error */
 	if (info == NULL)
-	{
-		OUT2E("%s: filpinfo: info is NULL\n", argv0);
-		return -1;
-	}
-	ignIFS();
+		code_fault(__FILE__, __LINE__);
+	ignIFS(); /* Ignore starting spaces */
 	cnt_first_nonIFS = ++cnt_buffer;
-	/* The input command should be initialized */
 	do
 	{
 		switch (buffer[cnt_buffer])
@@ -227,9 +242,7 @@ int filpinfo(char *buffer, struct command *info)
 						stat_in_squote = 1;
 					else if (!escape)
 						stat_in_squote = 1;
-					else /* cnt_buffer != cnt_first_nonIFS
-						&& buffer[cnt_buffer-1] ==
-						'\\' */
+					else /* not the first char and a '\\' is there */
 						/* Write a ' */
 						write_current();
 				}
