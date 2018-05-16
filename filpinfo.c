@@ -162,7 +162,7 @@ int filpinfo(char *buffer, struct command *info)
 	{                                                                                                              \
 		if (stat_parsing_redirect == 0)                                                                        \
 			cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = buffer[cnt_buffer];      \
-		if (stat_parsing_redirect == 1)                                                                        \
+		if (stat_parsing_redirect == 1) /* for an fd */                                                        \
 		{                                                                                                      \
 			if (redir_lastnode == NULL)                                                                    \
 			{                                                                                              \
@@ -175,11 +175,10 @@ int filpinfo(char *buffer, struct command *info)
 				cnt_return = -2;                                                                       \
 				goto done;                                                                             \
 			}                                                                                              \
-			if (strchr(" \t", buffer[cnt_buffer]) == NULL &&                                               \
-			    buffer[cnt_buffer] != 0) /* current char not blank */                                      \
-				cnt_return++;                                                                          \
-		} /* Make the semicolon happy */                                                                       \
-	} while (0)
+		}                                                                                                      \
+		if (strchr(" \t", buffer[cnt_buffer]) == NULL && buffer[cnt_buffer] != 0) /* current char not blank */ \
+			cnt_return++;                                                                                  \
+	} while (0) /* Make the semicolon happy */
 
 /* Write any char to current command, increase cnt_return only if c != 0 */
 #define write_char(c)                                                                                                  \
