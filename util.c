@@ -80,7 +80,7 @@ char *p_fgets(char *prompt, FILE *fp)
 
 char *p_gets(char *prompt) { return p_fgets(prompt, stdin); }
 
-void code_fault(char *file, int line)
+__attribute__((noreturn)) void code_fault(char *file, int line)
 {
 	OUT2E("%s: Programming error at %s: %d\n", argv0, file, line);
 	OUT2E("Shell version: %s", PSH_VERSION);

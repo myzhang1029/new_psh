@@ -31,6 +31,9 @@
 #ifndef NO_HISTORY
 #include <readline/history.h>
 #endif
+#ifndef __GNUC__
+#define __attribute__()
+#endif
 
 #define MAX_PROMPT 1024
 #define MAXLINE 262144
@@ -93,7 +96,7 @@ char *p_fgets(char *prompt, FILE *fp);
 char *p_gets(char *prompt);
 int new_command(struct command **info);
 void free_command(struct command *info);
-void code_fault(char *file, int line);
-void exit_psh(int status);
+void code_fault(char *file, int line)__attribute__((noreturn));
+void exit_psh(int status)__attribute__((noreturn));
 int add_atexit_free(void *ptr);
 #endif

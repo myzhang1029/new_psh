@@ -32,7 +32,7 @@ int pipe_fd[2], in_fd, out_fd;
 extern char *argv0;	 /*main.c*/
 extern jmp_buf reset_point; /*main.c*/
 
-void sigchld_handler(int sig)
+void sigchld_handler(__attribute__((unused))int sig)
 {
 	pid_t pid;
 	int i;
