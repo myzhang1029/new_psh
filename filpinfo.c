@@ -538,7 +538,15 @@ int filpinfo(char *buffer, struct command *info)
 				{
 					if (redir_lastnode->type != 0)
 						code_fault(__FILE__, __LINE__);
-					else
+                    else if (buffer[cnt_buffer+1] == '&')
+                        redir_lastnode->type = FD2FD;
+                    else if (buffer[cnt_buffer+1] == 0)
+                    {
+                        synerr("newline");
+                        cnt_return = -2;
+                        goto done;
+                    }
+                    else
 						redir_lastnode->type = OUT_REDIR;
 				}
 				if (cnt_buffer == cnt_first_nonIFS)
