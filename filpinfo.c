@@ -553,6 +553,13 @@ int filpinfo(char *buffer, struct command *info)
 					redir_lastnode->in.fd = 1 /* stdout */;
 				else
 				{
+					if (cnt_argument_char == 0) /* Previously a blank reached */
+					{
+						cnt_argument_char = cnt_old_parameter;
+						free(cmd_lastnode->parameters[cnt_argument_element]);
+						cmd_lastnode->parameters[cnt_argument_element] = NULL;
+						cnt_argument_element--;
+					}
 					int case_count = cnt_buffer, case_buf_cnt = 0;
 					char buf[MAXLINE] = {0};
 					while (--case_count, 1 /* infinity loop */)
