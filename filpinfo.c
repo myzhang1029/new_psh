@@ -521,13 +521,6 @@ int filpinfo(char *buffer, struct command *info)
 				strncat(buffer, newline_buf, strlen(newline_buf));
 				free(newline_buf);
 				break;
-			case '`':
-				/* TODO: Write command substitude code here */
-
-			case '$':
-			/* TODO: Write variable, variable cut,
-			 * ANSI-C style escape, command substitude,
-			 * arithmetic expansion code here */
 			case '>':
 				if (ignore)
 				{
@@ -666,6 +659,16 @@ int filpinfo(char *buffer, struct command *info)
 						break;
 				}
 				break;
+			case '`':
+				/* TODO: Write command substitude code here */
+
+			case '$':
+			/* TODO: Write variable, variable cut,
+			 * ANSI-C style escape, command substitude,
+			 * arithmetic expansion code here */
+			case '(':
+			case ')':
+			/* TODO: Write command sequence code here */
 			case '<':
 				/* TODO: Write input redirect, here string and here document code
 				 * here */
@@ -687,9 +690,6 @@ int filpinfo(char *buffer, struct command *info)
 				}
 				write_char(0);
 				return cnt_return;
-			case '(':
-			case ')':
-			/* TODO: Write command sequence code here */
 			case ';':
 				/* TODO: Write muiltiple command process code here */
 				if (ignore)
