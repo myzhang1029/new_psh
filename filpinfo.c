@@ -428,6 +428,7 @@ int filpinfo(char *buffer, struct command *info)
 				}
 				break;
 			case '~': /* $HOME spanding stable */
+			/* TODO: more tlide */
 				if (ignore)
 				{
 					write_current();
