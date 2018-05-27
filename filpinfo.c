@@ -427,7 +427,7 @@ int filpinfo(char *buffer, struct command *info)
 					ignIFS_from_next_char();
 				}
 				break;
-			case '~': /* This feature stable */
+			case '~': /* $HOME spanding stable */
 				if (ignore)
 				{
 					write_current();
