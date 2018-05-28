@@ -732,8 +732,7 @@ int filpinfo(char *buffer, struct command *info)
 				ignIFS_from_next_char();
 				do /* Remove all following `;'s. I'll mess up with case later. TODO */
 				{
-					if (!buffer[cnt_buffer]) /* EOL */
-						;		 /* No new command required */
+					if (!buffer[cnt_buffer]){;}/* EOL, No new command required */
 					if (buffer[cnt_buffer] != ';')
 					{
 						--cnt_buffer;
