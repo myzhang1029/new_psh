@@ -32,7 +32,7 @@
 #include <readline/history.h>
 #endif
 #ifndef __GNUC__
-#define __attribute__()
+#define __attribute__(x)
 #endif
 
 #define MAX_PROMPT 1024
