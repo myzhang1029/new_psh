@@ -146,8 +146,8 @@ int builtin_cd(ARGS)
 		OUT2E("%s: %s: %s\n", b_command, strerror(errno), cd_path);
 	else
 	{
-		setenv("OLDPWD", getenv("PWD"), 1);
-		setenv("PWD", cd_path, 1);
+		pshsetenv("OLDPWD", getenv("PWD"), 1);
+		pshsetenv("PWD", cd_path, 1);
 	}
 	free(cd_path);
 	return 1;
