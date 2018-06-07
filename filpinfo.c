@@ -428,7 +428,7 @@ int filpinfo(char *buffer, struct command *info)
 				}
 				break;
 			case '~': /* $HOME spanding stable */
-			/* TODO: more tlide */
+				  /* TODO: more tlide */
 				if (ignore)
 				{
 					write_current();
@@ -532,15 +532,15 @@ int filpinfo(char *buffer, struct command *info)
 				{
 					if (redir_lastnode->type != 0)
 						code_fault(__FILE__, __LINE__);
-                    else if (buffer[cnt_buffer+1] == '&')
-                        redir_lastnode->type = FD2FD;
-                    else if (buffer[cnt_buffer+1] == 0)
-                    {
-                        synerr("newline");
-                        cnt_return = -2;
-                        goto done;
-                    }
-                    else
+					else if (buffer[cnt_buffer + 1] == '&')
+						redir_lastnode->type = FD2FD;
+					else if (buffer[cnt_buffer + 1] == 0)
+					{
+						synerr("newline");
+						cnt_return = -2;
+						goto done;
+					}
+					else
 						redir_lastnode->type = OUT_REDIR;
 				}
 				if (cnt_buffer == cnt_first_nonIFS)
@@ -732,7 +732,10 @@ int filpinfo(char *buffer, struct command *info)
 				ignIFS_from_next_char();
 				do /* Remove all following `;'s. I'll mess up with case later. TODO */
 				{
-					if (!buffer[cnt_buffer]){;}/* EOL, No new command required */
+					if (!buffer[cnt_buffer])
+					{
+						;
+					} /* EOL, No new command required */
 					if (buffer[cnt_buffer] != ';')
 					{
 						--cnt_buffer;

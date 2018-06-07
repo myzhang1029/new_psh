@@ -96,7 +96,7 @@ char *p_fgets(char *prompt, FILE *fp);
 char *p_gets(char *prompt);
 int new_command(struct command **info);
 void free_command(struct command *info);
-void code_fault(char *file, int line)__attribute__((noreturn));
-void exit_psh(int status)__attribute__((noreturn));
+void code_fault(char *file, int line) __attribute__((noreturn));
+void exit_psh(int status) __attribute__((noreturn));
 int add_atexit_free(void *ptr);
 #endif
