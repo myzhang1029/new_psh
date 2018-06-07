@@ -110,16 +110,15 @@ char *pshgetcwd(void)
 	return cwd;
 }
 
+char *pshstrdup(char *str) { return strdup(str); }
+
 int pshgethostname(char *hstnme, size_t len) { return gethostname(hstnme, len); }
 
 int pshgetuid(void) { return geteuid(); }
 
 int pshchdir(char *dir) { return chdir(dir); }
 
-int pshsetenv(const char *name, const char *value, int overwrite)
-{
-	return setenv(name, value, overwrite);
-}
+int pshsetenv(const char *name, const char *value, int overwrite) { return setenv(name, value, overwrite); }
 
 static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char **env)
 {
