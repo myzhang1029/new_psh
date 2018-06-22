@@ -40,7 +40,7 @@ int builtin_history(ARGS)
 	if (b_parameters[1] != NULL)
 	{
 		int count, ch, flags = 0, n;
-		char *filename = malloc(sizeof(char) * MAXEACHARG);
+		char *filename = malloc(P_CS * MAXEACHARG);
 		struct option longopts[] = {{"help", no_argument, NULL, 'h'}, {NULL, 0, NULL, 0}};
 		if (!filename)
 		{

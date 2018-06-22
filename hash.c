@@ -129,12 +129,12 @@ recheck:
 		}
 		avail = &(table[hash_result].nexts[(table[hash_result].next_count)++]); /* The first blank element */
 		avail->used = 1;
-		avail->key = malloc(strlen(key) + 1);
+		avail->key = malloc(P_CS * (strlen(key) + 1));
 		strcpy(avail->key, key);
 		return edit_hash_elem(avail, val);
 	}
 	table[hash_result].used = 1;
-	table[hash_result].key = malloc(strlen(key) + 1);
+	table[hash_result].key = malloc(P_CS * (strlen(key) + 1));
 	strcpy(table[hash_result].key, key);
 	/* Write element */
 	i = edit_hash_elem(&table[hash_result], val);

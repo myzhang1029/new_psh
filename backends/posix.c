@@ -103,7 +103,7 @@ char *getun(void)
 
 char *pshgetcwd(void)
 {
-	char *cwd = malloc(4097);
+	char *cwd = malloc(P_CS * 4097);
 	if (cwd == NULL)
 		return NULL;
 	getcwd(cwd, 4097);

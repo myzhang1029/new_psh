@@ -97,7 +97,7 @@ int new_command(struct command **info)
 	}
 	memset((*info)->parameters, 0, MAXARG); /* This will be used to detect whether an element is
 						   used */
-	(*info)->parameters[0] = malloc(sizeof(char) * MAXEACHARG);
+	(*info)->parameters[0] = malloc(P_CS * MAXEACHARG);
 	if ((*info)->parameters[0] == NULL)
 	{
 		free((*info)->parameters);
@@ -153,7 +153,7 @@ int filpinfo(char *buffer, struct command *info)
 	} while (0)
 
 /* malloc() and zero-initialize an element in parameters[][] */
-#define malloc_one(n) (cmd_lastnode->parameters[n]) = calloc(MAXEACHARG, sizeof(char))
+#define malloc_one(n) (cmd_lastnode->parameters[n]) = calloc(MAXEACHARG, P_CS)
 
 /* Write the current char in buffer to current command, increase cnt_return
  * only if current is neither blank nor 0 */
@@ -324,8 +324,9 @@ int filpinfo(char *buffer, struct command *info)
 						{
 							char *cmdand_buf;
 							cmdand_buf = p_gets("> ");
-							buffer = realloc(buffer, strlen(buffer) + strlen(cmdand_buf) +
-										     1 /* \0 */);
+							buffer =
+							    realloc(buffer, P_CS * (strlen(buffer) +
+										    strlen(cmdand_buf) + 1 /* \0 */));
 							strncat(buffer, cmdand_buf, strlen(cmdand_buf));
 							free(cmdand_buf);
 						}
@@ -393,8 +394,9 @@ int filpinfo(char *buffer, struct command *info)
 						{
 							char *cmdor_buf;
 							cmdor_buf = p_gets("> ");
-							buffer = realloc(buffer, strlen(buffer) + strlen(cmdor_buf) +
-										     1 /* \0 */);
+							buffer =
+							    realloc(buffer, P_CS * (strlen(buffer) + strlen(cmdor_buf) +
+										    1 /* \0 */));
 							strncat(buffer, cmdor_buf, strlen(cmdor_buf));
 							free(cmdor_buf);
 						}
@@ -415,8 +417,9 @@ int filpinfo(char *buffer, struct command *info)
 						{
 							char *pipe_buf;
 							pipe_buf = p_gets("> ");
-							buffer = realloc(buffer, strlen(buffer) + strlen(pipe_buf) +
-										     1 /* \0 */);
+							buffer =
+							    realloc(buffer, P_CS * (strlen(buffer) + strlen(pipe_buf) +
+										    1 /* \0 */));
 							strncat(buffer, pipe_buf, strlen(pipe_buf));
 							free(pipe_buf);
 						}
@@ -438,7 +441,7 @@ int filpinfo(char *buffer, struct command *info)
 				    buffer[cnt_buffer + 1] != '\t' && buffer[cnt_buffer + 1] != ' ' &&
 				    buffer[cnt_buffer + 1] != '/') /* ~username */
 				{
-					char *username = malloc(sizeof(char) * 256);
+					char *username = malloc(P_CS * 256);
 					char *posit;
 					strncpy(username, &(buffer[cnt_buffer + 1]), 256);
 					posit = strchr(username, '/');
@@ -518,7 +521,7 @@ int filpinfo(char *buffer, struct command *info)
 				 */
 				char *newline_buf;
 				newline_buf = p_gets("> ");
-				buffer = realloc(buffer, strlen(buffer) + strlen(newline_buf) + 1 /* \0 */);
+				buffer = realloc(buffer, P_CS * (strlen(buffer) + strlen(newline_buf) + 1 /* \0 */));
 				strncat(buffer, newline_buf, strlen(newline_buf));
 				free(newline_buf);
 				break;

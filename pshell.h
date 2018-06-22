@@ -40,6 +40,7 @@
 #define MAXARG 64
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
+#define P_CS sizeof(char) /* keep this although c99 says it's always 1 */
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 #undef strncpy
 #define strncpy p_strncpy

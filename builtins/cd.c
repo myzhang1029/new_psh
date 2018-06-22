@@ -74,7 +74,7 @@ static int create_new_pwd(char **cd_dir)
 	else
 	{
 		char *oldpwd = getenv("PWD");
-		*cd_dir = realloc(*cd_dir, strlen(*cd_dir) + 1 /*\0*/ + strlen(oldpwd) + 1 /*'/'*/);
+		*cd_dir = realloc(*cd_dir, P_CS * (strlen(*cd_dir) + 1 /*\0*/ + strlen(oldpwd) + 1 /*'/'*/));
 		if (!cd_dir)
 		{
 			OUT2E("%s: create_new_pwd: realloc failed\n", argv0);
@@ -104,7 +104,7 @@ int builtin_cd(ARGS)
 			OUT2E("%s: %s: HOME not set\n", argv0, b_command);
 			return 2;
 		}
-		cd_path = malloc(strlen(homedir) + 1);
+		cd_path = malloc(P_CS * (strlen(homedir) + 1));
 		if (cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
@@ -120,7 +120,7 @@ int builtin_cd(ARGS)
 			OUT2E("%s: %s: OLDPWD not set\n", argv0, b_command);
 			return 2;
 		}
-		cd_path = malloc(strlen(oldpwd) + 1);
+		cd_path = malloc(P_CS * (strlen(oldpwd) + 1));
 		if (cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
@@ -131,7 +131,7 @@ int builtin_cd(ARGS)
 	}
 	else
 	{
-		cd_path = malloc(strlen(b_parameters[1]) + 1);
+		cd_path = malloc(P_CS * (strlen(b_parameters[1]) + 1));
 		if (cd_path == NULL)
 		{
 			OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
