@@ -19,12 +19,12 @@
 
 typedef struct psh_hash_struct
 {
-        char *key;
-        char *val;
-        unsigned used : 1;
-        unsigned int len;              /* Only used in the first element */
-        unsigned next_count : 6;       /* count for nexts */
-        struct psh_hash_struct *nexts; /* array with 64 elements */
+    char *key;
+    char *val;
+    unsigned used : 1;
+    unsigned int len;              /* Only used in the first element */
+    unsigned next_count : 6;       /* count for nexts */
+    struct psh_hash_struct *nexts; /* array with 64 elements */
 } PSH_HASH;
 
 PSH_HASH *realloc_hash(PSH_HASH *, unsigned int);

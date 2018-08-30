@@ -22,96 +22,96 @@ void *freeptrs[16] = {NULL};
 
 int add_atexit_free(void *ptr)
 {
-        if ((freeptrs[0] = ((int)(freeptrs[0]) + 1)) == (void *)16)
-                return -1;
-        freeptrs[(int)(freeptrs[0])] = ptr;
-        return (int)freeptrs[0];
+    if ((freeptrs[0] = ((int)(freeptrs[0]) + 1)) == (void *)16)
+        return -1;
+    freeptrs[(int)(freeptrs[0])] = ptr;
+    return (int)freeptrs[0];
 }
 
 char *p_fgets(char *prompt, FILE *fp)
 {
 #ifndef NO_READLINE
-        if (fp == stdin)
-                return readline(prompt);
+    if (fp == stdin)
+        return readline(prompt);
 #endif
-        if (fp == NULL)
-                return NULL;
-        if (fp == stdin)
-                printf("%s", prompt);
+    if (fp == NULL)
+        return NULL;
+    if (fp == stdin)
+        printf("%s", prompt);
+    {
+        size_t charcount = 0, nowhave = MAXLINE;
+        char *result = malloc(P_CS * nowhave);
+        char *ptr = result;
+        if (result == NULL)
+            return NULL;
+        while (1)
         {
-                size_t charcount = 0, nowhave = MAXLINE;
-                char *result = malloc(P_CS * nowhave);
-                char *ptr = result;
-                if (result == NULL)
-                        return NULL;
-                while (1)
+            *ptr = fgetc(fp);
+            if (*ptr == EOF)
+            {
+                if (ptr == result) /* nothing read */
                 {
-                        *ptr = fgetc(fp);
-                        if (*ptr == EOF)
-                        {
-                                if (ptr == result) /* nothing read */
-                                {
-                                        free(result);
-                                        return NULL;
-                                }
-                                *ptr = 0;                                              /* Replace EOF with NUL */
-                                result = realloc(result, P_CS * (strlen(result) + 1)); /* Resize the array to minimum */
-                                return result;
-                        }
-                        if (*ptr == '\n')
-                        {
-                                *ptr = 0;                                              /* Replace \n with NUL */
-                                result = realloc(result, P_CS * (strlen(result) + 1)); /* Resize the array to minimum */
-                                return result;
-                        }
-                        ++ptr;
-                        if ((++charcount) == nowhave)
-                                if ((result = realloc(result, P_CS * (nowhave <<= 1))) == NULL) /* malloc more mem */
-                                        return NULL;
+                    free(result);
+                    return NULL;
                 }
+                *ptr = 0;                                              /* Replace EOF with NUL */
+                result = realloc(result, P_CS * (strlen(result) + 1)); /* Resize the array to minimum */
+                return result;
+            }
+            if (*ptr == '\n')
+            {
+                *ptr = 0;                                              /* Replace \n with NUL */
+                result = realloc(result, P_CS * (strlen(result) + 1)); /* Resize the array to minimum */
+                return result;
+            }
+            ++ptr;
+            if ((++charcount) == nowhave)
+                if ((result = realloc(result, P_CS * (nowhave <<= 1))) == NULL) /* malloc more mem */
+                    return NULL;
         }
+    }
 }
 
 char *p_gets(char *prompt) { return p_fgets(prompt, stdin); }
 
 __attribute__((noreturn)) void code_fault(char *file, int line)
 {
-        OUT2E("%s: Programming error at %s: %d\n", argv0, file, line);
-        OUT2E("Shell version: %s", PSH_VERSION);
-        OUT2E("Please create a GitHub Issue with above info\n");
-        exit_psh(1);
+    OUT2E("%s: Programming error at %s: %d\n", argv0, file, line);
+    OUT2E("Shell version: %s", PSH_VERSION);
+    OUT2E("Please create a GitHub Issue with above info\n");
+    exit_psh(1);
 }
 
 void exit_psh(int status)
 {
-        int count;
-        for (count = 1; count < (int)freeptrs[0]; ++count)
-                free(freeptrs[count]);
-        exit(status);
+    int count;
+    for (count = 1; count < (int)freeptrs[0]; ++count)
+        free(freeptrs[count]);
+    exit(status);
 }
 
 size_t p_strncpy(char *dst, const char *src, size_t size)
 {
-        register char *d = dst;
-        register const char *s = src;
-        register size_t n = ++size;
+    register char *d = dst;
+    register const char *s = src;
+    register size_t n = ++size;
 
-        if (n != 0 && --n != 0)
+    if (n != 0 && --n != 0)
+    {
+        do
         {
-                do
-                {
-                        if ((*d++ = *s++) == 0)
-                                break;
-                } while (--n != 0);
-        }
+            if ((*d++ = *s++) == 0)
+                break;
+        } while (--n != 0);
+    }
 
-        if (n == 0)
-        {
-                if (size != 0)
-                        *d = '\0';
-                while (*s++)
-                        ;
-        }
+    if (n == 0)
+    {
+        if (size != 0)
+            *d = '\0';
+        while (*s++)
+            ;
+    }
 
-        return (s - src - 1);
+    return (s - src - 1);
 }

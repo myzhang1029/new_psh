@@ -25,25 +25,25 @@ extern int last_command_status;
 
 int builtin_unsupported(ARGS)
 {
-        OUT2E("%s: %s: Not supported, coming soon\n", argv0, b_command);
-        return 2;
+    OUT2E("%s: %s: Not supported, coming soon\n", argv0, b_command);
+    return 2;
 }
 
 int builtin_compare(const void *key, const void *cur)
 {
-        const struct builtin *bkey = (const struct builtin *)key;
-        const struct builtin *builtin = (const struct builtin *)cur;
-        return strcmp(bkey->name, builtin->name);
+    const struct builtin *bkey = (const struct builtin *)key;
+    const struct builtin *builtin = (const struct builtin *)cur;
+    return strcmp(bkey->name, builtin->name);
 }
 
 builtin_function find_builtin(char *name)
 {
-        struct builtin *key = malloc(sizeof(struct builtin));
-        struct builtin *result;
-        key->name = name;
-        result = (struct builtin *)bsearch(key, builtins, 61, sizeof(struct builtin), &builtin_compare);
-        free(key);
-        return result != NULL ? result->proc : (builtin_function)0;
+    struct builtin *key = malloc(sizeof(struct builtin));
+    struct builtin *result;
+    key->name = name;
+    result = (struct builtin *)bsearch(key, builtins, 61, sizeof(struct builtin), &builtin_compare);
+    free(key);
+    return result != NULL ? result->proc : (builtin_function)0;
 }
 
 /* List of all builtins, sorted by name */
@@ -111,18 +111,18 @@ const struct builtin builtins[] = {{".", &builtin_unsupported},
 
 int run_builtin(struct command *info)
 {
-        if (cmdis("getstat"))
-                return printf("%d\n", last_command_status), 1;
-        else if (cmdis("about"))
-        {
-                printf("psh is a not fully implemented shell in UNIX.\n");
-                return 1;
-        }
-        else
-        {
-                builtin_function proc = find_builtin(info->parameters[0]);
-                if (proc == 0)
-                        return 0;
-                return ((*proc)(info));
-        }
+    if (cmdis("getstat"))
+        return printf("%d\n", last_command_status), 1;
+    else if (cmdis("about"))
+    {
+        printf("psh is a not fully implemented shell in UNIX.\n");
+        return 1;
+    }
+    else
+    {
+        builtin_function proc = find_builtin(info->parameters[0]);
+        if (proc == 0)
+            return 0;
+        return ((*proc)(info));
+    }
 }

@@ -22,14 +22,14 @@ extern int last_command_status;
 
 int builtin_exit(ARGS)
 {
-        if (info->parameters[1] == NULL)
-        {
-                exit_psh(last_command_status);
-        }
-        else
-        {
-                int i = atoi(b_parameters[1]);
-                exit_psh(i);
-        }
-        return 2; /* Noreturn */
+    if (info->parameters[1] == NULL)
+    {
+        exit_psh(last_command_status);
+    }
+    else
+    {
+        int i = atoi(b_parameters[1]);
+        exit_psh(i);
+    }
+    return 2; /* Noreturn */
 }
