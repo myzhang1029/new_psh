@@ -29,44 +29,44 @@ extern int last_command_status;
 
 int read_command(char *prompt, struct command *info)
 {
-	int count;
-	char *buffer;
-	buffer = p_gets(prompt);
-	if (feof(stdin) || !buffer) /* EOF reached */
-	{
-		printf("\n");
-		exit_psh(last_command_status);
-	}
+        int count;
+        char *buffer;
+        buffer = p_gets(prompt);
+        if (feof(stdin) || !buffer) /* EOF reached */
+        {
+                printf("\n");
+                exit_psh(last_command_status);
+        }
 #ifndef NO_HISTORY
-	if (buffer && *buffer)
-	{
-		char *expans;
-		int res;
-		res = history_expand(buffer, &expans);
-		if (res < 0)
-		{
-			OUT2E("%s: Error on history expansion\n", argv0);
-			free(expans);
-			longjmp(reset_point, 1);
-		}
-		if (res == 1 || res == 2)
-			printf("%s\n", expans);
-		if (res == 2)
-		{
-			free(expans);
-			return -2;
-		}
+        if (buffer && *buffer)
+        {
+                char *expans;
+                int res;
+                res = history_expand(buffer, &expans);
+                if (res < 0)
+                {
+                        OUT2E("%s: Error on history expansion\n", argv0);
+                        free(expans);
+                        longjmp(reset_point, 1);
+                }
+                if (res == 1 || res == 2)
+                        printf("%s\n", expans);
+                if (res == 2)
+                {
+                        free(expans);
+                        return -2;
+                }
 #ifdef NO_READLINE
-		strncpy(buffer, expans, MAXLINE - 1);
+                strncpy(buffer, expans, MAXLINE - 1);
 #else
-		strncpy(buffer, expans, strlen(buffer));
+                strncpy(buffer, expans, strlen(buffer));
 #endif
-		free(expans);
-		add_history(buffer);
-	}
+                free(expans);
+                add_history(buffer);
+        }
 #endif
-	if (buffer == NULL || buffer[0] == '\0')
-		return -1;
-	count = filpinfo(buffer, info);
-	return count;
+        if (buffer == NULL || buffer[0] == '\0')
+                return -1;
+        count = filpinfo(buffer, info);
+        return count;
 }

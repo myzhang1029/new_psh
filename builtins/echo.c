@@ -21,58 +21,58 @@
 
 int builtin_echo(ARGS)
 {
-	if (b_parameters[1] == NULL)
-	{
-		/* A blank line */
-		printf("\n");
-		return 1;
-	}
-	else if (b_parameters[1][0] == '-')
-	{
-		switch (b_parameters[1][1])
-		{
-			case 0:
-				/* Another blank line */
-				puts("");
-				return 1;
-			case 'n':
-				if (b_parameters[2] == NULL)
-					/* No more blank line */
-					return 1;
-				else
-				{
-					int cnt = 2;
-					printf("%s", b_parameters[cnt]);
-					while (b_parameters[++cnt] != NULL)
-					{
-						printf(" %s", b_parameters[cnt]);
-					}
-					return 1;
-				}
-			default:
-			{
-				int cnt = 1;
-				printf("%s", b_parameters[cnt]);
-				while (b_parameters[++cnt] != NULL)
-				{
-					printf(" %s", b_parameters[cnt]);
-					cnt++;
-				}
-				puts("");
-				return 1;
-			}
-		} /* switch-case */
-	}
-	else
-	{
-		int cnt = 1;
-		printf("%s", b_parameters[cnt]);
-		while (b_parameters[++cnt] != NULL)
-		{
-			printf(" %s", b_parameters[cnt]);
-			cnt++;
-		}
-		puts("");
-		return 1;
-	}
+        if (b_parameters[1] == NULL)
+        {
+                /* A blank line */
+                printf("\n");
+                return 1;
+        }
+        else if (b_parameters[1][0] == '-')
+        {
+                switch (b_parameters[1][1])
+                {
+                        case 0:
+                                /* Another blank line */
+                                puts("");
+                                return 1;
+                        case 'n':
+                                if (b_parameters[2] == NULL)
+                                        /* No more blank line */
+                                        return 1;
+                                else
+                                {
+                                        int cnt = 2;
+                                        printf("%s", b_parameters[cnt]);
+                                        while (b_parameters[++cnt] != NULL)
+                                        {
+                                                printf(" %s", b_parameters[cnt]);
+                                        }
+                                        return 1;
+                                }
+                        default:
+                        {
+                                int cnt = 1;
+                                printf("%s", b_parameters[cnt]);
+                                while (b_parameters[++cnt] != NULL)
+                                {
+                                        printf(" %s", b_parameters[cnt]);
+                                        cnt++;
+                                }
+                                puts("");
+                                return 1;
+                        }
+                } /* switch-case */
+        }
+        else
+        {
+                int cnt = 1;
+                printf("%s", b_parameters[cnt]);
+                while (b_parameters[++cnt] != NULL)
+                {
+                        printf(" %s", b_parameters[cnt]);
+                        cnt++;
+                }
+                puts("");
+                return 1;
+        }
 }

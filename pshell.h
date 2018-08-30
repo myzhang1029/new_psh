@@ -48,42 +48,42 @@
 
 struct command /* Everything about a command */
 {
-	enum flag
-	{
-		BG_CMD = 1,
-		PIPED,
-		RUN_AND,
-		RUN_OR,
-		MULTICMD
-	} flag;
-	struct redirect
-	{
-		enum redir_type
-		{
-			FD2FD = 1, /* fd to fd, n>&n; n<&n */
-			OUT_REDIR, /* fd to filename,
-			n>name; n<name; &>name;  */
-			OUT_APPN,
-			IN_REDIR, /* filename to fd */
-			CLOSEFD,  /* n>&-; n<&- */
-			OPENFN,   /* n<>name */
-			HEREXX    /* heredoc, herestring */
-		} type;
-		union in /* file that redirect from */
-		{
-			int fd;
-			char *file;
-			FILE *herexx; /* temporary file created to store here document and here string values */
-		} in;
-		union out /* file than redirect to */
-		{
-			int fd;
-			char *file;
-		} out;
-		struct redirect *next;
-	} * rlist;
-	char **parameters; /*argv*/
-	struct command *next;
+        enum flag
+        {
+                BG_CMD = 1,
+                PIPED,
+                RUN_AND,
+                RUN_OR,
+                MULTICMD
+        } flag;
+        struct redirect
+        {
+                enum redir_type
+                {
+                        FD2FD = 1, /* fd to fd, n>&n; n<&n */
+                        OUT_REDIR, /* fd to filename,
+                        n>name; n<name; &>name;  */
+                        OUT_APPN,
+                        IN_REDIR, /* filename to fd */
+                        CLOSEFD,  /* n>&-; n<&- */
+                        OPENFN,   /* n<>name */
+                        HEREXX    /* heredoc, herestring */
+                } type;
+                union in /* file that redirect from */
+                {
+                        int fd;
+                        char *file;
+                        FILE *herexx; /* temporary file created to store here document and here string values */
+                } in;
+                union out /* file than redirect to */
+                {
+                        int fd;
+                        char *file;
+                } out;
+                struct redirect *next;
+        } * rlist;
+        char **parameters; /*argv*/
+        struct command *next;
 };
 
 extern char *argv0;

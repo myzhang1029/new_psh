@@ -23,12 +23,12 @@
 
 unsigned int hasher(const char *s, unsigned int ulimit)
 {
-	unsigned int i;
-	for (i = 0; *s; ++s)
-	{
-		i *= 16777619;
-		i ^= *s;
-	}
+        unsigned int i;
+        for (i = 0; *s; ++s)
+        {
+                i *= 16777619;
+                i ^= *s;
+        }
 
-	return i % ulimit;
+        return i % ulimit;
 }

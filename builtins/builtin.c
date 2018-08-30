@@ -20,15 +20,15 @@
 
 int builtin_builtin(ARGS)
 {
-	if (b_parameters[1] == NULL) /* No args */
-		return 1;
-	info->parameters++; /* Increase parameters */
-	if (run_builtin(info) == 0)
-	{
-		info->parameters--;
-		OUT2E("%s: %s: %s: not a shell builtin\n", argv0, info->parameters[0], info->parameters[1]);
-		return 2;
-	}
-	info->parameters--;
-	return 1;
+        if (b_parameters[1] == NULL) /* No args */
+                return 1;
+        info->parameters++; /* Increase parameters */
+        if (run_builtin(info) == 0)
+        {
+                info->parameters--;
+                OUT2E("%s: %s: %s: not a shell builtin\n", argv0, info->parameters[0], info->parameters[1]);
+                return 2;
+        }
+        info->parameters--;
+        return 1;
 }
