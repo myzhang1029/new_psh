@@ -36,8 +36,10 @@ enum psh_tokens
     IN,                  /* in */
     BANG,                /* ! */
     TIME,                /* time */
-    WORD, ASSIGNMENT,    /* = */
-    NUMBER, ARITH_CMD,   /*  */
+    WORD,                /* whatever */
+    ASSIGNMENT,          /* = */
+    NUMBER,              /* 1234567890 */
+    ARITH_CMD,           /*  */
     ARITH_FOR_EXPRS,     /*  */
     AND_AND,             /* && */
     OR_OR,               /* || */
@@ -55,3 +57,10 @@ enum psh_tokens
     LESS_GREATER,        /* <& */
     GREATER_BAR,         /* >- */
     BAR_AND,             /* -& */
+}
+
+typedef struct psh_token_stream
+{
+    enum psh_tokens the_token;
+    char *arg;
+}*tokenstream;
