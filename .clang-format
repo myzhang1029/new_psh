@@ -42,27 +42,22 @@ BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
-ColumnLimit:     120
-CommentPragmas:  '^ IWYU pragma:'
+ColumnLimit:     80
+CommentPragmas:  '^ vi.*'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
-DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
-ForEachMacros:
-  - foreach
-  - Q_FOREACH
-  - BOOST_FOREACH
 IncludeCategories:
-  - Regex:       '^".*'
+  - Regex:       '^".*"'
     Priority:    3
-  - Regex:       '^<.*/'
+  - Regex:       '^<.*/.*>'
     Priority:    2
-  - Regex:       '.*'
+  - Regex:       '^<.*>'
     Priority:    1
 IncludeIsMainRegex: '(Test)?$'
 IndentCaseLabels: true
@@ -80,9 +75,9 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 19
-PenaltyBreakComment: 300
+PenaltyBreakComment: 100
 PenaltyBreakFirstLessLess: 120
-PenaltyBreakString: 1000
+PenaltyBreakString: 100
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Right

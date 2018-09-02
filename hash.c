@@ -113,7 +113,9 @@ recheck:
         if (table[hash_result].next_count + 1 == 64) /*maximum exceeded*/
         {
             PSH_HASH *tmp;
-            tmp = realloc_hash(table, ((table->len) << 1) + 1); /*get an approx. twice bigger table */
+            tmp = realloc_hash(table,
+                               ((table->len) << 1) +
+                                   1); /*get an approx. twice bigger table */
             if (tmp == NULL)
                 return 1;
             table = tmp;
@@ -121,13 +123,15 @@ recheck:
         }
         if (table[hash_result].next_count == 0) /* No elements in nexts */
         {
-            if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) == NULL)
+            if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) ==
+                NULL)
             {
                 OUT2E("%s: add_hash: malloc failed\n", argv0);
                 return 1;
             }
         }
-        avail = &(table[hash_result].nexts[(table[hash_result].next_count)++]); /* The first blank element */
+        avail = &(table[hash_result].nexts[(
+            table[hash_result].next_count)++]); /* The first blank element */
         avail->used = 1;
         avail->key = malloc(P_CS * (strlen(key) + 1));
         strcpy(avail->key, key);
@@ -168,7 +172,8 @@ char *get_hash(PSH_HASH *table, char *key)
 int rm_hash(PSH_HASH *table, char *key)
 {
     unsigned int hash_result = hasher(key, table->len);
-    if (strcmp(table[hash_result].key, key) == 0) /* Deleting the first element */
+    if (strcmp(table[hash_result].key, key) ==
+        0) /* Deleting the first element */
     {
         if (table[hash_result].used == 0)
             return 1;
@@ -181,7 +186,8 @@ int rm_hash(PSH_HASH *table, char *key)
         {
             /* Move the last element in nexts here */
             unsigned int i = table[hash_result].next_count - 1;
-            add_hash(&table, table[hash_result].nexts[i].key, table[hash_result].nexts[i].val);
+            add_hash(&table, table[hash_result].nexts[i].key,
+                     table[hash_result].nexts[i].val);
             table[hash_result].nexts[i].used = 0;
             table[hash_result].next_count--;
         }
@@ -202,7 +208,8 @@ int rm_hash(PSH_HASH *table, char *key)
                 {
                     /* Move the last element in nexts here */
                     i = table[hash_result].next_count - 1;
-                    add_hash(&table, table[hash_result].nexts[i].key, table[hash_result].nexts[i].val);
+                    add_hash(&table, table[hash_result].nexts[i].key,
+                             table[hash_result].nexts[i].val);
                     table[hash_result].nexts[i].used = 0;
                     table[hash_result].next_count--;
                 }

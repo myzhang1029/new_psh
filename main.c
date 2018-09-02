@@ -31,7 +31,8 @@ int main(int argc, char **argv)
 {
     char prompt[MAX_PROMPT];
     struct command *info;
-    argv0 = pshstrdup((strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
+    argv0 = pshstrdup(
+        (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
     if (argv0 == NULL)
     {

@@ -19,8 +19,8 @@
 #include <getopt.h>
 #include "builtin.h"
 
-#define USAGE()                                                                                                        \
-    OUT2E("history: usage: history [-c] [-d offset] [n] or history -awrn "                                             \
+#define USAGE()                                                                \
+    OUT2E("history: usage: history [-c] [-d offset] [n] or history -awrn "     \
           "[filename] or history -ps arg [arg...]\n")
 #define AFLAG 0x01
 #define RFLAG 0x02
@@ -41,7 +41,8 @@ int builtin_history(ARGS)
     {
         int count, ch, flags = 0, n;
         char *filename = malloc(P_CS * MAXEACHARG);
-        struct option longopts[] = {{"help", no_argument, NULL, 'h'}, {NULL, 0, NULL, 0}};
+        struct option longopts[] = {{"help", no_argument, NULL, 'h'},
+                                    {NULL, 0, NULL, 0}};
         if (!filename)
         {
             OUT2E("%s: %s: malloc failed\n", argv0, b_command);
@@ -51,14 +52,16 @@ int builtin_history(ARGS)
         /*Get argc for getopt*/
         for (count = 0; b_parameters[count]; count++)
             ;
-        while ((ch = getopt_long(count, b_parameters, ":a::w::r::n::p::s::cd:", longopts, NULL)) != -1)
+        while ((ch = getopt_long(count, b_parameters, ":a::w::r::n::p::s::cd:",
+                                 longopts, NULL)) != -1)
         {
             switch (ch)
             {
                 case 'a':
                     flags |= AFLAG;
                     if (optarg)
-                        strncpy(filename, optarg, sizeof(char) * MAXEACHARG - 1);
+                        strncpy(filename, optarg,
+                                sizeof(char) * MAXEACHARG - 1);
                     break;
                 case 'r':
                     if (flags & AFLAG)
@@ -72,7 +75,8 @@ int builtin_history(ARGS)
                     }
                     flags |= RFLAG;
                     if (optarg)
-                        strncpy(filename, optarg, sizeof(char) * MAXEACHARG - 1);
+                        strncpy(filename, optarg,
+                                sizeof(char) * MAXEACHARG - 1);
                     break;
                 case 'w':
                     if (flags & AFLAG || flags & RFLAG)
@@ -85,7 +89,8 @@ int builtin_history(ARGS)
                         return 2;
                     }
                     if (optarg)
-                        strncpy(filename, optarg, sizeof(char) * MAXEACHARG - 1);
+                        strncpy(filename, optarg,
+                                sizeof(char) * MAXEACHARG - 1);
                     flags |= WFLAG;
                     break;
                 case 'n':
@@ -99,7 +104,8 @@ int builtin_history(ARGS)
                         return 2;
                     }
                     if (optarg)
-                        strncpy(filename, optarg, sizeof(char) * MAXEACHARG - 1);
+                        strncpy(filename, optarg,
+                                sizeof(char) * MAXEACHARG - 1);
                     flags |= NFLAG;
                     break;
                 case 's':
@@ -126,7 +132,8 @@ int builtin_history(ARGS)
                     {
                         int count2;
                         for (count2 = 0; b_parameters[count][count2]; ++count2)
-                            if (b_parameters[count][count2] != '0' && (!isspace(b_parameters[count][count2])))
+                            if (b_parameters[count][count2] != '0' &&
+                                (!isspace(b_parameters[count][count2])))
                             {
                                 OUT2E("%s: %s: "
                                       "%s: "
@@ -141,7 +148,8 @@ int builtin_history(ARGS)
                     }
                     break;
                 case '?':
-                    OUT2E("%s: %s: invalid option '-%c'\n", argv0, b_command, optopt);
+                    OUT2E("%s: %s: invalid option '-%c'\n", argv0, b_command,
+                          optopt);
                     free(filename);
                     return 2;
                 case ':':

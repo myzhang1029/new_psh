@@ -95,8 +95,8 @@ int new_command(struct command **info)
         free(*info);
         return -1;
     }
-    memset((*info)->parameters, 0, MAXARG); /* This will be used to detect whether an element is
-                           used */
+    memset((*info)->parameters, 0, MAXARG); /* This will be used to detect
+                           whether an element is used */
     (*info)->parameters[0] = malloc(P_CS * MAXEACHARG);
     if ((*info)->parameters[0] == NULL)
     {
@@ -130,26 +130,27 @@ void free_command(struct command *info)
 int filpinfo(char *buffer, struct command *info)
 {
 /* Report a syntax error bashly */
-#define synerr(token) OUT2E("%s: syntax error near unexpected token `%s'\n", argv0, (token))
+#define synerr(token)                                                          \
+    OUT2E("%s: syntax error near unexpected token `%s'\n", argv0, (token))
 
 /* Increase cnt_buffer to the last space from buffer[cnt_buffer] */
-#define ignIFS()                                                                                                       \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        int tmp;                                                                                                       \
-        if ((tmp = ignore_IFSs(buffer, cnt_buffer)) == -5)                                                             \
-            goto done;                                                                                                 \
-        cnt_buffer = tmp;                                                                                              \
+#define ignIFS()                                                               \
+    do                                                                         \
+    {                                                                          \
+        int tmp;                                                               \
+        if ((tmp = ignore_IFSs(buffer, cnt_buffer)) == -5)                     \
+            goto done;                                                         \
+        cnt_buffer = tmp;                                                      \
     } while (0)
 
 /* Increase cnt_buffer to the last space from buffer[cnt_buffer+1] */
-#define ignIFS_from_next_char()                                                                                        \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        int tmp;                                                                                                       \
-        if ((tmp = ignore_IFSs(buffer, ++cnt_buffer)) == -5)                                                           \
-            goto done;                                                                                                 \
-        cnt_buffer = tmp;                                                                                              \
+#define ignIFS_from_next_char()                                                \
+    do                                                                         \
+    {                                                                          \
+        int tmp;                                                               \
+        if ((tmp = ignore_IFSs(buffer, ++cnt_buffer)) == -5)                   \
+            goto done;                                                         \
+        cnt_buffer = tmp;                                                      \
     } while (0)
 
 /* malloc() and zero-initialize an element in parameters[][] */
@@ -157,36 +158,41 @@ int filpinfo(char *buffer, struct command *info)
 
 /* Write the current char in buffer to current command, increase cnt_return
  * only if current is neither blank nor 0 */
-#define write_current()                                                                                                \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (stat_parsing_redirect == 0)                                                                                \
-            cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = buffer[cnt_buffer];                  \
-        if (stat_parsing_redirect == 1) /* for an fd */                                                                \
-        {                                                                                                              \
-            if (redir_lastnode == NULL)                                                                                \
-            {                                                                                                          \
-                redir_lastnode = malloc(sizeof(struct redirect));                                                      \
-                redirect_init(redir_lastnode);                                                                         \
-            }                                                                                                          \
-            if (!isdigit(buffer[cnt_buffer]))                                                                          \
-            {                                                                                                          \
-                OUT2E("%s: %c: Digit input required\n", argv0, buffer[cnt_buffer]);                                    \
-                cnt_return = -2;                                                                                       \
-                goto done;                                                                                             \
-            }                                                                                                          \
-        }                                                                                                              \
-        if (strchr(" \t", buffer[cnt_buffer]) == NULL && buffer[cnt_buffer] != 0) /* current char not blank */         \
-            cnt_return++;                                                                                              \
+#define write_current()                                                        \
+    do                                                                         \
+    {                                                                          \
+        if (stat_parsing_redirect == 0)                                        \
+            cmd_lastnode                                                       \
+                ->parameters[cnt_argument_element][cnt_argument_char++] =      \
+                buffer[cnt_buffer];                                            \
+        if (stat_parsing_redirect == 1) /* for an fd */                        \
+        {                                                                      \
+            if (redir_lastnode == NULL)                                        \
+            {                                                                  \
+                redir_lastnode = malloc(sizeof(struct redirect));              \
+                redirect_init(redir_lastnode);                                 \
+            }                                                                  \
+            if (!isdigit(buffer[cnt_buffer]))                                  \
+            {                                                                  \
+                OUT2E("%s: %c: Digit input required\n", argv0,                 \
+                      buffer[cnt_buffer]);                                     \
+                cnt_return = -2;                                               \
+                goto done;                                                     \
+            }                                                                  \
+        }                                                                      \
+        if (strchr(" \t", buffer[cnt_buffer]) == NULL &&                       \
+            buffer[cnt_buffer] != 0) /* current char not blank */              \
+            cnt_return++;                                                      \
     } while (0) /* Make the semicolon happy */
 
 /* Write any char to current command, increase cnt_return only if c != 0 */
-#define write_char(c)                                                                                                  \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] = c;                                       \
-        if (strchr(" \t", c) == NULL && c != 0)                                                                        \
-            cnt_return++;                                                                                              \
+#define write_char(c)                                                          \
+    do                                                                         \
+    {                                                                          \
+        cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] =  \
+            c;                                                                 \
+        if (strchr(" \t", c) == NULL && c != 0)                                \
+            cnt_return++;                                                      \
     } while (0)
 
 #define escape (cnt_buffer != 0 && buffer[cnt_buffer - 1] == '\\')
@@ -199,8 +205,8 @@ int filpinfo(char *buffer, struct command *info)
     struct command *cmd_lastnode = info /* The last node of the command list */;
     struct redirect *redir_lastnode = info ? info->rlist : NULL;
     int stat_in_squote = 0, stat_in_dquote = 0, stat_parsing_redirect = 0;
-    int cnt_buffer = 0, cnt_argument_char = 0, cnt_argument_element = 0, cnt_return = 0, cnt_old_parameter = 0,
-        cnt_first_nonIFS = 0;
+    int cnt_buffer = 0, cnt_argument_char = 0, cnt_argument_element = 0,
+        cnt_return = 0, cnt_old_parameter = 0, cnt_first_nonIFS = 0;
     /*
     -- Variable prefixes:
         - cnt: count;
@@ -214,12 +220,14 @@ int filpinfo(char *buffer, struct command *info)
         x = 2: Parsing for a filename (like 1>output, 2>/dev/null);
         - cnt_buffer: count for buffer;
         - cnt_argument_char: count for current parameter element;
-        - cnt_argument_element: count representing how many elements are there in parameter;
+        - cnt_argument_element: count representing how many elements are there
+    in parameter;
         - cnt_return: characters actually wrote to the command, returned;
         - cnt_old_parameter: saved cnt_argument_char for undo IFS delim;
         - cnt_first_nonIFS: the first non-IFS char in buffer.
     */
-    /* The input command should be initialized in main.c, otherwise report a programming error */
+    /* The input command should be initialized in main.c, otherwise report a
+     * programming error */
     if (info == NULL)
         code_fault(__FILE__, __LINE__);
     ignIFS(); /* Ignore starting spaces */
@@ -229,8 +237,9 @@ int filpinfo(char *buffer, struct command *info)
         switch (buffer[cnt_buffer])
         {
             case '\'':
-                if (stat_in_dquote == 1) /* Already in a "" quote, just write a '
-                                          */
+                if (stat_in_dquote ==
+                    1) /* Already in a "" quote, just write a '
+                        */
                     write_current();
 
                 else if (stat_in_squote == 1) /* Get out of the quote */
@@ -288,7 +297,9 @@ int filpinfo(char *buffer, struct command *info)
                         cmd_lastnode->parameters[cnt_argument_element] = NULL;
                         cnt_argument_element--;
                     }
-                    if (ignore_IFSs(buffer, cnt_buffer + 1 /* the char after & */) == -5) /* EOL */
+                    if (ignore_IFSs(buffer,
+                                    cnt_buffer + 1 /* the char after & */) ==
+                        -5) /* EOL */
                     {
                         /* done */
                         if (cmd_lastnode->flag == 0)
@@ -319,11 +330,17 @@ int filpinfo(char *buffer, struct command *info)
                             cnt_return = -2;
                             goto done;
                         }
-                        if (ignore_IFSs(buffer, cnt_buffer + 2 /* the char after && */) == -5) /* EOL */
+                        if (ignore_IFSs(buffer,
+                                        cnt_buffer +
+                                            2 /* the char after && */) ==
+                            -5) /* EOL */
                         {
                             char *cmdand_buf;
                             cmdand_buf = p_gets("> ");
-                            buffer = realloc(buffer, P_CS * (strlen(buffer) + strlen(cmdand_buf) + 1 /* \0 */));
+                            buffer =
+                                realloc(buffer, P_CS * (strlen(buffer) +
+                                                        strlen(cmdand_buf) +
+                                                        1 /* \0 */));
                             strncat(buffer, cmdand_buf, strlen(cmdand_buf));
                             free(cmdand_buf);
                         }
@@ -386,11 +403,16 @@ int filpinfo(char *buffer, struct command *info)
                             cnt_return = -2;
                             goto done;
                         }
-                        if (ignore_IFSs(buffer, cnt_buffer + 2 /* the char after || */) == -5) /* EOL */
+                        if (ignore_IFSs(buffer,
+                                        cnt_buffer +
+                                            2 /* the char after || */) ==
+                            -5) /* EOL */
                         {
                             char *cmdor_buf;
                             cmdor_buf = p_gets("> ");
-                            buffer = realloc(buffer, P_CS * (strlen(buffer) + strlen(cmdor_buf) + 1 /* \0 */));
+                            buffer = realloc(buffer, P_CS * (strlen(buffer) +
+                                                             strlen(cmdor_buf) +
+                                                             1 /* \0 */));
                             strncat(buffer, cmdor_buf, strlen(cmdor_buf));
                             free(cmdor_buf);
                         }
@@ -406,11 +428,15 @@ int filpinfo(char *buffer, struct command *info)
                             cnt_return = -2;
                             goto done;
                         }
-                        if (ignore_IFSs(buffer, cnt_buffer + 2 /* the char after | */) == -5) /* EOL */
+                        if (ignore_IFSs(buffer, cnt_buffer +
+                                                    2 /* the char after | */) ==
+                            -5) /* EOL */
                         {
                             char *pipe_buf;
                             pipe_buf = p_gets("> ");
-                            buffer = realloc(buffer, P_CS * (strlen(buffer) + strlen(pipe_buf) + 1 /* \0 */));
+                            buffer = realloc(buffer, P_CS * (strlen(buffer) +
+                                                             strlen(pipe_buf) +
+                                                             1 /* \0 */));
                             strncat(buffer, pipe_buf, strlen(pipe_buf));
                             free(pipe_buf);
                         }
@@ -428,8 +454,11 @@ int filpinfo(char *buffer, struct command *info)
                     write_current();
                     break;
                 }
-                if (buffer[cnt_buffer + 1] != 0 && buffer[cnt_buffer + 1] != '\n' && buffer[cnt_buffer + 1] != '\t' &&
-                    buffer[cnt_buffer + 1] != ' ' && buffer[cnt_buffer + 1] != '/') /* ~username */
+                if (buffer[cnt_buffer + 1] != 0 &&
+                    buffer[cnt_buffer + 1] != '\n' &&
+                    buffer[cnt_buffer + 1] != '\t' &&
+                    buffer[cnt_buffer + 1] != ' ' &&
+                    buffer[cnt_buffer + 1] != '/') /* ~username */
                 {
                     char *username = malloc(P_CS * 256);
                     char *posit;
@@ -451,7 +480,8 @@ int filpinfo(char *buffer, struct command *info)
                     {
                         int usernamelen = strlen(username);
                         for (--usernamelen; usernamelen != 0; --usernamelen)
-                            if (username[usernamelen] != ' ' && username[usernamelen] != '\t')
+                            if (username[usernamelen] != ' ' &&
+                                username[usernamelen] != '\t')
                             {
                                 username[++usernamelen] = 0; /* Terminate
                                                 the
@@ -467,7 +497,8 @@ int filpinfo(char *buffer, struct command *info)
                         write_current();
                         break;
                     }
-                    strncpy(cmd_lastnode->parameters[cnt_argument_element], hdir, 4094 - cnt_argument_char);
+                    strncpy(cmd_lastnode->parameters[cnt_argument_element],
+                            hdir, 4094 - cnt_argument_char);
                     cnt_buffer += strlen(username);
                     cnt_argument_char += strlen(hdir);
                     free(username);
@@ -475,14 +506,16 @@ int filpinfo(char *buffer, struct command *info)
                 else /* ~/ and ~ */
                 {
                     char *hdir = gethd();
-                    strncpy(cmd_lastnode->parameters[cnt_argument_element], hdir, 4094 - cnt_argument_char);
+                    strncpy(cmd_lastnode->parameters[cnt_argument_element],
+                            hdir, 4094 - cnt_argument_char);
                     cnt_argument_char += strlen(hdir);
                 }
                 break;
             case '\\':
             {
                 int case_count;
-                for (case_count = 1; buffer[cnt_buffer]; ++case_count, ++cnt_buffer)
+                for (case_count = 1; buffer[cnt_buffer];
+                     ++case_count, ++cnt_buffer)
                 {
                     if (buffer[cnt_buffer] != '\\')
                     {
@@ -508,7 +541,9 @@ int filpinfo(char *buffer, struct command *info)
                  */
                 char *newline_buf;
                 newline_buf = p_gets("> ");
-                buffer = realloc(buffer, P_CS * (strlen(buffer) + strlen(newline_buf) + 1 /* \0 */));
+                buffer =
+                    realloc(buffer, P_CS * (strlen(buffer) +
+                                            strlen(newline_buf) + 1 /* \0 */));
                 strncat(buffer, newline_buf, strlen(newline_buf));
                 free(newline_buf);
                 break;
@@ -548,7 +583,8 @@ int filpinfo(char *buffer, struct command *info)
                     char buf[MAXLINE] = {0};
                     while (--case_count, 1 /* infinity loop */)
                     {
-                        if (case_count == cnt_first_nonIFS || !isdigit(buffer[case_count]))
+                        if (case_count == cnt_first_nonIFS ||
+                            !isdigit(buffer[case_count]))
                         {
                             if (buf[0] == 0)
                                 buf[0] = 1 /* stdout */;
@@ -571,8 +607,9 @@ int filpinfo(char *buffer, struct command *info)
                 switch (buffer[cnt_buffer + 1])
                 {
                     case '&':
-                        ++cnt_buffer;                                /* Increase cnt_buffer to the '&' */
-                        if (ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+                        ++cnt_buffer; /* Increase cnt_buffer to the '&' */
+                        if (ignore_IFSs(buffer, ++cnt_buffer) ==
+                            -5) /* and remove all following blanks */
                         {
                             synerr("newline"); /* if EOL met, report error */
                             cnt_return = -2;
@@ -583,8 +620,10 @@ int filpinfo(char *buffer, struct command *info)
                     case ' ':
                     case '\t':
                     case '|':
-                        ++cnt_buffer;                                /* Increase cnt_buffer to the [' ''\t''|'] */
-                        if (ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+                        ++cnt_buffer; /* Increase cnt_buffer to the [' ''\t''|']
+                                       */
+                        if (ignore_IFSs(buffer, ++cnt_buffer) ==
+                            -5) /* and remove all following blanks */
                         {
                             synerr("newline"); /* if EOL met, report error */
                             cnt_return = -2;
@@ -600,10 +639,13 @@ int filpinfo(char *buffer, struct command *info)
                         switch (buffer[cnt_buffer + 1])
                         {
                             case '&':
-                                ++cnt_buffer;                                /* Increase cnt_buffer to the '&' */
-                                if (ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+                                ++cnt_buffer; /* Increase cnt_buffer to the '&'
+                                               */
+                                if (ignore_IFSs(buffer, ++cnt_buffer) ==
+                                    -5) /* and remove all following blanks */
                                 {
-                                    synerr("newline"); /* if EOL met, report error */
+                                    synerr("newline"); /* if EOL met, report
+                                                          error */
                                     cnt_return = -2;
                                     goto done;
                                 }
@@ -612,15 +654,19 @@ int filpinfo(char *buffer, struct command *info)
                             case ' ':
                             case '\t':
                             case '|':
-                                ++cnt_buffer;                                /* Increase cnt_buffer to the [' ''\t''|']
-                                                                              */
-                                if (ignore_IFSs(buffer, ++cnt_buffer) == -5) /* and remove all following blanks */
+                                ++cnt_buffer; /* Increase cnt_buffer to the ['
+                                               * ''\t''|']
+                                               */
+                                if (ignore_IFSs(buffer, ++cnt_buffer) ==
+                                    -5) /* and remove all following blanks */
                                 {
-                                    synerr("newline"); /* if EOL met, report error */
+                                    synerr("newline"); /* if EOL met, report
+                                                          error */
                                     cnt_return = -2;
                                     goto done;
                                 }
-                                stat_parsing_redirect = 2; /* Parsing for filename */
+                                stat_parsing_redirect =
+                                    2; /* Parsing for filename */
                                 break;
                             case '>': /* >>> */
                                 synerr(">");
@@ -639,7 +685,7 @@ int filpinfo(char *buffer, struct command *info)
                         synerr("newline");
                         cnt_return = -2;
                         goto done;
-                    default:                       /* I don't need to handle the rest */
+                    default: /* I don't need to handle the rest */
                         stat_parsing_redirect = 2; /* Parsing for filename */
                         break;
                 }
@@ -655,12 +701,13 @@ int filpinfo(char *buffer, struct command *info)
             case ')':
             /* TODO: Write command sequence code here */
             case '<':
-                /* TODO: Write input redirect, here string and here document code
-                 * here */
+                /* TODO: Write input redirect, here string and here document
+                 * code here */
                 write_current();
                 break;
             case '#':
-                if (cnt_buffer == cnt_first_nonIFS || (!strchr(" \t", buffer[cnt_buffer - 1])) /* Is IFS */)
+                if (cnt_buffer == cnt_first_nonIFS ||
+                    (!strchr(" \t", buffer[cnt_buffer - 1])) /* Is IFS */)
                 {
                     write_current();
                     break;
@@ -703,7 +750,9 @@ int filpinfo(char *buffer, struct command *info)
                         cnt_return = -2;
                         goto done;
                     }
-                    if (ignore_IFSs(buffer, cnt_buffer + 1 /* the char after ; */) == -5) /* EOL */
+                    if (ignore_IFSs(buffer,
+                                    cnt_buffer + 1 /* the char after ; */) ==
+                        -5) /* EOL */
                     {
                         goto done; /* Ending `;', end parsing */
                     }
@@ -713,7 +762,8 @@ int filpinfo(char *buffer, struct command *info)
                 cnt_argument_element = 0;
                 cnt_argument_char = 0;
                 ignIFS_from_next_char();
-                do /* Remove all following `;'s. I'll mess up with case later. TODO */
+                do /* Remove all following `;'s. I'll mess up with case later.
+                      TODO */
                 {
                     if (!buffer[cnt_buffer])
                     {

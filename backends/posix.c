@@ -112,15 +112,22 @@ char *pshgetcwd(void)
 
 char *pshstrdup(char *str) { return strdup(str); }
 
-int pshgethostname(char *hstnme, size_t len) { return gethostname(hstnme, len); }
+int pshgethostname(char *hstnme, size_t len)
+{
+    return gethostname(hstnme, len);
+}
 
 int pshgetuid(void) { return geteuid(); }
 
 int pshchdir(char *dir) { return chdir(dir); }
 
-int pshsetenv(const char *name, const char *value, int overwrite) { return setenv(name, value, overwrite); }
+int pshsetenv(const char *name, const char *value, int overwrite)
+{
+    return setenv(name, value, overwrite);
+}
 
-static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char **env)
+static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
+                         char **env)
 {
     pid_t pid;
     struct redirect *info = arginfo;
@@ -135,19 +142,25 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv, char 
                     close(info->in.fd);
                     break;
                 case OUT_REDIR:
-                    dup2(open(info->out.file, O_WRONLY | O_CREAT | O_TRUNC, 0644), info->in.fd);
+                    dup2(open(info->out.file, O_WRONLY | O_CREAT | O_TRUNC,
+                              0644),
+                         info->in.fd);
                     break;
                 case OUT_APPN:
-                    dup2(open(info->out.file, O_WRONLY | O_CREAT | O_APPEND, 0644), info->in.fd);
+                    dup2(open(info->out.file, O_WRONLY | O_CREAT | O_APPEND,
+                              0644),
+                         info->in.fd);
                     break;
                 case IN_REDIR:
-                    dup2(open(info->in.file, O_RDONLY | O_CREAT, 0644), info->out.fd);
+                    dup2(open(info->in.file, O_RDONLY | O_CREAT, 0644),
+                         info->out.fd);
                     break;
                 case CLOSEFD:
                     close(info->in.fd);
                     break;
                 case OPENFN:
-                    dup2(open(info->in.file, O_RDWR | O_CREAT, 0644), info->out.fd);
+                    dup2(open(info->in.file, O_RDWR | O_CREAT, 0644),
+                         info->out.fd);
                     break;
             }
             info = info->next;
@@ -174,7 +187,8 @@ int do_run(struct command *arginfo)
         for (j = 0; info->parameters[j]; ++j)
             printf("%s\n", info->parameters[j]);
         printf("flag: %d\n", info->flag);
-        printf("redir type: %d\n", (info->rlist != NULL) ? info->rlist->type : 0);
+        printf("redir type: %d\n",
+               (info->rlist != NULL) ? info->rlist->type : 0);
 
         if (info->next == NULL)
             break;
@@ -191,12 +205,14 @@ int do_run(struct command *arginfo)
         {
             if (errno == ENOENT && !strchr(info->parameters[0], '/'))
             {
-                OUT2E("%s: %s: command not found\n", argv0, info->parameters[0]);
+                OUT2E("%s: %s: command not found\n", argv0,
+                      info->parameters[0]);
                 _Exit(127);
             }
             else
             {
-                OUT2E("%s: %s: %s\n", argv0, info->parameters[0], strerror(errno));
+                OUT2E("%s: %s: %s\n", argv0, info->parameters[0],
+                      strerror(errno));
                 /* Exit the failed command child process */
                 _Exit(126);
             }

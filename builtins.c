@@ -41,7 +41,8 @@ builtin_function find_builtin(char *name)
     struct builtin *key = malloc(sizeof(struct builtin));
     struct builtin *result;
     key->name = name;
-    result = (struct builtin *)bsearch(key, builtins, 61, sizeof(struct builtin), &builtin_compare);
+    result = (struct builtin *)bsearch(
+        key, builtins, 61, sizeof(struct builtin), &builtin_compare);
     free(key);
     return result != NULL ? result->proc : (builtin_function)0;
 }

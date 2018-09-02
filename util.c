@@ -54,19 +54,24 @@ char *p_fgets(char *prompt, FILE *fp)
                     free(result);
                     return NULL;
                 }
-                *ptr = 0;                                              /* Replace EOF with NUL */
-                result = realloc(result, P_CS * (strlen(result) + 1)); /* Resize the array to minimum */
+                *ptr = 0; /* Replace EOF with NUL */
+                result = realloc(result,
+                                 P_CS * (strlen(result) +
+                                         1)); /* Resize the array to minimum */
                 return result;
             }
             if (*ptr == '\n')
             {
-                *ptr = 0;                                              /* Replace \n with NUL */
-                result = realloc(result, P_CS * (strlen(result) + 1)); /* Resize the array to minimum */
+                *ptr = 0; /* Replace \n with NUL */
+                result = realloc(result,
+                                 P_CS * (strlen(result) +
+                                         1)); /* Resize the array to minimum */
                 return result;
             }
             ++ptr;
             if ((++charcount) == nowhave)
-                if ((result = realloc(result, P_CS * (nowhave <<= 1))) == NULL) /* malloc more mem */
+                if ((result = realloc(result, P_CS * (nowhave <<= 1))) ==
+                    NULL) /* malloc more mem */
                     return NULL;
         }
     }
