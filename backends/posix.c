@@ -162,6 +162,8 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
                     dup2(open(info->in.file, O_RDWR | O_CREAT, 0644),
                          info->out.fd);
                     break;
+                case HEREXX: /* Some magic TODO */
+                    break;
             }
             info = info->next;
         }
@@ -230,9 +232,9 @@ int do_run(struct command *arginfo)
 /* Builtin exec */
 int builtin_exec(ARGS)
 {
-    if (b_parameters[1] == NULL)
+    if (bltin_argv[1] == NULL)
         return 1; /* Do nothing */
-    if (execv(b_parameters[1], &b_parameters[1]) == -1)
-        OUT2E("exec: %s: %s\n", b_parameters[1], strerror(errno));
+    if (execv(bltin_argv[1], &bltin_argv[1]) == -1)
+        OUT2E("exec: %s: %s\n", bltin_argv[1], strerror(errno));
     return 2;
 }

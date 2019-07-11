@@ -97,35 +97,36 @@ static int create_new_pwd(char **cd_dir)
 int builtin_cd(ARGS)
 {
     char *cd_path = NULL;
-    if (b_parameters[1] == NULL) /* 'cd', the same as cd $HOME */
+    int argc = get_argc(bltin_argv);
+    if (argc == 1) /* 'cd', the same as cd $HOME */
     {
         char *homedir = getenv("HOME");
         if (!homedir)
         {
-            OUT2E("%s: %s: HOME not set\n", argv0, b_command);
+            OUT2E("%s: %s: HOME not set\n", argv0, bltin_argv[0]);
             return 2;
         }
         cd_path = malloc(P_CS * (strlen(homedir) + 1));
         if (cd_path == NULL)
         {
-            OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
+            OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
             return 2;
         }
         strcpy(cd_path, homedir);
     }
-    else if (strcmp(b_parameters[1], "-") ==
+    else if (strcmp(bltin_argv[1], "-") ==
              0) /* 'cd -', the same as cd $OLDPWD*/
     {
         char *oldpwd = getenv("OLDPWD");
         if (!oldpwd)
         {
-            OUT2E("%s: %s: OLDPWD not set\n", argv0, b_command);
+            OUT2E("%s: %s: OLDPWD not set\n", argv0, bltin_argv[0]);
             return 2;
         }
         cd_path = malloc(P_CS * (strlen(oldpwd) + 1));
         if (cd_path == NULL)
         {
-            OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
+            OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
             return 2;
         }
         puts(oldpwd);
@@ -133,19 +134,19 @@ int builtin_cd(ARGS)
     }
     else
     {
-        cd_path = malloc(P_CS * (strlen(b_parameters[1]) + 1));
+        cd_path = malloc(P_CS * (strlen(bltin_argv[1]) + 1));
         if (cd_path == NULL)
         {
-            OUT2E("%s: malloc failed: %s\n", b_command, strerror(errno));
+            OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
             return 2;
         }
-        strncpy(cd_path, b_parameters[1], strlen(b_parameters[1]));
+        strncpy(cd_path, bltin_argv[1], strlen(bltin_argv[1]));
     }
 
     create_new_pwd(&cd_path);
 
     if (pshchdir(cd_path) != 0)
-        OUT2E("%s: %s: %s\n", b_command, strerror(errno), cd_path);
+        OUT2E("%s: %s: %s\n", bltin_argv[0], strerror(errno), cd_path);
     else
     {
         pshsetenv("OLDPWD", getenv("PWD"), 1);

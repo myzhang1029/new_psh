@@ -34,10 +34,10 @@
 int builtin_history(ARGS)
 {
 #ifdef NO_HISTORY
-    OUT2E("%s: libhistory not compiled!\n", b_command);
+    OUT2E("%s: libhistory not compiled!\n", bltin_argv[0]);
     return 2;
 #else
-    if (b_parameters[1] != NULL)
+    if (bltin_argv[1] != NULL)
     {
         int count, ch, flags = 0, n;
         char *filename = malloc(P_CS * MAXEACHARG);
@@ -45,14 +45,14 @@ int builtin_history(ARGS)
                                     {NULL, 0, NULL, 0}};
         if (!filename)
         {
-            OUT2E("%s: %s: malloc failed\n", argv0, b_command);
+            OUT2E("%s: %s: malloc failed\n", argv0, bltin_argv[0]);
             return 2;
         }
 
         /*Get argc for getopt*/
-        for (count = 0; b_parameters[count]; count++)
+        for (count = 0; bltin_argv[count]; count++)
             ;
-        while ((ch = getopt_long(count, b_parameters, ":a::w::r::n::p::s::cd:",
+        while ((ch = getopt_long(count, bltin_argv, ":a::w::r::n::p::s::cd:",
                                  longopts, NULL)) != -1)
         {
             switch (ch)
@@ -68,7 +68,7 @@ int builtin_history(ARGS)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, b_command);
+                              argv0, bltin_argv[0]);
                         USAGE();
                         free(filename);
                         return 2;
@@ -83,7 +83,7 @@ int builtin_history(ARGS)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, b_command);
+                              argv0, bltin_argv[0]);
                         USAGE();
                         free(filename);
                         return 2;
@@ -98,7 +98,7 @@ int builtin_history(ARGS)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, b_command);
+                              argv0, bltin_argv[0]);
                         USAGE();
                         free(filename);
                         return 2;
@@ -119,21 +119,21 @@ int builtin_history(ARGS)
                     break;
                 case 'd':
                     flags |= DFLAG;
-                    n = atoi(b_parameters[count]);
+                    n = atoi(bltin_argv[count]);
                     if (n < 0)
                     {
                         OUT2E("%s: %s: %d: invalid "
                               "option\n",
-                              argv0, b_command, n);
+                              argv0, bltin_argv[0], n);
                         free(filename);
                         return 2;
                     }
                     if (!n)
                     {
                         int count2;
-                        for (count2 = 0; b_parameters[count][count2]; ++count2)
-                            if (b_parameters[count][count2] != '0' &&
-                                (!isspace(b_parameters[count][count2])))
+                        for (count2 = 0; bltin_argv[count][count2]; ++count2)
+                            if (bltin_argv[count][count2] != '0' &&
+                                (!isspace(bltin_argv[count][count2])))
                             {
                                 OUT2E("%s: %s: "
                                       "%s: "
@@ -141,21 +141,21 @@ int builtin_history(ARGS)
                                       "argument "
                                       "required"
                                       "\n",
-                                      argv0, b_command, b_parameters[count]);
+                                      argv0, bltin_argv[0], bltin_argv[count]);
                                 free(filename);
                                 return 2;
                             }
                     }
                     break;
                 case '?':
-                    OUT2E("%s: %s: invalid option '-%c'\n", argv0, b_command,
-                          optopt);
+                    OUT2E("%s: %s: invalid option '-%c'\n", argv0,
+                          bltin_argv[0], optopt);
                     free(filename);
                     return 2;
                 case ':':
                     OUT2E("%s: %s: -d: option requires an "
                           "argument\n",
-                          argv0, b_command);
+                          argv0, bltin_argv[0]);
                     free(filename);
                     return 2;
             }

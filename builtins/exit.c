@@ -28,7 +28,7 @@ int builtin_exit(ARGS)
     }
     else
     {
-        int i = atoi(b_parameters[1]);
+        int i = atoi(bltin_argv[1]);
         exit_psh(i);
     }
     return 2; /* Noreturn */

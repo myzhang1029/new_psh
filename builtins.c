@@ -23,13 +23,21 @@
 
 extern int last_command_status;
 
+int get_argc(char **argv)
+{
+    int argc = 0;
+    for (; argv[argc]; ++argc)
+        ;
+    return argc;
+}
+
 int builtin_unsupported(ARGS)
 {
-    OUT2E("%s: %s: Not supported, coming soon\n", argv0, b_command);
+    OUT2E("%s: %s: Not supported, coming soon\n", argv0, bltin_argv[0]);
     return 2;
 }
 
-int builtin_compare(const void *key, const void *cur)
+int compare_builtin(const void *key, const void *cur)
 {
     const struct builtin *bkey = (const struct builtin *)key;
     const struct builtin *builtin = (const struct builtin *)cur;
@@ -42,7 +50,7 @@ builtin_function find_builtin(char *name)
     struct builtin *result;
     key->name = name;
     result = (struct builtin *)bsearch(
-        key, builtins, 61, sizeof(struct builtin), &builtin_compare);
+        key, builtins, 61, sizeof(struct builtin), &compare_builtin);
     free(key);
     return result != NULL ? result->proc : (builtin_function)0;
 }

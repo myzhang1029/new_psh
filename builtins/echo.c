@@ -21,41 +21,41 @@
 
 int builtin_echo(ARGS)
 {
-    if (b_parameters[1] == NULL)
+    if (bltin_argv[1] == NULL)
     {
         /* A blank line */
         printf("\n");
         return 1;
     }
-    else if (b_parameters[1][0] == '-')
+    else if (bltin_argv[1][0] == '-')
     {
-        switch (b_parameters[1][1])
+        switch (bltin_argv[1][1])
         {
             case 0:
                 /* Another blank line */
                 puts("");
                 return 1;
             case 'n':
-                if (b_parameters[2] == NULL)
+                if (bltin_argv[2] == NULL)
                     /* No more blank line */
                     return 1;
                 else
                 {
                     int cnt = 2;
-                    printf("%s", b_parameters[cnt]);
-                    while (b_parameters[++cnt] != NULL)
+                    printf("%s", bltin_argv[cnt]);
+                    while (bltin_argv[++cnt] != NULL)
                     {
-                        printf(" %s", b_parameters[cnt]);
+                        printf(" %s", bltin_argv[cnt]);
                     }
                     return 1;
                 }
             default:
             {
                 int cnt = 1;
-                printf("%s", b_parameters[cnt]);
-                while (b_parameters[++cnt] != NULL)
+                printf("%s", bltin_argv[cnt]);
+                while (bltin_argv[++cnt] != NULL)
                 {
-                    printf(" %s", b_parameters[cnt]);
+                    printf(" %s", bltin_argv[cnt]);
                     cnt++;
                 }
                 puts("");
@@ -66,10 +66,10 @@ int builtin_echo(ARGS)
     else
     {
         int cnt = 1;
-        printf("%s", b_parameters[cnt]);
-        while (b_parameters[++cnt] != NULL)
+        printf("%s", bltin_argv[cnt]);
+        while (bltin_argv[++cnt] != NULL)
         {
-            printf(" %s", b_parameters[cnt]);
+            printf(" %s", bltin_argv[cnt]);
             cnt++;
         }
         puts("");

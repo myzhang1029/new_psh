@@ -20,8 +20,7 @@
 #include "pshell.h"
 
 #define ARGS struct command *info
-#define b_command (info->parameters[0])
-#define b_parameters (info->parameters)
+#define bltin_argv (info->parameters)
 
 typedef int (*builtin_function)(ARGS);
 
@@ -35,6 +34,7 @@ int builtin_pwd(ARGS);
 int builtin_history(ARGS);
 int builtin_builtin(ARGS);
 builtin_function find_builtin(char *name);
+int get_argc(char **argv);
 
 struct builtin
 {

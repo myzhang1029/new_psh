@@ -20,9 +20,9 @@
 
 int builtin_builtin(ARGS)
 {
-    if (b_parameters[1] == NULL) /* No args */
+    if (bltin_argv[1] == NULL) /* No args */
         return 1;
-    info->parameters++; /* Increase parameters */
+    info->parameters++; /* Skip command name([0]) */
     if (run_builtin(info) == 0)
     {
         info->parameters--;
