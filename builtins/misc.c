@@ -1,5 +1,5 @@
 /*
-   builtin/builtin.c - builtin command builtin
+   builtin/misc.c - various non-standard builtins
 
    Copyright 2017-present Zhang Maiyun.
 
@@ -15,21 +15,3 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
-#include "builtin.h"
-
-int builtin_builtin(ARGS)
-{
-    if (bltin_argv[1] == NULL) /* No args */
-        return 1;
-    info->parameters++; /* Skip command name([0]) */
-    if (run_builtin(info) == 0)
-    {
-        info->parameters--;
-        OUT2E("%s: %s: %s: not a shell builtin\n", argv0, info->parameters[0],
-              info->parameters[1]);
-        return 2;
-    }
-    info->parameters--;
-    return 1;
-}

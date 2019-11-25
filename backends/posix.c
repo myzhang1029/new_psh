@@ -1,8 +1,8 @@
 /*
-   posix.c - backend of POSIX systems
+   backends/posix.c - backend of POSIX systems
 
    Copyright 2013 wuyve.
-   Copyright 2017 Zhang Maiyun.
+   Copyright 2017-present Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
