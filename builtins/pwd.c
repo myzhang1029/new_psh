@@ -59,7 +59,10 @@ int builtin_pwd(ARGS)
             p++;
         }
         if (use_logical)
-            path = strdup(wd);
+        {
+            puts(wd);
+            return 1;
+        }
         else
             path = pshgetcwd();
     }
