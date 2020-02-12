@@ -691,11 +691,11 @@ int filpinfo(char *buffer, struct command *info)
                 }
                 break;
             case '`':
-                /* TODO: Write command substitude code here */
+                /* TODO: Write command substitute code here */
 
             case '$':
             /* TODO: Write variable, variable cut,
-             * ANSI-C style escape, command substitude,
+             * ANSI-C style escape, command substitute,
              * arithmetic expansion code here */
             case '(':
             case ')':

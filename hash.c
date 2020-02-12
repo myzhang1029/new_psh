@@ -78,7 +78,7 @@ PSH_HASH *new_hash(unsigned int len)
     return table;
 }
 
-/* Edit the vaule of an element, return 0 if success, 1 if not */
+/* Edit the value of an element, return 0 if success, 1 if not */
 static int edit_hash_elem(PSH_HASH *elem, char *val)
 {
     char *tmp;

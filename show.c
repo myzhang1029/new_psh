@@ -1,5 +1,5 @@
 /*
-   show.c - Prompt generater
+   show.c - Prompt generator
 
    Copyright 2013 wuyve.
    Copyright 2017 Zhang Maiyun.

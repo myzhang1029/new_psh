@@ -51,7 +51,7 @@ void sigchld_handler(__attribute__((unused)) int sig)
                     OUT2E("%s: waitpid error: %s", argv0, strerror(errno));
             }
             /*else:do nothing.*/
-            /*Not background processses has their waitpid() in
+            /*Not background processes has their waitpid() in
              * wshell.*/
         }
     return;
