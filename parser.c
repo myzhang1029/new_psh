@@ -1,6 +1,6 @@
 /*
    parser.c - the parser and the tokenizer
-   Copyright 2018 Zhang Maiyun.
+   Copyright 2018-2020 Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,3 +14,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
+#include <cstddef>
+#include <ctype.h>
+
+#include "backends/backend.h"
+#include "token.h"
+#include "pshell.h"
+
+psh_tokenstream *parse(char *input)
+{
+    return NULL;
+}

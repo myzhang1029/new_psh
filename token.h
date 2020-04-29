@@ -63,4 +63,4 @@ typedef struct psh_token_stream
 {
     enum psh_tokens the_token;
     char *arg;
-}*tokenstream;
+} psh_tokenstream;
