@@ -1,19 +1,21 @@
 /*
-   util.c - utilities for everyone
+    util.c - libpsh utilities for everyone
+    Copyright 2018-2020 Zhang Maiyun
 
-   Copyright 2018-2020 Zhang Maiyun.
+    This file is part of Psh, P shell.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    Psh is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+    Psh is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -22,23 +24,13 @@
 #include <readline.h>
 #endif
 
-#include "libpsh.h"
-
-void *freeptrs[16] = {NULL};
-
-int add_atexit_free(void *ptr)
-{
-    if ((freeptrs[0] = ((int)(freeptrs[0]) + 1)) == (void *)16)
-        return -1;
-    freeptrs[(int)(freeptrs[0])] = ptr;
-    return (int)freeptrs[0];
-}
+#include "libpsh/util.h"
 
 /* Get a line from file FP with prompt PROMPT.
  * The momory is allocated automatically.
  * Returns the content when an EOF or \n is read,
  * not including the trailing EOF or \n. */
-char *p_fgets(char *prompt, FILE *fp)
+char *psh_fgets(char *prompt, FILE *fp)
 {
 #ifndef NO_READLINE
     if (fp == stdin)
@@ -87,25 +79,9 @@ char *p_fgets(char *prompt, FILE *fp)
     }
 }
 
-char *p_gets(char *prompt) { return p_fgets(prompt, stdin); }
+char *psh_gets(char *prompt) { return p_fgets(prompt, stdin); }
 
-__attribute__((noreturn)) void code_fault(char *file, int line)
-{
-    OUT2E("%s: Programming error at %s: %d\n", argv0, file, line);
-    OUT2E("Shell version: %s", PSH_VERSION);
-    OUT2E("Please create a GitHub Issue with above info\n");
-    exit_psh(1);
-}
-
-void exit_psh(int status)
-{
-    int count;
-    for (count = 1; count < (int)freeptrs[0]; ++count)
-        free(freeptrs[count]);
-    exit(status);
-}
-
-size_t p_strncpy(char *dst, const char *src, size_t size)
+size_t psh_strncpy(char *dst, const char *src, size_t size)
 {
     register char *d = dst;
     register const char *s = src;

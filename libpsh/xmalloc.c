@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "libpsh.h"
+#include "libpsh/xmalloc.h"
 
 
 /* **************************************************************** */
