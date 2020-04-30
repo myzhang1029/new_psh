@@ -1,7 +1,7 @@
 /*
    util.c - utilities for everyone
 
-   Copyright 2018 Zhang Maiyun.
+   Copyright 2018-2020 Zhang Maiyun.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@
    limitations under the License.
 */
 
-#include "pshell.h"
+#include <stdio.h>
+#include <string.h>
+#ifndef NO_READLINE
+#include <readline.h>
+#endif
+
+#include "libpsh.h"
 
 void *freeptrs[16] = {NULL};
 
@@ -28,6 +34,10 @@ int add_atexit_free(void *ptr)
     return (int)freeptrs[0];
 }
 
+/* Get a line from file FP with prompt PROMPT.
+ * The momory is allocated automatically.
+ * Returns the content when an EOF or \n is read,
+ * not including the trailing EOF or \n. */
 char *p_fgets(char *prompt, FILE *fp)
 {
 #ifndef NO_READLINE
@@ -40,7 +50,7 @@ char *p_fgets(char *prompt, FILE *fp)
         printf("%s", prompt);
     {
         size_t charcount = 0, nowhave = MAXLINE;
-        char *result = malloc(P_CS * nowhave);
+        char *result = xmalloc(P_CS * nowhave);
         char *ptr = result;
         if (result == NULL)
             return NULL;
@@ -51,11 +61,11 @@ char *p_fgets(char *prompt, FILE *fp)
             {
                 if (ptr == result) /* nothing read */
                 {
-                    free(result);
+                    xfree(result);
                     return NULL;
                 }
                 *ptr = 0; /* Replace EOF with NUL */
-                result = realloc(result,
+                result = xrealloc(result,
                                  P_CS * (strlen(result) +
                                          1)); /* Resize the array to minimum */
                 return result;
@@ -63,14 +73,14 @@ char *p_fgets(char *prompt, FILE *fp)
             if (*ptr == '\n')
             {
                 *ptr = 0; /* Replace \n with NUL */
-                result = realloc(result,
+                result = xrealloc(result,
                                  P_CS * (strlen(result) +
                                          1)); /* Resize the array to minimum */
                 return result;
             }
             ++ptr;
             if ((++charcount) == nowhave)
-                if ((result = realloc(result, P_CS * (nowhave <<= 1))) ==
+                if ((result = xrealloc(result, P_CS * (nowhave <<= 1))) ==
                     NULL) /* malloc more mem */
                     return NULL;
         }

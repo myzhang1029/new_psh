@@ -20,23 +20,10 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
-#if defined (HAVE_STDLIB_H)
-#  include <stdlib.h>
-#else
-#  include "ansi_stdlib.h"
-#endif /* HAVE_STDLIB_H */
+#include "libpsh.h"
 
-/* Generic pointer type. */
-#ifndef PTR_T
-
-#if defined (__STDC__)
-#  define PTR_T void *
-#else
-#  define PTR_T char *
-#endif
-
-#endif /* PTR_T */
 
 /* **************************************************************** */
 /*								    */
