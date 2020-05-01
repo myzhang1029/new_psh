@@ -1,2 +1,4 @@
+tasks:
+  - command: exec zsh
 image:
   file: .gitpod.Dockerfile
