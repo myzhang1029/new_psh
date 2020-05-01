@@ -5,14 +5,21 @@
    Copyright 2017-present Zhang Maiyun.
 */
 
+#include <errno.h>
 #include <fcntl.h>
 #include <pwd.h>
 #include <setjmp.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "backend.h"
+
+#include "libpsh/backend.h"
+#include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 pid_t ChdPid, ChdPid2;
 pid_t BPTable[MAXPIDTABLE] = {0};
@@ -91,7 +98,7 @@ char *getun(void)
 
 char *pshgetcwd(void)
 {
-    char *cwd = malloc(P_CS * 4097);
+    char *cwd = xmalloc(P_CS * 4097);
     if (cwd == NULL)
         return NULL;
     getcwd(cwd, 4097);
@@ -210,10 +217,9 @@ int do_run(struct command *arginfo)
     }
     return 0;
 }
-
 /* * *
  * Platform dependent builtins part
- *  * *
+ * * *
  */
 #include "builtins/builtin.h"
 

@@ -1,7 +1,7 @@
 /*
    builtin/builtin.c - builtin command builtin
 
-   Copyright 2017-2020 Zhang Maiyun. 
+   Copyright 2017-2020 Zhang Maiyun.
 
    This file is part of Psh, P shell.
 
@@ -20,6 +20,7 @@
 */
 
 #include "builtin.h"
+#include "libpsh/util.h"
 
 int builtin_builtin(ARGS)
 {

@@ -19,8 +19,12 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "backends/backend.h"
+#include <errno.h>
+
+#include "backend.h"
 #include "builtin.h"
+#include "libpsh/xmalloc.h"
+#include "libpsh/util.h"
 
 static int create_new_pwd(char **cd_dir)
 {

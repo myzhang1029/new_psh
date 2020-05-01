@@ -60,7 +60,7 @@ enum psh_tokens
     LESS_GREATER,        /* <& */
     GREATER_BAR,         /* >- */
     BAR_AND,             /* -& */
-}
+};
 
 typedef struct psh_token_stream
 {

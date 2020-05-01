@@ -5,7 +5,9 @@
    Copyright 2017 Zhang Maiyun.
 */
 
-#include "backends/backend.h"
+#include <string.h>
+
+#include "backend.h"
 #include "pshell.h"
 
 const int max_name_len = 256;

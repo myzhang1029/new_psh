@@ -39,7 +39,7 @@ typedef struct _psh_stringbuilder
 } psh_stringbuilder;
 
 psh_stringbuilder *psh_stringbuilder_create();
-char *psh_stringbuilder_add(psh_stringbuilder * builder, char *string);
+char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string);
 char *psh_stringbuilder_yield(psh_stringbuilder *builder);
 void psh_stringbuilder_free(psh_stringbuilder *builder);
 #endif

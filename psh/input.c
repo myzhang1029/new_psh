@@ -6,7 +6,9 @@
 */
 
 #include <setjmp.h>
+
 #include "pshell.h"
+#include "libpsh/util.h"
 
 extern jmp_buf reset_point;
 extern int last_command_status;

@@ -8,7 +8,9 @@
 #include <memory.h>
 #include <setjmp.h>
 #include <string.h>
-#include "backends/backend.h"
+
+#include "libpsh/util.h"
+#include "backend.h"
 #include "pshell.h"
 
 int last_command_status = 0;

@@ -8,11 +8,6 @@
 #ifndef PSHELL_HEADER_INCLUDED
 #define PSHELL_HEADER_INCLUDED
 
-#include <errno.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #ifndef NO_READLINE
 #include <readline/readline.h>
 #endif
@@ -23,16 +18,9 @@
 #define __attribute__(x)
 #endif
 
-#define MAX_PROMPT 1024
-#define MAXLINE 262144
-#define MAXARG 64
-#define MAXEACHARG 4096
-#define MAXPIDTABLE 1024
-#define OUT2E(...) fprintf(stderr, __VA_ARGS__)
-#undef strncpy
-#define strncpy p_strncpy
-#define PSH_VERSION "0.13.0"
+#define PSH_VERSION "0.14.0"
 
+extern char *argv0;
 struct command /* Everything about a command */
 {
     enum flag
@@ -63,7 +51,7 @@ struct command /* Everything about a command */
             FILE *herexx; /* temporary file created to store here document and
                              here string values */
         } in;
-        union out /* file than redirect to */
+        union out /* file that redirect to */
         {
             int fd;
             char *file;
@@ -74,15 +62,10 @@ struct command /* Everything about a command */
     struct command *next;
 };
 
-extern char *argv0;
-
 void type_prompt(char *);
 int read_command(char *prompt, struct command *info);
 int run_builtin(struct command *info);
 int filpinfo(char *buffer, struct command *info);
-size_t p_strncpy(char *dst, const char *src, size_t size);
-char *p_fgets(char *prompt, FILE *fp);
-char *p_gets(char *prompt);
 int new_command(struct command **info);
 void free_command(struct command *info);
 void code_fault(char *file, int line) __attribute__((noreturn));

@@ -21,10 +21,11 @@
 #include <stdio.h>
 #include <string.h>
 #ifndef NO_READLINE
-#include <readline.h>
+#include <readline/readline.h>
 #endif
 
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 /* Get a line from file FP with prompt PROMPT.
  * The momory is allocated automatically.
@@ -56,30 +57,22 @@ char *psh_fgets(char *prompt, FILE *fp)
                     xfree(result);
                     return NULL;
                 }
-                *ptr = 0; /* Replace EOF with NUL */
-                result = xrealloc(result,
-                                 P_CS * (strlen(result) +
-                                         1)); /* Resize the array to minimum */
-                return result;
+                break;
             }
             if (*ptr == '\n')
-            {
-                *ptr = 0; /* Replace \n with NUL */
-                result = xrealloc(result,
-                                 P_CS * (strlen(result) +
-                                         1)); /* Resize the array to minimum */
-                return result;
-            }
+                break;
             ++ptr;
             if ((++charcount) == nowhave)
-                if ((result = xrealloc(result, P_CS * (nowhave <<= 1))) ==
-                    NULL) /* malloc more mem */
-                    return NULL;
+                result = xrealloc(result, P_CS * (nowhave <<= 1));
         }
+        *ptr = 0; /* Replace EOF or \n with NUL */
+        result = xrealloc(result, P_CS * (strlen(result) +
+                                          1)); /* Resize the array to minimum */
+        return result;
     }
 }
 
-char *psh_gets(char *prompt) { return p_fgets(prompt, stdin); }
+char *psh_gets(char *prompt) { return psh_fgets(prompt, stdin); }
 
 size_t psh_strncpy(char *dst, const char *src, size_t size)
 {

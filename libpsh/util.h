@@ -22,6 +22,17 @@
 #ifndef _LIBPSH_UTIL_H
 #define _LIBPSH_UTIL_H
 
+#include <stdio.h>
+
+#define MAXLINE 262144
+#define MAX_PROMPT 1024
+#define MAXARG 64
+#define MAXEACHARG 4096
+#define MAXPIDTABLE 1024
+#undef strncpy
+#define strncpy psh_strncpy
+#define OUT2E(...) fprintf(stderr, __VA_ARGS__)
+
 char *psh_fgets(char *prompt, FILE *fp);
 char *psh_gets(char *prompt);
 size_t psh_strncpy(char *dst, const char *src, size_t size);

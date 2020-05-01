@@ -17,7 +17,10 @@
 */
 
 #include <getopt.h>
+
 #include "builtin.h"
+#include "libpsh/xmalloc.h"
+#include "libpsh/util.h"
 
 #define USAGE()                                                                \
     OUT2E("history: usage: history [-c] [-d offset] [n] or history -awrn "     \
@@ -172,8 +175,7 @@ int builtin_history(ARGS)
         }
     }
     else
-    noopts:
-    {
+    noopts : {
         HIST_ENTRY **histlist;
         int i;
 

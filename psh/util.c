@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "pshell.h"
+#include "libpsh/util.h"
 
 void *freeptrs[16] = {NULL};
 

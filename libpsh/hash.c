@@ -19,12 +19,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "hash.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pshell.h"
+
+#include "hash.h"
+#include "libpsh/xmalloc.h"
 
 /* Resize the hash table, the new size cannot be lower than the old size,
  * otherwise return 1. return 2 if realloc failed, 0 if success */
@@ -33,10 +34,6 @@ PSH_HASH *realloc_hash(PSH_HASH *table, unsigned int newlen)
     /* XXX: This algorithm uses a helping table */
     PSH_HASH *newtable = new_hash(newlen);
     unsigned int i;
-    if (newtable == NULL)
-    {
-        OUT2E("%s: realloc_hash: %s\n", argv0, strerror(errno));
-    }
     for (i = 0; i < table->len; ++i)
     {
         unsigned int j;
@@ -60,14 +57,9 @@ PSH_HASH *new_hash(unsigned int len)
     unsigned int i;
     PSH_HASH *table;
     if (len == 0)
-        return malloc(0); /* Ask the libc malloc for a value */
+        return xmalloc(0); /* Ask the libc malloc for a value */
 
-    table = malloc(sizeof(PSH_HASH) * len);
-    if (table == NULL)
-    {
-        OUT2E("%s: new_hash: %s\n", argv0, strerror(errno));
-        return NULL;
-    }
+    table = xmalloc(sizeof(PSH_HASH) * len);
 
     table[0].len = len;
 
@@ -86,11 +78,7 @@ static int edit_hash_elem(PSH_HASH *elem, char *val)
 {
     char *tmp;
     /* Need more space/free extra space */
-    if ((tmp = realloc(elem->val, strlen(val) + 1)) == NULL)
-    {
-        OUT2E("%s: Unable to realloc: %s\n", argv0, strerror(errno));
-        return 1;
-    }
+    tmp = xrealloc(elem->val, strlen(val) + 1);
     elem->val = tmp;
     strcpy(elem->val, val);
     return 0;
@@ -126,12 +114,7 @@ recheck:
         }
         if (table[hash_result].next_count == 0) /* No elements in nexts */
         {
-            if ((table[hash_result].nexts = malloc(sizeof(PSH_HASH) * 64)) ==
-                NULL)
-            {
-                OUT2E("%s: add_hash: malloc failed\n", argv0);
-                return 1;
-            }
+            table[hash_result].nexts = xmalloc(sizeof(PSH_HASH) * 64);
         }
         avail = &(table[hash_result].nexts[(
             table[hash_result].next_count)++]); /* The first blank element */

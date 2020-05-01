@@ -49,8 +49,7 @@ int builtin_echo(ARGS)
                     }
                     return 1;
                 }
-            default:
-            {
+            default: {
                 int cnt = 1;
                 printf("%s", bltin_argv[cnt]);
                 while (bltin_argv[++cnt] != NULL)

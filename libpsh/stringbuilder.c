@@ -18,8 +18,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
 #include <memory.h>
+#include <stddef.h>
 
 #include "libpsh/stringbuilder.h"
 #include "libpsh/xmalloc.h"
@@ -28,33 +28,33 @@
 psh_stringbuilder *psh_stringbuilder_create()
 {
     psh_stringbuilder *builder = xmalloc(sizeof(psh_stringbuilder));
-    builder -> total_length = 0;
-    builder -> first = xmalloc(sizeof(struct _psh_sb_item));
-    builder -> current = builder -> first = NULL;
+    builder->total_length = 0;
+    builder->first = xmalloc(sizeof(struct _psh_sb_item));
+    builder->current = builder->first = NULL;
     return builder;
 }
 
 /* Append a string to the builder */
-char *psh_stringbuilder_add(psh_stringbuilder * builder, char *string)
+char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string)
 {
     size_t length = strlen(string);
-    builder -> total_length += length;
-    if (builder -> current)
+    builder->total_length += length;
+    if (builder->current)
     {
         /* Not empty */
-        builder -> current -> next = xmalloc(sizeof(struct _psh_sb_item));
-        builder -> current = builder -> current -> next;
+        builder->current->next = xmalloc(sizeof(struct _psh_sb_item));
+        builder->current = builder->current->next;
     }
     else
     {
         /* Empty */
-        builder -> first = xmalloc(sizeof(struct _psh_sb_item));
-        builder -> current = builder -> first;
+        builder->first = xmalloc(sizeof(struct _psh_sb_item));
+        builder->current = builder->first;
     }
     /* Now current is empty */
-    builder -> current -> length = length;
-    builder -> current -> string = string;
-    builder -> current -> next = NULL;
+    builder->current->length = length;
+    builder->current->string = string;
+    builder->current->next = NULL;
     /* Now current is filled */
     return string;
 }
@@ -62,8 +62,8 @@ char *psh_stringbuilder_add(psh_stringbuilder * builder, char *string)
 /* Generate a string from the builder */
 char *psh_stringbuilder_yield(psh_stringbuilder *builder)
 {
-    struct _psh_sb_item *cur_from = builder -> first;
-    char *result = xmalloc(P_CS * builder -> total_length + 1);
+    struct _psh_sb_item *cur_from = builder->first;
+    char *result = xmalloc(P_CS * builder->total_length + 1);
     char *cur_to = result;
     while (cur_from)
     {
@@ -72,17 +72,17 @@ char *psh_stringbuilder_yield(psh_stringbuilder *builder)
         /* Increase result pointer */
         cur_to += cur_from->length;
         /* Get next string */
-        cur_from = cur_from -> next;
+        cur_from = cur_from->next;
     }
     /* NUL-terminate */
-    result[builder -> total_length] = 0;
+    result[builder->total_length] = 0;
     return result;
 }
 
 /* Free resources used by the builder */
 void psh_stringbuilder_free(psh_stringbuilder *builder)
 {
-    struct _psh_sb_item *tmp, *cur = builder -> first;
+    struct _psh_sb_item *tmp, *cur = builder->first;
     while (cur)
     {
         tmp = cur;

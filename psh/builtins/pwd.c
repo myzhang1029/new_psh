@@ -16,8 +16,9 @@
    limitations under the License.
 */
 
-#include "backends/backend.h"
+#include "backend.h"
 #include "builtin.h"
+#include "libpsh/util.h"
 
 int builtin_pwd(ARGS)
 {

@@ -7,6 +7,8 @@
 
 #include "builtins/builtin.h"
 #include "pshell.h"
+#include "libpsh/util.h"
+
 #define cmdis(cmd) (strcmp(info->parameters[0], cmd) == 0)
 
 extern int last_command_status;

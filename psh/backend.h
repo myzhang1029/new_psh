@@ -1,5 +1,5 @@
 /*
-   backends/backend.h - backend definitions of the psh
+   backends/backend.h - backend definitions of psh
 
    Copyright 2017-2020 Zhang Maiyun.
 
@@ -18,7 +18,12 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-#include "../pshell.h"
+#ifndef _PSH_BACKEND_H
+#define _PSH_BACKEND_H
+
+#include <stdio.h>
+
+#include "pshell.h"
 
 extern int last_command_status;
 extern int pipe_fd[2], in_fd, out_fd;
@@ -34,3 +39,5 @@ int pshsetenv(const char *, const char *, int);
 int do_run(struct command *info);
 int pshgetuid(void);
 int pshchdir(char *);
+
+#endif /* _PSH_BACKEND_H*/

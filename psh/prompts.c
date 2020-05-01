@@ -48,16 +48,14 @@
 */
 
 #include "backends/backend.h"
+#include "libpsh/xmalloc.h"
 #include "pshell.h"
 
 /* Expands $PS1-4 */
-char *ps_expander(char *prompt, char *result)
-{
-
-}
+char *ps_expander(char *prompt, char *result) {}
 
 void show_prompt(char *prompt)
 {
-    char *ps1 = "\u@\h:\w\$";/* TODO: Actually get $PS1 after #8 */
-    char *expanded = malloc();
+    char *ps1 = "\u@\h:\w\$"; /* TODO: Actually get $PS1 after #8 */
+    char *expanded = xmalloc();
 }

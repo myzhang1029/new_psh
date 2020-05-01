@@ -21,8 +21,10 @@
 */
 
 #include <ctype.h>
-#include "backends/backend.h"
+#include "backend.h"
 #include "pshell.h"
+#include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 static void command_init(struct command *info)
 {
@@ -514,8 +516,7 @@ int filpinfo(char *buffer, struct command *info)
                     cnt_argument_char += strlen(hdir);
                 }
                 break;
-            case '\\':
-            {
+            case '\\': {
                 int case_count;
                 for (case_count = 1; buffer[cnt_buffer];
                      ++case_count, ++cnt_buffer)

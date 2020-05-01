@@ -18,14 +18,11 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <cstddef>
+#include <stddef.h>
 #include <ctype.h>
 
-#include "backends/backend.h"
-#include "token.h"
+#include "backend.h"
 #include "pshell.h"
+#include "token.h"
 
-psh_tokenstream *parse(char *input)
-{
-    return NULL;
-}
+psh_tokenstream *parse(char *input) { return NULL; }

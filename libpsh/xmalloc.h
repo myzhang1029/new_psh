@@ -29,14 +29,14 @@
 #include <stddef.h>
 
 #ifndef PTR_T
-#  if defined (__STDC__)
-#    define PTR_T void *
-#  else
-#    define PTR_T char *
-#  endif
+#if defined(__STDC__)
+#define PTR_T void *
+#else
+#define PTR_T char *
+#endif
 #endif /* PTR_T */
-PTR_T xmalloc (size_t bytes);
-PTR_T xrealloc (PTR_T pointer, size_t bytes);
-void xfree (PTR_T pointer);
+PTR_T xmalloc(size_t bytes);
+PTR_T xrealloc(PTR_T pointer, size_t bytes);
+void xfree(PTR_T pointer);
 
 #endif /* _LIBPSH_XMALLOC_H */
