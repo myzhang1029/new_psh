@@ -1,0 +1,14 @@
+{
+    "cpp.buildConfigurations": [
+        {
+            "name": "",
+            "directory": ""
+        },
+        {
+            "name": "",
+            "directory": ""
+        }
+    ],
+    "cpp.clangTidy": true,
+    "cpp.clangdArgs": "--compile-commands-dir=${THEIA_WORKSPACE_ROOT}"
+}
