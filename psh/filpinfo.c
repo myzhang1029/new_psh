@@ -21,6 +21,8 @@
 */
 
 #include <ctype.h>
+#include <stdlib.h>
+
 #include "backend.h"
 #include "pshell.h"
 #include "libpsh/util.h"

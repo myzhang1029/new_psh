@@ -8,6 +8,7 @@
 #include <memory.h>
 #include <setjmp.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "libpsh/util.h"
 #include "backend.h"

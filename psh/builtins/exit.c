@@ -16,6 +16,8 @@
    limitations under the License.
 */
 
+#include <stdlib.h>
+
 #include "builtin.h"
 
 extern int last_command_status;

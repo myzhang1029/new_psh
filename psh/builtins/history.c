@@ -17,6 +17,7 @@
 */
 
 #include <getopt.h>
+#include <stdlib.h>
 
 #include "builtin.h"
 #include "libpsh/xmalloc.h"

@@ -16,6 +16,8 @@
    limitations under the License.
 */
 
+#include <stdlib.h>
+
 #include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
