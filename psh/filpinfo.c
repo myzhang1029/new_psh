@@ -341,7 +341,7 @@ int filpinfo(char *buffer, struct command *info)
                             -5) /* EOL */
                         {
                             char *cmdand_buf;
-                            cmdand_buf = p_gets("> ");
+                            cmdand_buf = psh_gets("> ");
                             buffer =
                                 realloc(buffer, P_CS * (strlen(buffer) +
                                                         strlen(cmdand_buf) +
@@ -414,7 +414,7 @@ int filpinfo(char *buffer, struct command *info)
                             -5) /* EOL */
                         {
                             char *cmdor_buf;
-                            cmdor_buf = p_gets("> ");
+                            cmdor_buf = psh_gets("> ");
                             buffer = realloc(buffer, P_CS * (strlen(buffer) +
                                                              strlen(cmdor_buf) +
                                                              1 /* \0 */));
@@ -438,7 +438,7 @@ int filpinfo(char *buffer, struct command *info)
                             -5) /* EOL */
                         {
                             char *pipe_buf;
-                            pipe_buf = p_gets("> ");
+                            pipe_buf = psh_gets("> ");
                             buffer = realloc(buffer, P_CS * (strlen(buffer) +
                                                              strlen(pipe_buf) +
                                                              1 /* \0 */));
@@ -544,7 +544,7 @@ int filpinfo(char *buffer, struct command *info)
                 /* Line: command args... \
                  */
                 char *newline_buf;
-                newline_buf = p_gets("> ");
+                newline_buf = psh_gets("> ");
                 buffer =
                     realloc(buffer, P_CS * (strlen(buffer) +
                                             strlen(newline_buf) + 1 /* \0 */));

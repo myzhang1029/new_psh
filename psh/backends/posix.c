@@ -17,7 +17,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include "libpsh/backend.h"
+#include "backend.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 

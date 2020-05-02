@@ -5,6 +5,7 @@
    Copyright 2017 Zhang Maiyun.
 */
 
+#include <stdlib.h>
 #include <setjmp.h>
 
 #include "pshell.h"
@@ -21,7 +22,7 @@ int read_command(char *prompt, struct command *info)
 {
     int count;
     char *buffer;
-    buffer = p_gets(prompt);
+    buffer = psh_gets(prompt);
     if (feof(stdin) || !buffer) /* EOF reached */
     {
         printf("\n");
