@@ -5,9 +5,12 @@
    Copyright 2017 Zhang Maiyun.
 */
 
+#include <stdlib.h>
+
 #include "builtins/builtin.h"
 #include "pshell.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 #define cmdis(cmd) (strcmp(info->parameters[0], cmd) == 0)
 
@@ -36,12 +39,12 @@ int compare_builtin(const void *key, const void *cur)
 
 builtin_function find_builtin(char *name)
 {
-    struct builtin *key = malloc(sizeof(struct builtin));
+    struct builtin *key = xmalloc(sizeof(struct builtin));
     struct builtin *result;
     key->name = name;
     result = (struct builtin *)bsearch(
         key, builtins, 61, sizeof(struct builtin), &compare_builtin);
-    free(key);
+    xfree(key);
     return result != NULL ? result->proc : (builtin_function)0;
 }
 
