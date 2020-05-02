@@ -48,7 +48,5 @@ endif()
 #    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake")
 
 
-install(FILES include/slib.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY include/slib DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 #install(FILES ${CMAKE_BINARY_DIR}/libpsh.pc
 #    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
