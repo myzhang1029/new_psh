@@ -539,6 +539,7 @@ int filpinfo(char *buffer, struct command *info)
                             write_current();
                     }
                 }
+                break;
             }
             case 0: /* final EOL reached*/
                 if (cnt_buffer == cnt_first_nonIFS || !ignore)
