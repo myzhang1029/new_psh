@@ -15,8 +15,12 @@ add_subdirectory(psh)
 # checks
 check_include_files(readline/readline.h HAVE_READLINE_H)
 check_type_size(size_t SIZE_T)
+check_type_size(intptr_t INTPTR_T)
 if(NOT SIZE_T)
     set(size_t int)
+endif()
+if(NOT INTPTR_T)
+    set(intptr_t long)
 endif()
 
 # pkg-config file
