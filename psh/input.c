@@ -48,9 +48,9 @@ int read_command(char *prompt, struct command *info)
             return -2;
         }
 #ifdef NO_READLINE
-        strncpy(buffer, expans, MAXLINE - 1);
+        psh_strncpy(buffer, expans, MAXLINE - 1);
 #else
-        strncpy(buffer, expans, strlen(buffer));
+        psh_strncpy(buffer, expans, strlen(buffer));
 #endif
         free(expans);
         add_history(buffer);

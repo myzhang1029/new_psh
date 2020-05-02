@@ -29,8 +29,6 @@
 #define MAXARG 64
 #define MAXEACHARG 4096
 #define MAXPIDTABLE 1024
-#undef strncpy
-#define strncpy psh_strncpy
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 
 char *psh_fgets(char *prompt, FILE *fp);

@@ -469,7 +469,7 @@ int filpinfo(char *buffer, struct command *info)
                 {
                     char *username = malloc(P_CS * 256);
                     char *posit;
-                    strncpy(username, &(buffer[cnt_buffer + 1]), 256);
+                    psh_strncpy(username, &(buffer[cnt_buffer + 1]), 256);
                     posit = strchr(username, '/');
                     if (posit != NULL)
                     {
@@ -504,7 +504,7 @@ int filpinfo(char *buffer, struct command *info)
                         write_current();
                         break;
                     }
-                    strncpy(cmd_lastnode->parameters[cnt_argument_element],
+                    psh_strncpy(cmd_lastnode->parameters[cnt_argument_element],
                             hdir, 4094 - cnt_argument_char);
                     cnt_buffer += strlen(username);
                     cnt_argument_char += strlen(hdir);
@@ -513,7 +513,7 @@ int filpinfo(char *buffer, struct command *info)
                 else /* ~/ and ~ */
                 {
                     char *hdir = gethd();
-                    strncpy(cmd_lastnode->parameters[cnt_argument_element],
+                    psh_strncpy(cmd_lastnode->parameters[cnt_argument_element],
                             hdir, 4094 - cnt_argument_char);
                     cnt_argument_char += strlen(hdir);
                 }

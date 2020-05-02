@@ -144,7 +144,7 @@ int builtin_cd(ARGS)
             OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
             return 2;
         }
-        strncpy(cd_path, bltin_argv[1], strlen(bltin_argv[1]));
+        psh_strncpy(cd_path, bltin_argv[1], strlen(bltin_argv[1]));
     }
 
     create_new_pwd(&cd_path);

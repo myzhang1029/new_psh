@@ -64,7 +64,7 @@ int builtin_history(ARGS)
                 case 'a':
                     flags |= AFLAG;
                     if (optarg)
-                        strncpy(filename, optarg,
+                        psh_strncpy(filename, optarg,
                                 sizeof(char) * MAXEACHARG - 1);
                     break;
                 case 'r':
@@ -79,7 +79,7 @@ int builtin_history(ARGS)
                     }
                     flags |= RFLAG;
                     if (optarg)
-                        strncpy(filename, optarg,
+                        psh_strncpy(filename, optarg,
                                 sizeof(char) * MAXEACHARG - 1);
                     break;
                 case 'w':
@@ -93,7 +93,7 @@ int builtin_history(ARGS)
                         return 2;
                     }
                     if (optarg)
-                        strncpy(filename, optarg,
+                        psh_strncpy(filename, optarg,
                                 sizeof(char) * MAXEACHARG - 1);
                     flags |= WFLAG;
                     break;
@@ -108,7 +108,7 @@ int builtin_history(ARGS)
                         return 2;
                     }
                     if (optarg)
-                        strncpy(filename, optarg,
+                        psh_strncpy(filename, optarg,
                                 sizeof(char) * MAXEACHARG - 1);
                     flags |= NFLAG;
                     break;
