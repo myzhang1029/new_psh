@@ -24,9 +24,9 @@
 #include <stdlib.h>
 
 #include "backend.h"
-#include "pshell.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "pshell.h"
 
 static void command_init(struct command *info)
 {

@@ -18,8 +18,8 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
 #include <ctype.h>
+#include <stddef.h>
 
 #include "backend.h"
 #include "pshell.h"

@@ -18,11 +18,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-#include "pshell.h"
 #include "libpsh/util.h"
+#include "pshell.h"
 
 /* freeptrs[0] holds the current number of items */
 void *freeptrs[16] = {NULL};

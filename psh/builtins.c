@@ -8,9 +8,9 @@
 #include <stdlib.h>
 
 #include "builtins/builtin.h"
-#include "pshell.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "pshell.h"
 
 #define cmdis(cmd) (strcmp(info->parameters[0], cmd) == 0)
 
