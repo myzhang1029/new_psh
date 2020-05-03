@@ -34,10 +34,9 @@ psh_stringbuilder *psh_stringbuilder_create()
     return builder;
 }
 
-/* Append a string to the builder */
-char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string)
+/* Append a string starting at *STRING with a length of LENGTH to the builder */
+char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, size_t length)
 {
-    size_t length = strlen(string);
     builder->total_length += length;
     if (builder->current)
     {
@@ -57,6 +56,13 @@ char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string)
     builder->current->next = NULL;
     /* Now current is filled */
     return string;
+}
+
+/* Append STRING to the builder */
+char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string)
+{
+    size_t length = strlen(string);
+    return psh_stringbuilder_add_length(builder, string, length);
 }
 
 /* Generate a string from the builder */

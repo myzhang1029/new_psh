@@ -21,6 +21,9 @@
 #ifndef _LIBPSH_STRINGBUILD_H
 #define _LIBPSH_STRINGBUILD_H
 
+/* For size_t */
+#include <stddef.h>
+
 struct _psh_sb_item
 {
     char *string;
@@ -39,6 +42,7 @@ typedef struct _psh_stringbuilder
 } psh_stringbuilder;
 
 psh_stringbuilder *psh_stringbuilder_create();
+char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, size_t length);
 char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string);
 char *psh_stringbuilder_yield(psh_stringbuilder *builder);
 void psh_stringbuilder_free(psh_stringbuilder *builder);

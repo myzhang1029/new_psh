@@ -47,15 +47,62 @@
 \]	end a sequence of non-printing chars
 */
 
-#include "backends/backend.h"
+#include "backend.h"
 #include "libpsh/xmalloc.h"
 #include "pshell.h"
 
 /* Expands $PS1-4 */
-char *ps_expander(char *prompt, char *result) {}
+char *ps_expander(char *prompt, char *result)
+{
+    do
+    {
+        switch (*prompt)
+        {
+            case '\\':
+            case 'a':
+            case 'd':
+            case 'e':
+            case 'h':
+            case 'H':
+            case 'j':
+            case 'l':
+            case 'n':
+            case 'r':
+            case 's':
+            case 't':
+            case 'T':
+            case '@':
+            case 'A':
+            case 'D':
+            case 'u':
+            case 'v':
+            case 'V':
+            case 'w':
+            case 'W':
+            case '!':
+            case '#':
+            case '$':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '0':
+            case '[':
+            case ']':
+            default:
+                break;
+        }
+    } while (*++prompt);
+    return result;
+}
 
 void show_prompt(char *prompt)
 {
-    char *ps1 = "\u@\h:\w\$"; /* TODO: Actually get $PS1 after #8 */
-    char *expanded = xmalloc();
+    char *ps1 = "\\u@\\h:\\w\\$"; /* TODO: Actually get $PS1 after #8 */
+    char *expanded = xmalloc(0);
 }
