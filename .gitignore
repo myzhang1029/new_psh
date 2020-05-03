@@ -127,5 +127,6 @@ tags
 # Persistent undo
 [._]*.un~
 
-# Gitpod
+# Environment
 .clangd
+test.c
