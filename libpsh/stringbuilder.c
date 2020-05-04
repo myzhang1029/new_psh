@@ -34,8 +34,9 @@ psh_stringbuilder *psh_stringbuilder_create()
     return builder;
 }
 
-/* Append a string starting at *STRING with a length of LENGTH to the builder */
-char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, size_t length)
+/* Append a string starting at *STRING with a length of LENGTH to the builder.
+   STRING gets free()d if IF_FREE is 1 */
+char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, size_t length, int if_free)
 {
     builder->total_length += length;
     if (builder->current)
@@ -53,16 +54,17 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, siz
     /* Now current is empty */
     builder->current->length = length;
     builder->current->string = string;
+    builder->current->if_free = if_free;
     builder->current->next = NULL;
     /* Now current is filled */
     return string;
 }
 
 /* Append STRING to the builder */
-char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string)
+char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string, int if_free)
 {
     size_t length = strlen(string);
-    return psh_stringbuilder_add_length(builder, string, length);
+    return psh_stringbuilder_add_length(builder, string, length, if_free);
 }
 
 /* Generate a string from the builder */
@@ -93,7 +95,8 @@ void psh_stringbuilder_free(psh_stringbuilder *builder)
     {
         tmp = cur;
         cur = cur->next;
-        /* Free the string is not out business */
+        if (tmp->if_free)
+            xfree(tmp->string);
         xfree(tmp);
     }
     xfree(builder);

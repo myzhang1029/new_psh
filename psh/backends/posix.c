@@ -105,7 +105,13 @@ char *pshgetcwd(void)
     return cwd;
 }
 
-char *pshstrdup(char *str) { return strdup(str); }
+char *pshstrdup(char *str)
+{
+    char *temp = strdup(str);
+    if (temp == 0)
+        memory_error_and_abort("pshstrdup");
+    return temp;
+}
 
 int pshgethostname(char *hstnme, size_t len)
 {

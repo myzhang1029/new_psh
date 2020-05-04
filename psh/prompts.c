@@ -47,20 +47,76 @@
 \]	end a sequence of non-printing chars
 */
 
+#include <time.h>
+
 #include "backend.h"
+#include "libpsh/stringbuilder.h"
 #include "libpsh/xmalloc.h"
 #include "pshell.h"
 
-/* Expands $PS1-4 */
-char *ps_expander(char *prompt, char *result)
+/* Expands $PS1-4, result needs to be free()d */
+char *ps_expander(char *prompt)
 {
+    #define reset_start(newloc) cur = start = newloc
+    char *result;
+    /* Our approach alters the original PROMPT, so duplicate it */
+    char *start = pshstrdup(prompt);
+    char *save_start = start;
+    char *cur = start;
+    /* Count of current number of charactors to write */
+    int count = 0;
+    int is_backslash = 0;
+    psh_stringbuilder *builder = psh_stringbuilder_create();
+
     do
     {
-        switch (*prompt)
+        /* This branching only handles COUNT */
+        if (*cur != '\\')/* likely */
+            ++count;
+        switch (*cur)
         {
+            /* XXX: Should this be ordered by freq? */
             case '\\':
+                if (is_backslash)
+                {
+                    /* A backslash was before this backslash */
+                    /* Add one of them to the builder */
+                    /* Performance will be a issue if people use multiple '\\\\'s */
+                    is_backslash = 0;
+                    psh_stringbuilder_add_length(builder, start, count+1/* for '/' */, 0);
+                    reset_start(++prompt);
+                }
+                else
+                    is_backslash = 1;
+                break;
             case 'a':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    *(cur-1)/* the '\\' */ = '\a';
+                    psh_stringbuilder_add_length(builder, start, count, 0);
+                    reset_start(++prompt);
+                }
+                /* else write a */
+                break;
             case 'd':
+                if (is_backslash)
+                {
+                    char *timestr = xmalloc(P_CS * 11);
+                    time_t rt;
+                    is_backslash = 0;
+                    struct tm *ti;
+
+                    time(&rt);
+                    ti = localtime(&rt);
+                    strftime(timestr, 11, "%a %b %e", ti);
+
+                    psh_stringbuilder_add_length(builder, start, count-1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(++prompt);
+                }
+                /* else write d */
+                break;
             case 'e':
             case 'h':
             case 'H':
@@ -94,10 +150,18 @@ char *ps_expander(char *prompt, char *result)
             case '0':
             case '[':
             case ']':
+                break;
             default:
+                /* When the escape is unknown, bash and dash keeps both the 
+                   backslash and the charactor. */
+                if (is_backslash)
+                    is_backslash = 0;
                 break;
         }
-    } while (*++prompt);
+    } while (++count,*++cur/* when *cur == 0, exit */);
+    result = psh_stringbuilder_yield(builder);
+    psh_stringbuilder_free(builder);
+    xfree(save_start);
     return result;
 }
 
