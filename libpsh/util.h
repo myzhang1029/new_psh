@@ -34,5 +34,6 @@
 char *psh_fgets(char *prompt, FILE *fp);
 char *psh_gets(char *prompt);
 size_t psh_strncpy(char *dst, const char *src, size_t size);
+char *psh_strdup(const char *str);
 
 #endif /* _LIBPSH_UTIL_H */

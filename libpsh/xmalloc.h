@@ -35,7 +35,6 @@
 #define PTR_T char *
 #endif
 #endif /* PTR_T */
-void memory_error_and_abort(char *fname);
 PTR_T xmalloc(size_t bytes);
 PTR_T xrealloc(PTR_T pointer, size_t bytes);
 void xfree(PTR_T pointer);

@@ -99,3 +99,11 @@ size_t psh_strncpy(char *dst, const char *src, size_t size)
 
     return (s - src - 1);
 }
+
+char *psh_strdup(const char *str)
+{
+    size_t length = strlen(str) + 1;
+    char *dest = xmalloc(P_CS * length);
+    memcpy(dest, str, length);
+    return dest;
+}

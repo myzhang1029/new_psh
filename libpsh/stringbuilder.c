@@ -37,6 +37,9 @@ psh_stringbuilder *psh_stringbuilder_create()
    STRING gets free()d if IF_FREE is 1 */
 char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, size_t length, int if_free)
 {
+    /* Don't waste memory here */
+    if (length == 0)
+        return string;
     builder->total_length += length;
     if (builder->current)
     {
