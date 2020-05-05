@@ -7,8 +7,14 @@
         {
             "name": "",
             "directory": ""
+        },
+        {
+            "name": "",
+            "directory": ""
         }
     ],
     "cpp.clangTidy": true,
-    "cpp.clangdArgs": "--compile-commands-dir=${THEIA_WORKSPACE_ROOT}"
+    "cpp.clangdArgs": "--compile-commands-dir=${THEIA_WORKSPACE_ROOT}",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true
 }
