@@ -3,14 +3,6 @@
         {
             "name": "",
             "directory": ""
-        },
-        {
-            "name": "",
-            "directory": ""
-        },
-        {
-            "name": "",
-            "directory": ""
         }
     ],
     "cpp.clangTidy": true,
