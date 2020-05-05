@@ -24,7 +24,7 @@
 #include "libpsh/stringbuilder.h"
 #include "libpsh/xmalloc.h"
 
-/* Creater a new builder */
+/* Create a new builder */
 psh_stringbuilder *psh_stringbuilder_create()
 {
     psh_stringbuilder *builder = xmalloc(sizeof(psh_stringbuilder));
@@ -35,7 +35,8 @@ psh_stringbuilder *psh_stringbuilder_create()
 
 /* Append a string starting at *STRING with a length of LENGTH to the builder.
    STRING gets free()d if IF_FREE is 1 */
-char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, size_t length, int if_free)
+char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
+                                   size_t length, int if_free)
 {
     /* Don't waste memory here */
     if (length == 0)
@@ -63,7 +64,8 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string, siz
 }
 
 /* Append STRING to the builder */
-char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string, int if_free)
+char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string,
+                            int if_free)
 {
     size_t length = strlen(string);
     return psh_stringbuilder_add_length(builder, string, length, if_free);
