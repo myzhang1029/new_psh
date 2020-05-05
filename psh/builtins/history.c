@@ -17,6 +17,7 @@
 */
 
 #include <getopt.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "builtin.h"
@@ -65,7 +66,7 @@ int builtin_history(ARGS)
                     flags |= AFLAG;
                     if (optarg)
                         psh_strncpy(filename, optarg,
-                                sizeof(char) * MAXEACHARG - 1);
+                                    sizeof(char) * MAXEACHARG - 1);
                     break;
                 case 'r':
                     if (flags & AFLAG)
@@ -80,7 +81,7 @@ int builtin_history(ARGS)
                     flags |= RFLAG;
                     if (optarg)
                         psh_strncpy(filename, optarg,
-                                sizeof(char) * MAXEACHARG - 1);
+                                    sizeof(char) * MAXEACHARG - 1);
                     break;
                 case 'w':
                     if (flags & AFLAG || flags & RFLAG)
@@ -94,7 +95,7 @@ int builtin_history(ARGS)
                     }
                     if (optarg)
                         psh_strncpy(filename, optarg,
-                                sizeof(char) * MAXEACHARG - 1);
+                                    sizeof(char) * MAXEACHARG - 1);
                     flags |= WFLAG;
                     break;
                 case 'n':
@@ -109,7 +110,7 @@ int builtin_history(ARGS)
                     }
                     if (optarg)
                         psh_strncpy(filename, optarg,
-                                sizeof(char) * MAXEACHARG - 1);
+                                    sizeof(char) * MAXEACHARG - 1);
                     flags |= NFLAG;
                     break;
                 case 's':

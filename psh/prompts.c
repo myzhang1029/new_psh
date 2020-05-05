@@ -192,7 +192,7 @@ char *ps_expander(char *prompt)
 
 void show_prompt()
 {
-    char *ps1 = "\\u@\\h:\\w\\$"; /* TODO: Actually get $PS1 after #8 */
+    char *ps1 = "\\u@\\h:\\w\\$ "; /* TODO: Actually get $PS1 after #8 */
     char *expanded = ps_expander(ps1);
     printf("%s", expanded);
     xfree(expanded);

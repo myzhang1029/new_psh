@@ -63,6 +63,7 @@ struct command /* Everything about a command */
 };
 
 void type_prompt(char *);
+void show_prompt();
 int read_command(char *prompt, struct command *info);
 int run_builtin(struct command *info);
 int filpinfo(char *buffer, struct command *info);

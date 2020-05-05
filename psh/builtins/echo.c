@@ -17,6 +17,8 @@
    limitations under the License.
 */
 
+#include <stdio.h>
+
 #include "builtin.h"
 
 int builtin_echo(ARGS)

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
             OUT2E("%s: malloc failed\n", argv0);
             longjmp(reset_point, 1);
         }
-        type_prompt(prompt);
+        show_prompt();
         if (read_command(prompt, info) <= 0)
             continue;
 

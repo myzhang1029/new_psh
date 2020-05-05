@@ -5,6 +5,7 @@
    Copyright 2017 Zhang Maiyun.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "builtins/builtin.h"

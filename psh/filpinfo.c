@@ -505,7 +505,7 @@ int filpinfo(char *buffer, struct command *info)
                         break;
                     }
                     psh_strncpy(cmd_lastnode->parameters[cnt_argument_element],
-                            hdir, 4094 - cnt_argument_char);
+                                hdir, 4094 - cnt_argument_char);
                     cnt_buffer += strlen(username);
                     cnt_argument_char += strlen(hdir);
                     free(username);
@@ -514,7 +514,7 @@ int filpinfo(char *buffer, struct command *info)
                 {
                     char *hdir = gethd();
                     psh_strncpy(cmd_lastnode->parameters[cnt_argument_element],
-                            hdir, 4094 - cnt_argument_char);
+                                hdir, 4094 - cnt_argument_char);
                     cnt_argument_char += strlen(hdir);
                 }
                 break;

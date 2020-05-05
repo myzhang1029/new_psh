@@ -15,6 +15,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include <stdio.h>
+
 #include "builtin.h"
 int builtin_true(ARGS) { return 1; }
 

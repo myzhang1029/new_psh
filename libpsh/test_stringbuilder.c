@@ -1,12 +1,14 @@
 /* Test for stringbuilder, xmaloc and psh_strncpy
- * do `gcc -DNO_READLINE -Wall -Wextra -I. -g -fsanitize=address libpsh/test_stringbuilder.c libpsh/util.c libpsh/stringbuilder.c libpsh/xmalloc.c`
+ * do `gcc -DNO_READLINE -Wall -Wextra -I. -g -fsanitize=address
+ * libpsh/test_stringbuilder.c libpsh/util.c libpsh/stringbuilder.c
+ * libpsh/xmalloc.c`
  */
 #include <stdio.h>
 #include <string.h>
 
 #include "libpsh/stringbuilder.h"
-#include "libpsh/xmalloc.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 int main()
 {
@@ -21,7 +23,8 @@ int main()
     psh_stringbuilder_add(builder, str1, 0);
     result = psh_stringbuilder_yield(builder);
     psh_stringbuilder_free(builder);
-    printf("%s: %s\n", result, strcmp(result, intended) == 0?"matches":"doesn't match");
+    printf("%s: %s\n", result,
+           strcmp(result, intended) == 0 ? "matches" : "doesn't match");
     xfree(result);
     return 0;
 }
