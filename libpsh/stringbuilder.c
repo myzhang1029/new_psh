@@ -29,7 +29,6 @@ psh_stringbuilder *psh_stringbuilder_create()
 {
     psh_stringbuilder *builder = xmalloc(sizeof(psh_stringbuilder));
     builder->total_length = 0;
-    builder->first = xmalloc(sizeof(struct _psh_sb_item));
     builder->current = builder->first = NULL;
     return builder;
 }
