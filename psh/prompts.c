@@ -51,19 +51,24 @@
 
 #include "backend.h"
 #include "libpsh/stringbuilder.h"
+#include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "pshell.h"
 
 /* Expands $PS1-4, result needs to be free()d */
 char *ps_expander(char *prompt)
 {
-    #define reset_start(newloc) cur = start = newloc
+/* cur: current char in process
+ * start: start of current piece of string
+ * reset_start: reset start of current string
+ */
+#define reset_start(newloc) (start = (newloc) + 1, cur = (newloc), count = 0)
     char *result;
     /* Our approach alters the original PROMPT, so duplicate it */
-    char *start = pshstrdup(prompt);
+    char *start = psh_strdup(prompt);
     char *save_start = start;
     char *cur = start;
-    /* Count of current number of charactors to write */
+    /* Count of current number of characters to write */
     int count = 0;
     int is_backslash = 0;
     psh_stringbuilder *builder = psh_stringbuilder_create();
@@ -71,7 +76,7 @@ char *ps_expander(char *prompt)
     do
     {
         /* This branching only handles COUNT */
-        if (*cur != '\\')/* likely */
+        if (*cur != '\\') /* likely */
             ++count;
         switch (*cur)
         {
@@ -81,10 +86,12 @@ char *ps_expander(char *prompt)
                 {
                     /* A backslash was before this backslash */
                     /* Add one of them to the builder */
-                    /* Performance will be a issue if people use multiple '\\\\'s */
+                    /* Performance will be a issue if people use multiple
+                     * '\\\\'s */
                     is_backslash = 0;
-                    psh_stringbuilder_add_length(builder, start, count+1/* for '/' */, 0);
-                    reset_start(++prompt);
+                    psh_stringbuilder_add_length(builder, start,
+                                                 count + 1 /* for '/' */, 0);
+                    reset_start(cur);
                 }
                 else
                     is_backslash = 1;
@@ -93,9 +100,9 @@ char *ps_expander(char *prompt)
                 if (is_backslash)
                 {
                     is_backslash = 0;
-                    *(cur-1)/* the '\\' */ = '\a';
+                    *(cur - 1) /* the '\\' */ = '\a';
                     psh_stringbuilder_add_length(builder, start, count, 0);
-                    reset_start(++prompt);
+                    reset_start(cur);
                 }
                 /* else write a */
                 break;
@@ -110,10 +117,14 @@ char *ps_expander(char *prompt)
                     time(&rt);
                     ti = localtime(&rt);
                     strftime(timestr, 11, "%a %b %e", ti);
+                    /* Strftime()'s %e prepends a space to single digits, but we
+                     * want a '0' */
+                    if (timestr[8] == ' ' /* space */)
+                        timestr[8] = '0';
 
-                    psh_stringbuilder_add_length(builder, start, count-1, 0);
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
                     psh_stringbuilder_add(builder, timestr, 1);
-                    reset_start(++prompt);
+                    reset_start(cur);
                 }
                 /* else write d */
                 break;
@@ -150,23 +161,39 @@ char *ps_expander(char *prompt)
             case '0':
             case '[':
             case ']':
-                break;
             default:
-                /* When the escape is unknown, bash and dash keeps both the 
-                   backslash and the charactor. */
+                /* When the escape is unknown, bash and dash keeps both the
+                   backslash and the character. */
                 if (is_backslash)
+                {
+                    /* For '\\' */
+                    ++count;
                     is_backslash = 0;
+                }
                 break;
         }
-    } while (++count,*++cur/* when *cur == 0, exit */);
+    } while (*(++cur) /* when *cur == 0, exit */);
+    psh_stringbuilder_add(builder, start, 0);
     result = psh_stringbuilder_yield(builder);
+#if DEBUG
+    {
+        struct _psh_sb_item *cur = builder->first;
+        while (cur)
+        {
+            printf("Len: %zu str: %s\n", cur->length, cur->string);
+            cur = cur->next;
+        }
+    }
+#endif
     psh_stringbuilder_free(builder);
     xfree(save_start);
     return result;
 }
 
-void show_prompt(char *prompt)
+void show_prompt()
 {
     char *ps1 = "\\u@\\h:\\w\\$"; /* TODO: Actually get $PS1 after #8 */
-    char *expanded = xmalloc(0);
+    char *expanded = ps_expander(ps1);
+    printf("%s", expanded);
+    xfree(expanded);
 }

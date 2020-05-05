@@ -3,6 +3,8 @@
 
 ## Introduction
 A simple simulation of bash and dash based on wshell for learning.
+Psh aims to be able to compile on as many C99 systems as possible,
+providing a highly emulated POSIX environment.
 
 ## Usage
 type
