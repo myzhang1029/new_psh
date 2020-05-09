@@ -51,7 +51,10 @@ int main(int argc, char **argv)
         read_stat = read_command(expanded_ps1, info);
         xfree(expanded_ps1);
         if (read_stat <= 0)
+        {
+            free_command(info);
             continue;
+        }
         switch (run_builtin(info))
         {
             case 1:

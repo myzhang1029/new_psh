@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 #include "pshell.h"
 
 extern jmp_buf reset_point;
@@ -57,7 +58,10 @@ int read_command(char *prompt, struct command *info)
     }
 #endif
     if (buffer == NULL || buffer[0] == '\0')
+    {
+        xfree(buffer);
         return -1;
+    }
     count = filpinfo(buffer, info);
     return count;
 }
