@@ -28,11 +28,6 @@ int main(int argc, char **argv)
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
-    if (argv0 == NULL)
-    {
-        OUT2E("psh: strdup: No memory\n");
-        exit(1);
-    }
     add_atexit_free(argv0);
     prepare();
 #ifndef NO_HISTORY
