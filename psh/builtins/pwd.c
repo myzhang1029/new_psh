@@ -17,6 +17,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "backend.h"
 #include "builtin.h"

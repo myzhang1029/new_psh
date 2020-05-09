@@ -7,6 +7,7 @@
 
 #include <setjmp.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"

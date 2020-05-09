@@ -3,7 +3,6 @@
  * libpsh/test_getstring.c libpsh/util.c libpsh/xmalloc.c`
  */
 
-#include <memory.h>
 #include <stdlib.h>
 #include <string.h>
 

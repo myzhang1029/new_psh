@@ -18,8 +18,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <memory.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "libpsh/stringbuilder.h"
 #include "libpsh/xmalloc.h"

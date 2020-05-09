@@ -5,7 +5,6 @@
    Copyright 2017-present Zhang Maiyun.
 */
 
-#include <memory.h>
 #include <setjmp.h>
 #include <stdlib.h>
 #include <string.h>
