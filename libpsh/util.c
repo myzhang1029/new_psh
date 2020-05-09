@@ -107,3 +107,31 @@ char *psh_strdup(const char *str)
     memcpy(dest, str, length);
     return dest;
 }
+
+/* Get a string from FUNC, where the first argument is a string pointer,
+ * while the second one is the length of the buffer.
+ * Original function's return value is copied into *RESULT.
+ * If that doesn't matter, use NULL, and RESULT will be left untouched.
+ * returned pointer needs to be free()d
+ */
+char *psh_getstring(void *(*func)(char *, size_t), void **result)
+{
+    size_t len = 256;
+    char *oldtry = NULL, *newtry = NULL;
+    for (;;)
+    {
+        newtry = xmalloc(P_CS * len);
+        if (result)
+            *result = (*func)(newtry, len);
+        else
+            (*func)(newtry, len);
+        if (oldtry && strcmp(oldtry, newtry) == 0) /* Identical */
+            break;
+        xfree(oldtry);
+        oldtry = newtry;
+        len *= 2;
+    }
+    xfree(oldtry);
+    newtry = xrealloc(newtry, strlen(newtry) + 1);
+    return newtry;
+}
