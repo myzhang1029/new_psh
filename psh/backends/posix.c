@@ -96,18 +96,22 @@ char *getun(void)
     return pwd->pw_name;
 }
 
-char *pshgetcwd(void)
+char *pshgetcwd(char *wd, size_t len) { return getcwd(wd, len); }
+
+char *pshgetcwd_dm(void)
 {
-    char *cwd = xmalloc(P_CS * 4097);
-    if (cwd == NULL)
-        return NULL;
-    getcwd(cwd, 4097);
-    return cwd;
+    /* Providing NULL to getcwd isn't maiinstream POSIX */
+    char *buf = psh_getstring((void *(*)(char *, size_t)) & pshgetcwd, NULL);
+    return buf;
 }
 
-int pshgethostname(char *hstnme, size_t len)
+int pshgethostname(char *dest, size_t len) { return gethostname(dest, len); }
+
+char *pshgethostname_dm(void)
 {
-    return gethostname(hstnme, len);
+    char *buf =
+        psh_getstring((void *(*)(char *, size_t)) & pshgethostname, NULL);
+    return buf;
 }
 
 int pshgetuid(void) { return geteuid(); }

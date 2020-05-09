@@ -47,6 +47,7 @@
 \]	end a sequence of non-printing chars
 */
 
+#include <string.h>
 #include <time.h>
 
 #include "backend.h"
@@ -63,6 +64,10 @@ char *ps_expander(char *prompt)
  * reset_start: reset start of current string
  */
 #define reset_start(newloc) (start = (newloc) + 1, cur = (newloc), count = 0)
+/* replace_char: replace "\\x" with another character */
+#define replace_char(newch)                                                    \
+    ((*(cur - 1) /* the '\\' */ = (newch)),                                    \
+     psh_stringbuilder_add_length(builder, start, count, 0))
     char *result;
     /* Our approach alters the original PROMPT, so duplicate it */
     char *start = psh_strdup(prompt);
@@ -100,8 +105,7 @@ char *ps_expander(char *prompt)
                 if (is_backslash)
                 {
                     is_backslash = 0;
-                    *(cur - 1) /* the '\\' */ = '\a';
-                    psh_stringbuilder_add_length(builder, start, count, 0);
+                    replace_char('\a');
                     reset_start(cur);
                 }
                 /* else write a */
@@ -111,8 +115,8 @@ char *ps_expander(char *prompt)
                 {
                     char *timestr = xmalloc(P_CS * 11);
                     time_t rt;
-                    is_backslash = 0;
                     struct tm *ti;
+                    is_backslash = 0;
 
                     time(&rt);
                     ti = localtime(&rt);
@@ -129,12 +133,80 @@ char *ps_expander(char *prompt)
                 /* else write d */
                 break;
             case 'e':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    replace_char('\033');
+                    reset_start(cur);
+                }
+                /* else write e */
+                break;
             case 'h':
+                if (is_backslash)
+                {
+                    char *dot, *hostname = pshgethostname_dm();
+                    is_backslash = 0;
+
+                    dot = strchr(hostname, '.');
+                    if (dot)
+                        *dot = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, hostname, 1);
+                    reset_start(cur);
+                }
+                /* else write h */
+                break;
             case 'H':
+                if (is_backslash)
+                {
+                    char *hostname = pshgethostname_dm();
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, hostname, 1);
+                    reset_start(cur);
+                }
+                /* else write H */
+                break;
+            case 'n':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    replace_char('\n');
+                    reset_start(cur);
+                }
+                /* else write n */
+                break;
+            case 'r':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    replace_char('\r');
+                    reset_start(cur);
+                }
+                /* else write r */
+                break;
+            case '[':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    reset_start(cur);
+                }
+                /* else write [ */
+                break;
+            case ']':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    reset_start(cur);
+                }
+                /* else write ] */
+                break;
             case 'j':
             case 'l':
-            case 'n':
-            case 'r':
             case 's':
             case 't':
             case 'T':
@@ -159,8 +231,6 @@ char *ps_expander(char *prompt)
             case '8':
             case '9':
             case '0':
-            case '[':
-            case ']':
             default:
                 /* When the escape is unknown, bash and dash keeps both the
                    backslash and the character. */
@@ -188,12 +258,4 @@ char *ps_expander(char *prompt)
     psh_stringbuilder_free(builder);
     xfree(save_start);
     return result;
-}
-
-void show_prompt()
-{
-    char *ps1 = "\\u@\\h:\\w\\$ "; /* TODO: Actually get $PS1 after #8 */
-    char *expanded = ps_expander(ps1);
-    printf("%s", expanded);
-    xfree(expanded);
 }

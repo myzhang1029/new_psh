@@ -67,10 +67,10 @@ int builtin_pwd(ARGS)
             return 1;
         }
         else
-            path = pshgetcwd();
+            path = pshgetcwd_dm();
     }
     else
-        path = pshgetcwd();
+        path = pshgetcwd_dm();
 
     puts(path);
     free(path);

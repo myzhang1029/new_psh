@@ -12,6 +12,7 @@
 
 #include "backend.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 #include "pshell.h"
 
 int last_command_status = 0;
@@ -20,8 +21,10 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
-    char prompt[MAX_PROMPT];
+    char *ps1 = "\\u@\\h:\\w\\$ "; /* TODO: Actually get $PS1 after #8 */
+    char *expanded_ps1;
     struct command *info;
+    int read_stat;
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
@@ -44,10 +47,11 @@ int main(int argc, char **argv)
             OUT2E("%s: malloc failed\n", argv0);
             longjmp(reset_point, 1);
         }
-        show_prompt();
-        if (read_command(prompt, info) <= 0)
+        expanded_ps1 = ps_expander(ps1);
+        read_stat = read_command(expanded_ps1, info);
+        xfree(expanded_ps1);
+        if (read_stat <= 0)
             continue;
-
         switch (run_builtin(info))
         {
             case 1:
