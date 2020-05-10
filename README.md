@@ -1,5 +1,5 @@
 # psh
-[![Build Status](https://travis-ci.com/myzhang1029/psh.svg?branch=master)](https://travis-ci.com/myzhang1029/psh)
+[![Build Status](https://travis-ci.com/myzhang1029/psh.svg)](https://travis-ci.com/myzhang1029/psh)
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/myzhang1029/psh) 
 
 ## Description
