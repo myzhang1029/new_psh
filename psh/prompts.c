@@ -101,6 +101,18 @@ char *ps_expander(char *prompt)
                 else
                     is_backslash = 1;
                 break;
+            case '$':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    if (pshgetuid() == 0) /* root */
+                        replace_char('#');
+                    else
+                        replace_char('$');
+                    reset_start(cur);
+                }
+                /* else write $ */
+                break;
             case 'a':
                 if (is_backslash)
                 {
@@ -187,11 +199,26 @@ char *ps_expander(char *prompt)
                 }
                 /* else write r */
                 break;
+            case 'u':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, getun(), 0);
+                    reset_start(cur);
+                }
+                /* else write u */
+                break;
             case '[':
                 if (is_backslash)
                 {
                     is_backslash = 0;
+#ifdef NO_READLINE
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
+#else
+                    replace_char('\001'); /* RL_PROMPT_START_IGNORE */
+#endif
                     reset_start(cur);
                 }
                 /* else write [ */
@@ -200,7 +227,11 @@ char *ps_expander(char *prompt)
                 if (is_backslash)
                 {
                     is_backslash = 0;
+#ifdef NO_READLINE
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
+#else
+                    replace_char('\002'); /* RL_PROMPT_END_IGNORE */
+#endif
                     reset_start(cur);
                 }
                 /* else write ] */
@@ -213,14 +244,23 @@ char *ps_expander(char *prompt)
             case '@':
             case 'A':
             case 'D':
-            case 'u':
             case 'v':
             case 'V':
             case 'w':
+                if (is_backslash)
+                {
+                    char *pathname = pshgetcwd_dm();
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, getun(), 0);
+                    reset_start(cur);
+                }
+                /* else write u */
+                break;
             case 'W':
             case '!':
             case '#':
-            case '$':
             case '1':
             case '2':
             case '3':
@@ -232,8 +272,8 @@ char *ps_expander(char *prompt)
             case '9':
             case '0':
             default:
-                /* When the escape is unknown, bash and dash keeps both the
-                   backslash and the character. */
+                /* When the escape is unknown, bash and dash keeps both
+                   the backslash and the character. */
                 if (is_backslash)
                 {
                     /* For '\\' */

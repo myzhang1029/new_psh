@@ -80,7 +80,7 @@ char *psh_stringbuilder_yield(psh_stringbuilder *builder)
     while (cur_from)
     {
         /* Copy the string without trailing NUL */
-        memcpy(cur_to, cur_from->string, cur_from->length);
+        memmove(cur_to, cur_from->string, cur_from->length);
         /* Increase result pointer */
         cur_to += cur_from->length;
         /* Get next string */

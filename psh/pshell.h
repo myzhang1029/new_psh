@@ -8,6 +8,8 @@
 #ifndef PSHELL_HEADER_INCLUDED
 #define PSHELL_HEADER_INCLUDED
 
+#include <stdio.h>
+
 #ifndef NO_READLINE
 #include <readline/readline.h>
 #endif

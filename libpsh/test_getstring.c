@@ -29,7 +29,7 @@ const char *helper(char *buf, size_t len)
         "hbllwbxqdvaphlttkhebauhfflmrgpgrftsfibgaubvs"; /* random characters */
     if (len > 1025)
         len = 1025; /* 1 for \0 */
-    memcpy(buf, data, len);
+    memmove(buf, data, len);
     buf[len - 1] = 0;
     return data;
 }

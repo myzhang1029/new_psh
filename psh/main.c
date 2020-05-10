@@ -21,6 +21,8 @@ char *argv0;
 int main(int argc, char **argv)
 {
     char *ps1 = "\\u@\\h:\\w\\$ "; /* TODO: Actually get $PS1 after #8 */
+    /* Gitpod style */
+    // char *ps1 = "\\[\033[01;32m\\]\\u \\[\033[01;34m\\]\\w\\[\033[0m \\$ ";
     char *expanded_ps1;
     struct command *info;
     int read_stat;
