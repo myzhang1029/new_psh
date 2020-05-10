@@ -8,5 +8,11 @@
     "cpp.clangTidy": true,
     "cpp.clangdArgs": "--compile-commands-dir=${THEIA_WORKSPACE_ROOT}",
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true
+    "editor.formatOnPaste": true,
+    "editor.autoIndent": true,
+    "editor.folding": true,
+    "editor.detectIndentation": false,
+	"editor.insertSpaces": false,
+	"terminal.integrated.shell.linux": "/usr/bin/zsh",
+	"terminal.integrated.shell.osx": "/bin/zsh"
 }
