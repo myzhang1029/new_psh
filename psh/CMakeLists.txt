@@ -9,7 +9,6 @@ if(HAVE_READLINE)
 elseif(HAVE_LIBEDIT)
     target_link_libraries(psh edit)
 endif()
-# some macOS systems have history.h but no libhistory
 if(HAVE_HISTORY_H AND HAVE_HISTORY)
     target_link_libraries(psh history)
 endif()
