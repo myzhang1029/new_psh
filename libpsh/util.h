@@ -1,5 +1,5 @@
 /*
-    libpsh.h - Psh utilities
+    libpsh/libpsh.h - Psh utilities
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.

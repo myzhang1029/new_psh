@@ -1,5 +1,5 @@
 /*
-   hash.h - hash functions and structures
+   libpsh/hash.h - hash functions and structures
 
    Copyright 2017 Zhang Maiyun.
 

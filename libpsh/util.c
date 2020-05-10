@@ -1,5 +1,5 @@
 /*
-    util.c - libpsh utilities for everyone
+    libpsh/util.c - libpsh utilities for everyone
     Copyright 2018-2020 Zhang Maiyun
 
     This file is part of Psh, P shell.

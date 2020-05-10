@@ -1,5 +1,5 @@
 /*
-   builtin/builtin.c - builtin command builtin
+   psh/builtins/builtin.c - builtin command builtin
 
    Copyright 2017-2020 Zhang Maiyun.
 

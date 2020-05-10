@@ -1,5 +1,5 @@
 /*
-    hash.c - hash table manage functions of the psh
+    libpsh/hash.c - hash table manage functions of the psh
 
     Copyright 2017 Zhang Maiyun.
 

@@ -1,5 +1,5 @@
 /*
-   builtins.c - builtins caller file of the psh
+   psh/builtins.c - builtins caller file of the psh
 
    Copyright 2013 wuyve.
    Copyright 2017 Zhang Maiyun.
