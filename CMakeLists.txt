@@ -38,7 +38,7 @@ add_subdirectory(libpsh)
 add_subdirectory(psh)
 
 # pkg-config file
-#configure_file(sbl.pc.in sbl.pc @ONLY)
+configure_file(psh.pc.in psh.pc @ONLY)
 
 # config.h
 #configure_file(config.h.in config.h)
@@ -62,5 +62,5 @@ add_subdirectory(psh)
 #    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake")
 
 
-#install(FILES ${CMAKE_BINARY_DIR}/libpsh.pc
-#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(FILES ${CMAKE_BINARY_DIR}/libpsh.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
