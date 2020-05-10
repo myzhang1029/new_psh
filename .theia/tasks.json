@@ -27,7 +27,7 @@
 			]
 		},
 		{
-			"label": "make",
+			"label": "build",
 			"type": "shell",
 			"command": "make",
 			"options": {
@@ -35,20 +35,6 @@
 			},
 			"dependsOn": [
 				"cmake"
-			]
-		},
-		{
-			"label": "build",
-			"type": "shell",
-			"options": {
-				"cwd": "${workspaceRoot}/build"
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"dependsOn": [
-				"make"
 			]
 		}
 	]
