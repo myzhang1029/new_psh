@@ -20,14 +20,20 @@ Psh is now my UWC FP _free summer_ project.
 
 ## Usage
 Psh is equipped with CMake build system.
-    mkdir build
-    cd build
-    cmake ..
-    make
+```
+mkdir build
+cd build
+cmake ..
+make
+```
 
 Now just run:
-    psh/psh
+```
+psh/psh
+```
 
 ## Future Plans
 Have a look at the GitHub projects
 [Roadmap](https://github.com/myzhang1029/psh/projects/2) kanban!
+
+
