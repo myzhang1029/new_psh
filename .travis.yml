@@ -1,0 +1,28 @@
+language: c
+git:
+  quiet: true
+  depth: 1
+os: linux
+compiler:
+- clang
+- gcc
+script:
+- mkdir build
+- cd build
+- 'cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../psh "-DCMAKE_C_FLAGS_INIT=-Wall -Wextra"'
+- make install
+jobs:
+  include:
+  - os: osx
+    osx_image: xcode8
+    compiler: gcc
+    env:
+    - CC=gcc-4.9
+    - CXX=g++-4.9
+# - os: windows
+#   script:
+#   - mkdir build
+#   - cd build
+#   - cmake .. -DCMAKE_INSTALL_PREFIX=../psh
+#   - '"C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin/MSBuild.exe"
+#     -property:Configuration=Release INSTALL.vcxproj'
