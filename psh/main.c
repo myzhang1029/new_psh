@@ -42,13 +42,13 @@ int main(int argc, char **argv)
         new_command(&info);
         expanded_ps1 = ps_expander(ps1);
         read_stat = read_cmdline(expanded_ps1, &buffer);
+        xfree(expanded_ps1);
         if (read_stat < 0 /* evaluate first */ || filpinfo(buffer, info) < 0)
         {
             free_command(info);
             continue;
         }
         xfree(buffer);
-        xfree(expanded_ps1);
         switch (run_builtin(info))
         {
             case 1:

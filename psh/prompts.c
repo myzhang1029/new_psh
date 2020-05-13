@@ -253,7 +253,7 @@ char *ps_expander(char *prompt)
                     is_backslash = 0;
 
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
-                    psh_stringbuilder_add(builder, getun(), 0);
+                    psh_stringbuilder_add(builder, pathname, 1);
                     reset_start(cur);
                 }
                 /* else write u */
