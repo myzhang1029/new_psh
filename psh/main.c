@@ -35,8 +35,13 @@ int main(int argc, char **argv)
 #ifndef NO_HISTORY
     using_history();
 #endif
+    /* Recovered from a signal */
     if (setjmp(reset_point) == 1)
+    {
         printf("\n");
+        xfree(expanded_ps1);
+        free_command(info);
+    }
     while (1)
     {
         new_command(&info);
@@ -45,6 +50,7 @@ int main(int argc, char **argv)
         xfree(expanded_ps1);
         if (read_stat < 0 /* evaluate first */ || filpinfo(buffer, info) < 0)
         {
+            xfree(buffer);
             free_command(info);
             continue;
         }
