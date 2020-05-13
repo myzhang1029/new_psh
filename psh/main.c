@@ -24,6 +24,7 @@ int main(int argc, char **argv)
     /* Gitpod style */
     // char *ps1 = "\\[\033[01;32m\\]\\u \\[\033[01;34m\\]\\w\\[\033[0m \\$ ";
     char *expanded_ps1;
+    char *buffer;
     struct command *info;
     int read_stat;
     argv0 = psh_strdup(
@@ -38,19 +39,16 @@ int main(int argc, char **argv)
         printf("\n");
     while (1)
     {
-        if (new_command(&info) == -1)
-        {
-            OUT2E("%s: malloc failed\n", argv0);
-            longjmp(reset_point, 1);
-        }
+        new_command(&info);
         expanded_ps1 = ps_expander(ps1);
-        read_stat = read_command(expanded_ps1, info);
-        xfree(expanded_ps1);
-        if (read_stat <= 0)
+        read_stat = read_cmdline(expanded_ps1, &buffer);
+        if (read_stat < 0 /* evaluate first */ || filpinfo(buffer, info) < 0)
         {
             free_command(info);
             continue;
         }
+        xfree(buffer);
+        xfree(expanded_ps1);
         switch (run_builtin(info))
         {
             case 1:

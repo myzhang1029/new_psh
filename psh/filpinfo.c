@@ -53,13 +53,13 @@ static void free_parameters(struct command *info)
     {
         if (info->parameters[count] != NULL)
         {
-            free(info->parameters[count]);
+            xfree(info->parameters[count]);
             info->parameters[count] = NULL;
         }
         else
             break; /* All parameters should be freed after here */
     }
-    free(info->parameters);
+    xfree(info->parameters);
     info->parameters = NULL;
 }
 
@@ -70,7 +70,7 @@ static void free_redirect(struct redirect *redir)
     {
         temp = redir;
         redir = redir->next;
-        free(temp);
+        xfree(temp);
         temp = NULL;
     }
 }
@@ -92,27 +92,14 @@ static int ignore_IFSs(char *buffer, int count)
  * struct redirect */
 int new_command(struct command **info)
 {
-    *info = malloc(sizeof(struct command));
-    if ((*info) == NULL)
-        return -1;
+    *info = xmalloc(sizeof(struct command));
     command_init(*info);
-    (*info)->parameters = malloc(sizeof(char *) * MAXARG);
-    if ((*info)->parameters == NULL)
-    {
-        free(*info);
-        return -1;
-    }
+    (*info)->parameters = xmalloc(sizeof(char *) * MAXARG);
     memset((*info)->parameters, 0, MAXARG); /* This will be used to detect
                            whether an element is used */
-    (*info)->parameters[0] = malloc(P_CS * MAXEACHARG);
-    if ((*info)->parameters[0] == NULL)
-    {
-        free((*info)->parameters);
-        free(*info);
-        return -1;
-    }
+    (*info)->parameters[0] = xmalloc(P_CS * MAXEACHARG);
     memset((*info)->parameters[0], 0, MAXEACHARG);
-    (*info)->rlist = malloc(sizeof(struct redirect));
+    (*info)->rlist = xmalloc(sizeof(struct redirect));
     redirect_init((*info)->rlist);
     return 0;
 }
@@ -127,12 +114,12 @@ void free_command(struct command *info)
         info = info->next;
         free_parameters(temp);
         free_redirect(temp->rlist);
-        free(temp);
+        xfree(temp);
         temp = NULL;
     }
 }
 
-/* Malloc and fill a command with a buffer, free() buffer, return characters
+/* Malloc and fill a command with a buffer,  returns the number of characters
  * processed */
 int filpinfo(char *buffer, struct command *info)
 {
@@ -300,7 +287,7 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        free(cmd_lastnode->parameters[cnt_argument_element]);
+                        xfree(cmd_lastnode->parameters[cnt_argument_element]);
                         cmd_lastnode->parameters[cnt_argument_element] = NULL;
                         cnt_argument_element--;
                     }
@@ -321,14 +308,7 @@ int filpinfo(char *buffer, struct command *info)
                     }
                     else if (buffer[cnt_buffer + 1] == '&')
                     {
-                        if (new_command(&(cmd_lastnode->next)) == -1)
-                        {
-                            OUT2E("%s: filpinfo: "
-                                  "malloc failed\n",
-                                  argv0);
-                            cnt_return = -1;
-                            goto done;
-                        }
+                        new_command(&(cmd_lastnode->next));
                         if (cmd_lastnode->flag == 0)
                             cmd_lastnode->flag = RUN_AND;
                         else
@@ -345,26 +325,17 @@ int filpinfo(char *buffer, struct command *info)
                             char *cmdand_buf;
                             cmdand_buf = psh_gets("> ");
                             buffer =
-                                realloc(buffer, P_CS * (strlen(buffer) +
-                                                        strlen(cmdand_buf) +
-                                                        1 /* \0 */));
+                                xrealloc(buffer, P_CS * (strlen(buffer) +
+                                                         strlen(cmdand_buf) +
+                                                         1 /* \0 */));
                             strncat(buffer, cmdand_buf, strlen(cmdand_buf));
-                            free(cmdand_buf);
+                            xfree(cmdand_buf);
                         }
                         ++cnt_buffer;
                     }
                     else
                     {
-                        if (new_command(&(cmd_lastnode->next)) == -1)
-                        {
-                            /* malloc failed,
-                             * cleanup */
-                            OUT2E("%s: filpinfo: "
-                                  "malloc failed\n",
-                                  argv0);
-                            cnt_return = -1;
-                            goto done;
-                        }
+                        new_command(&(cmd_lastnode->next));
                         if (cmd_lastnode->flag == 0)
                             cmd_lastnode->flag = BG_CMD;
                         else
@@ -391,15 +362,7 @@ int filpinfo(char *buffer, struct command *info)
                         free(cmd_lastnode->parameters[cnt_argument_element]);
                         cmd_lastnode->parameters[cnt_argument_element] = NULL;
                     }
-                    if (new_command(&(cmd_lastnode->next)) == -1)
-                    {
-                        /* malloc failed, cleanup */
-                        OUT2E("%s: filpinfo: malloc "
-                              "failed\n",
-                              argv0);
-                        cnt_return = -1;
-                        goto done;
-                    }
+                    new_command(&(cmd_lastnode->next));
                     if (buffer[cnt_buffer + 1] == '|')
                     {
                         if (cmd_lastnode->flag == 0)
@@ -417,11 +380,12 @@ int filpinfo(char *buffer, struct command *info)
                         {
                             char *cmdor_buf;
                             cmdor_buf = psh_gets("> ");
-                            buffer = realloc(buffer, P_CS * (strlen(buffer) +
-                                                             strlen(cmdor_buf) +
-                                                             1 /* \0 */));
+                            buffer =
+                                xrealloc(buffer, P_CS * (strlen(buffer) +
+                                                         strlen(cmdor_buf) +
+                                                         1 /* \0 */));
                             strncat(buffer, cmdor_buf, strlen(cmdor_buf));
-                            free(cmdor_buf);
+                            xfree(cmdor_buf);
                         }
                         ++cnt_buffer;
                     }
@@ -441,11 +405,11 @@ int filpinfo(char *buffer, struct command *info)
                         {
                             char *pipe_buf;
                             pipe_buf = psh_gets("> ");
-                            buffer = realloc(buffer, P_CS * (strlen(buffer) +
-                                                             strlen(pipe_buf) +
-                                                             1 /* \0 */));
+                            buffer = xrealloc(buffer, P_CS * (strlen(buffer) +
+                                                              strlen(pipe_buf) +
+                                                              1 /* \0 */));
                             strncat(buffer, pipe_buf, strlen(pipe_buf));
-                            free(pipe_buf);
+                            xfree(pipe_buf);
                         }
                     }
                     cmd_lastnode = cmd_lastnode->next;
@@ -467,7 +431,7 @@ int filpinfo(char *buffer, struct command *info)
                     buffer[cnt_buffer + 1] != ' ' &&
                     buffer[cnt_buffer + 1] != '/') /* ~username */
                 {
-                    char *username = malloc(P_CS * 256);
+                    char *username = xmalloc(P_CS * 256);
                     char *posit;
                     psh_strncpy(username, &(buffer[cnt_buffer + 1]), 256);
                     posit = strchr(username, '/');
@@ -508,7 +472,7 @@ int filpinfo(char *buffer, struct command *info)
                                 hdir, 4094 - cnt_argument_char);
                     cnt_buffer += strlen(username);
                     cnt_argument_char += strlen(hdir);
-                    free(username);
+                    xfree(username);
                 }
                 else /* ~/ and ~ */
                 {
@@ -549,10 +513,10 @@ int filpinfo(char *buffer, struct command *info)
                 char *newline_buf;
                 newline_buf = psh_gets("> ");
                 buffer =
-                    realloc(buffer, P_CS * (strlen(buffer) +
-                                            strlen(newline_buf) + 1 /* \0 */));
+                    xrealloc(buffer, P_CS * (strlen(buffer) +
+                                             strlen(newline_buf) + 1 /* \0 */));
                 strncat(buffer, newline_buf, strlen(newline_buf));
-                free(newline_buf);
+                xfree(newline_buf);
                 break;
             case '>':
                 if (ignore)
@@ -582,7 +546,7 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        free(cmd_lastnode->parameters[cnt_argument_element]);
+                        xfree(cmd_lastnode->parameters[cnt_argument_element]);
                         cmd_lastnode->parameters[cnt_argument_element] = NULL;
                         cnt_argument_element--;
                     }
@@ -722,7 +686,7 @@ int filpinfo(char *buffer, struct command *info)
                 if (cnt_argument_char == 0) /* Previously a blank reached */
                 {
                     cnt_argument_char = cnt_old_parameter;
-                    free(cmd_lastnode->parameters[cnt_argument_element]);
+                    xfree(cmd_lastnode->parameters[cnt_argument_element]);
                     cmd_lastnode->parameters[cnt_argument_element] = NULL;
                     cnt_argument_element--;
                 }
@@ -737,18 +701,10 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        free(cmd_lastnode->parameters[cnt_argument_element]);
+                        xfree(cmd_lastnode->parameters[cnt_argument_element]);
                         cmd_lastnode->parameters[cnt_argument_element] = NULL;
                     }
-                    if (new_command(&(cmd_lastnode->next)) == -1)
-                    {
-                        /* malloc failed, cleanup */
-                        OUT2E("%s: filpinfo: malloc "
-                              "failed\n",
-                              argv0);
-                        cnt_return = -1;
-                        goto done;
-                    }
+                    new_command(&(cmd_lastnode->next));
                     if (cmd_lastnode->flag == 0)
                         cmd_lastnode->flag = MULTICMD;
                     else
@@ -790,6 +746,5 @@ int filpinfo(char *buffer, struct command *info)
 done:
     if (cnt_return > 0)
         write_char(0);
-    free(buffer);
     return cnt_return;
 }
