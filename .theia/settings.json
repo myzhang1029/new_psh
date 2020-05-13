@@ -11,5 +11,11 @@
 	"editor.formatOnPaste": true,
 	"editor.folding": true,
 	"editor.detectIndentation": false,
-	"editor.insertSpaces": false
+	"editor.insertSpaces": false,
+	"terminal.integrated.shell.linux": "/usr/bin/zsh",
+	"terminal.integrated.shell.osx": "/bin/zsh",
+	"files.associations": {
+		"string.h": "c"
+	},
+	"C_Cpp.dimInactiveRegions": false
 }
