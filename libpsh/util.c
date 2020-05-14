@@ -42,7 +42,7 @@ char *psh_fgets(char *prompt, FILE *fp)
     if (fp == stdin)
         printf("%s", prompt);
     {
-        size_t charcount = 0, nowhave = MAXLINE;
+        size_t charcount = 0, nowhave = 256;
         char *result = xmalloc(P_CS * nowhave);
         char *ptr = result;
         if (result == NULL)

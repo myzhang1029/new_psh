@@ -1,1 +1,1 @@
-/* Dummy file for you, actual implementation in backends/*.c */
+/* Dummy file for you, actual implementation in backends/ */
