@@ -38,7 +38,7 @@ add_subdirectory(libpsh)
 add_subdirectory(psh)
 
 # pkg-config file
-configure_file(psh.pc.in psh.pc @ONLY)
+configure_file(libpsh.pc.in libpsh.pc @ONLY)
 
 # config.h
 #configure_file(config.h.in config.h)
