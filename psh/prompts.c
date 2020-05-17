@@ -281,16 +281,6 @@ char *ps_expander(char *prompt)
                 }
                 /* else write ] */
                 break;
-            case 'j':
-            case 'l':
-            case 's':
-            case 't':
-            case 'T':
-            case '@':
-            case 'A':
-            case 'D':
-            case 'v':
-            case 'V':
             case 'w':
                 if (is_backslash)
                 {
@@ -315,6 +305,16 @@ char *ps_expander(char *prompt)
                 }
                 /* else write W */
                 break;
+            case 'j':
+            case 'l':
+            case 's':
+            case 't':
+            case 'T':
+            case '@':
+            case 'A':
+            case 'D':
+            case 'v':
+            case 'V':
             case '!':
             case '#':
             case '1':
