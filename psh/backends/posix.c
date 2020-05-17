@@ -100,7 +100,7 @@ char *pshgetcwd(char *wd, size_t len) { return getcwd(wd, len); }
 
 char *pshgetcwd_dm(void)
 {
-    /* Providing NULL to getcwd isn't maiinstream POSIX */
+    /* Providing NULL to getcwd isn't mainstream POSIX */
     char *buf = psh_getstring((void *(*)(char *, size_t)) & pshgetcwd, NULL);
     return buf;
 }
