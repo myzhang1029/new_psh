@@ -20,12 +20,12 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
-    char *ps1 = "\\u@\\h:\\w\\$ "; /* TODO: Actually get $PS1 after #8 */
+    char *ps1 = "\\u@\\h:\\W\\$ "; /* TODO: Actually get $PS1 after #8 */
     /* Gitpod style */
     // char *ps1 = "\\[\033[01;32m\\]\\u \\[\033[01;34m\\]\\w\\[\033[0m \\$ ";
-    char *expanded_ps1;
-    char *buffer;
-    struct command *info;
+    char *expanded_ps1 = NULL;
+    char *buffer = NULL;
+    struct command *info = NULL;
     int read_stat;
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));

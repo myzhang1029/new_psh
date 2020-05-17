@@ -56,6 +56,51 @@
 #include "libpsh/xmalloc.h"
 #include "pshell.h"
 
+static char *workdir_expander(int if_last_component)
+{
+    /* Actually $PWD should be used here
+     * But changing $PWD really isn't so meaningful
+     * so let pshgetcwd_dm decide it.
+     */
+    size_t count, lenhome;
+    char *last_occur, *home = gethd(), *pathname = pshgetcwd_dm();
+
+    /* Replace $HOME with a tlide */
+    for (count = 0, lenhome = strlen(home); count < lenhome; ++count)
+    {
+        if (home[count] != pathname[count])
+        {
+            /* Doesn't match, isn't under home. Set a marker. */
+            count = lenhome + 1;
+            break;
+        }
+    }
+    /* Matches */
+    if (count <= lenhome)
+    {
+        pathname[0] = '~';
+        /* pathname[lenhome] == '/', so the leading slash got kept.
+         * if pathname is the same as home, strlen(pathname) - lenhome == 0,
+         * only '0' gets moved
+         */
+        memmove(pathname + 1, pathname + lenhome,
+                strlen(pathname) + 1 /* move '0' also */ - lenhome);
+    }
+    if (if_last_component)
+    {
+        last_occur = strrchr(pathname, '/');
+        if (last_occur && last_occur != pathname)
+        {
+            size_t diff = last_occur - pathname;
+            /* Next line: first +1 to jump over '/', second +1 for '0', -1 for
+             * '/' again */
+            memmove(pathname, last_occur + 1, strlen(pathname) + 1 - 1 - diff);
+        }
+        /* if last_occur == pathname: only '/' is left, keep it */
+    }
+    return pathname;
+}
+
 /* Expands $PS1-4, result needs to be free()d */
 char *ps_expander(char *prompt)
 {
@@ -249,16 +294,27 @@ char *ps_expander(char *prompt)
             case 'w':
                 if (is_backslash)
                 {
-                    char *pathname = pshgetcwd_dm();
+                    char *pathname = workdir_expander(0);
                     is_backslash = 0;
 
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
                     psh_stringbuilder_add(builder, pathname, 1);
                     reset_start(cur);
                 }
-                /* else write u */
+                /* else write w */
                 break;
             case 'W':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    char *pathname = workdir_expander(1);
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, pathname, 1);
+                    reset_start(cur);
+                }
+                /* else write W */
+                break;
             case '!':
             case '#':
             case '1':
