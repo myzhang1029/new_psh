@@ -20,7 +20,7 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
-    char *ps1 = "\\u@\\h:\\W\\$ "; /* TODO: Actually get $PS1 after #8 */
+    char *ps1 = "\\u@\\h:\\W\\12\\$ "; /* TODO: Actually get $PS1 after #8 */
     /* Gitpod style */
     // char *ps1 = "\\[\033[01;32m\\]\\u \\[\033[01;34m\\]\\w\\[\033[0m \\$ ";
     char *expanded_ps1 = NULL;

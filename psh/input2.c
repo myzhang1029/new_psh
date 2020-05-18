@@ -59,7 +59,6 @@ int read_cmdline(char *prompt, char **result)
         xfree(buffer);
         return -1;
     }
-    *result = buffer;
 #ifndef NO_HISTORY
     stat = history_expand(buffer, &expanded);
     if (stat < 0)
@@ -78,7 +77,8 @@ int read_cmdline(char *prompt, char **result)
     }
     xfree(buffer);
     add_history(expanded);
-    *result = expanded;
+    buffer = expanded;
 #endif /* NO_HISTORY */
+    *result = buffer;
     return 0;
 }

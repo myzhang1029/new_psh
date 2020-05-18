@@ -47,6 +47,7 @@
 \]	end a sequence of non-printing chars
 */
 
+#include <ctype.h>
 #include <string.h>
 #include <time.h>
 
@@ -120,7 +121,11 @@ char *ps_expander(char *prompt)
     char *cur = start;
     /* Count of current number of characters to write */
     int count = 0;
+    /* Whether the last processed character is '\\' */
     int is_backslash = 0;
+    /* When \nnn is encountered, this records the number of integer characters
+     * got */
+    int num_level = 0;
     psh_stringbuilder *builder = psh_stringbuilder_create();
 
     do
@@ -305,6 +310,44 @@ char *ps_expander(char *prompt)
                 }
                 /* else write W */
                 break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '0':
+                if (num_level || is_backslash)
+                {
+                    --count; /* These numbers shouldn't be added */
+                    is_backslash = 0;
+                    ++num_level;
+                    /* Now *(cur-num_level) is always '\\' */
+                    if (num_level == 3 || !isdigit(*(cur + 1)))
+                    {
+                        char save = *(cur + 1);
+                        int ch;
+                        /* Manually mark an end to the string */
+                        *(cur + 1) = 0;
+                        sscanf(cur - num_level + 1, "%o", &ch);
+                        /* Restore the old character (possibly NUL) */
+                        *(cur + 1) = save;
+                        /* Replace '\\' with the new char */
+                        *(cur - num_level) = ch;
+                        /* Reset num_level as the current one is processed */
+                        num_level = 0;
+                        /* count wasn't increased since '\\', so +1 for the new
+                         * char */
+                        psh_stringbuilder_add_length(builder, start, count + 1,
+                                                     0);
+                        reset_start(cur);
+                    }
+                }
+                /* else write [0-9] */
+                break;
             case 'j':
             case 'l':
             case 's':
@@ -317,16 +360,6 @@ char *ps_expander(char *prompt)
             case 'V':
             case '!':
             case '#':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '0':
             default:
                 /* When the escape is unknown, bash and dash keeps both
                    the backslash and the character. */
