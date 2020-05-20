@@ -20,9 +20,8 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
-    char *ps1 = "\\u@\\h:\\W\\12\\$ "; /* TODO: Actually get $PS1 after #8 */
-    /* Gitpod style */
-    // char *ps1 = "\\[\033[01;32m\\]\\u \\[\033[01;34m\\]\\w\\[\033[0m \\$ ";
+    char *ps1 = "\\[\\e[01;32m\\]\\u \\D{} "
+                "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\012\\s-\\V\\[\\e[0m\\]\\$ ";
     char *expanded_ps1 = NULL;
     char *buffer = NULL;
     struct command *info = NULL;

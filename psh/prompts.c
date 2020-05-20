@@ -57,6 +57,7 @@
 #include "libpsh/xmalloc.h"
 #include "pshell.h"
 
+/* Expand \w and \W */
 static char *workdir_expander(int if_last_component)
 {
     /* Actually $PWD should be used here
@@ -102,6 +103,29 @@ static char *workdir_expander(int if_last_component)
     return pathname;
 }
 
+/* psh_getstring for strftime, only uses current time */
+static char *get_strftime_string(const char *fmt)
+{
+    /* the time things */
+    time_t rt;
+    struct tm *ti;
+    /* Start with a reasonable guess */
+    size_t len = strlen(fmt) * 5;
+    char *result = xmalloc(P_CS * len);
+    /* Read the time */
+    time(&rt);
+    ti = localtime(&rt);
+
+    /* strftime returns 0 when buffer is too small */
+    while (strftime(result, len, fmt, ti) == 0)
+    {
+        result = xrealloc(result, len *= 2);
+    }
+
+    result = xrealloc(result, strlen(result) + 1);
+    return result;
+}
+
 /* Expands $PS1-4, result needs to be free()d */
 char *ps_expander(char *prompt)
 {
@@ -110,6 +134,8 @@ char *ps_expander(char *prompt)
  * reset_start: reset start of current string
  */
 #define reset_start(newloc) (start = (newloc) + 1, cur = (newloc), count = 0)
+/* end_processing: skip everything remaining */
+#define end_processing() reset_start(cur + strlen(cur) - 1)
 /* replace_char: replace "\\x" with another character */
 #define replace_char(newch)                                                    \
     ((*(cur - 1) /* the '\\' */ = (newch)),                                    \
@@ -175,16 +201,14 @@ char *ps_expander(char *prompt)
             case 'd':
                 if (is_backslash)
                 {
-                    char *timestr = xmalloc(P_CS * 11);
-                    time_t rt;
-                    struct tm *ti;
+                    char *timestr;
                     is_backslash = 0;
 
-                    time(&rt);
-                    ti = localtime(&rt);
-                    strftime(timestr, 11, "%a %b %e", ti);
+                    timestr = get_strftime_string("%a %b %e");
                     /* Strftime()'s %e prepends a space to single digits, but we
                      * want a '0' */
+                    /* FIXME: if the locale is different, '0' will be at a
+                     * strange position */
                     if (timestr[8] == ' ' /* space */)
                         timestr[8] = '0';
 
@@ -193,6 +217,103 @@ char *ps_expander(char *prompt)
                     reset_start(cur);
                 }
                 /* else write d */
+                break;
+            case 't':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%H:%M:%S");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write t */
+                break;
+            case 'T':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%I:%M:%S");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write T */
+                break;
+            case '@':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%I:%M %p");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write @ */
+                break;
+            case 'A':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%H:%M");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write A */
+                break;
+            case 'D':
+                if (is_backslash)
+                {
+                    /* in bash 5.0, if '{' isn't after 'D', then "\D" is
+                     * emitted. if '}' isn't found, the whole string after '{'
+                     * becomes FMT
+                     */
+                    char *fmt, *timestr, *end;
+                    is_backslash = 0;
+
+                    if (*(cur + 1) != '{')
+                    {
+                        /* So if 'D' is the last character, here things end, 'D'
+                         * gets written
+                         */
+                        /* For '\\' */
+                        ++count;
+                        break;
+                    }
+                    /* strftime's fmt starts here */
+                    fmt = cur + 2;
+                    end = strchr(fmt, '}');
+                    if (end)
+                        /* Needs no restoration */
+                        *end = 0;
+                    /* else fmt takes the whole remaining string */
+                    if (strlen(fmt))
+                        timestr = get_strftime_string(fmt);
+                    else
+                        /* Here bash uses HMS for empty fmt */
+                        timestr = get_strftime_string("%H:%M:%S");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    if (end)
+                        reset_start(end);
+                    else
+                        end_processing(); /* break */
+                }
+                /* else write D */
                 break;
             case 'e':
                 if (is_backslash)
@@ -348,18 +469,50 @@ char *ps_expander(char *prompt)
                 }
                 /* else write [0-9] */
                 break;
-            case 'j':
-            case 'l':
             case 's':
-            case 't':
-            case 'T':
-            case '@':
-            case 'A':
-            case 'D':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, argv0, 0);
+                    reset_start(cur);
+                }
+                /* else write s */
+                break;
             case 'v':
+                if (is_backslash)
+                {
+                    char *pv = psh_strdup(PSH_VERSION);
+                    char *occur = strrchr(pv, '.');
+                    is_backslash = 0;
+                    if (occur)
+                        *occur = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, pv, 1);
+                    reset_start(cur);
+                }
+                /* else write v */
+                break;
             case 'V':
-            case '!':
-            case '#':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, PSH_VERSION, 0);
+                    reset_start(cur);
+                }
+                /* else write s */
+                break;
+            case 'j': /* #9 TODO */
+            case 'l': /* #5 TODO */
+            case '!': /* #6 TODO */
+            case '#': /* #6 TODO */
+                OUT2E("Warning: Unsupported PS1 sequence \\%c\n", *cur);
+                /* fall through */
+                __attribute__((fallthrough));
             default:
                 /* When the escape is unknown, bash and dash keeps both
                    the backslash and the character. */

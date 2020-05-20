@@ -20,7 +20,7 @@
 #define __attribute__(x)
 #endif
 
-#define PSH_VERSION "0.16.0"
+#define PSH_VERSION "0.17.0"
 #define MAXLINE 262144
 #define MAXARG 64
 #define MAXEACHARG 4096
