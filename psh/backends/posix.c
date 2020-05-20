@@ -55,7 +55,6 @@ void sigchld_handler(__attribute__((unused)) int sig)
 void sigintabrt_hadler(int sig)
 {
     last_command_status = sig;
-    longjmp(reset_point, 1);
 }
 
 int prepare(void)

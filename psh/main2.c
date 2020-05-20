@@ -1,0 +1,65 @@
+/*
+    psh/main2.c - psh entry point
+    Copyright 2020 Zhang Maiyun
+
+    This file is part of Psh, P shell.
+
+    Psh is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Psh is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include <stdlib.h>
+#include <string.h>
+
+#include "backend.h"
+#include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
+#include "pshell.h"
+
+int last_command_status = 0; /* #8 TODO: $? */
+char *argv0;
+
+int main(int argc, char **argv)
+{
+    char *ps1 = "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
+                "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\012\\s-\\V\\[\\e[0m\\]\\$ ";
+    char *expanded_ps1, *buffer;
+    struct command *cmd = NULL;
+    argv0 = psh_strdup(
+        (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
+
+    add_atexit_free(argv0);
+    prepare();
+#ifndef NO_HISTORY
+    using_history();
+#endif
+    while (1)
+    {
+        expanded_ps1 = ps_expander(ps1);
+        if (read_cmdline(expanded_ps1, &buffer) < 0)
+            continue;
+        xfree(expanded_ps1);
+        new_command(&cmd);
+        if (filpinfo(buffer, cmd) < 0)
+        {
+            xfree(buffer);
+            free_command(cmd);
+            continue;
+        }
+        xfree(buffer);
+        /* #3 TODO, also change run_builtin() */
+        do_run(cmd);
+        free_command(cmd);
+    }
+    return 0;
+}
