@@ -61,7 +61,7 @@ int main(int argc, char **argv)
         }
         xfree(buffer);
 
-        /* Temporary work-around. #3 TODO, invoke bltin in do_run() */
+        /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in do_run() */
         bltin = find_builtin(cmd->parameters[0]);
         if (bltin)
         {
