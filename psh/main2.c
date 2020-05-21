@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "backend.h"
+#include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "pshell.h"
@@ -31,10 +32,12 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
+    builtin_function bltin;
+    struct command *cmd = NULL;
+    char *expanded_ps1, *buffer;
     char *ps1 = "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
                 "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\012\\s-\\V\\[\\e[0m\\]\\$ ";
-    char *expanded_ps1, *buffer;
-    struct command *cmd = NULL;
+
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
@@ -57,8 +60,18 @@ int main(int argc, char **argv)
             continue;
         }
         xfree(buffer);
-        /* #3 TODO, also change run_builtin() */
-        do_run(cmd);
+
+        /* Temporary work-around. #3 TODO, invoke bltin in do_run() */
+        bltin = find_builtin(cmd->parameters[0]);
+        if (bltin)
+        {
+            last_command_status =
+                (*bltin)(get_argc(cmd->parameters), cmd->parameters);
+        }
+        else
+        {
+            do_run(cmd);
+        }
         free_command(cmd);
     }
     return 0;

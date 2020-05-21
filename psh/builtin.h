@@ -1,6 +1,6 @@
 /*
-    psh/builtins/builtin.h - builtin definitions of the psh
-    Copyright 2017 Zhang Maiyun.
+    psh/builtin.h - builtin definitions of the psh
+    Copyright 2017-2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
 
@@ -21,28 +21,25 @@
 #define BUILTIN_INCLUDED
 #include "pshell.h"
 
-#define ARGS struct command *info
-#define bltin_argv (info->parameters)
-
-typedef int (*builtin_function)(ARGS);
-
-int builtin_exec(ARGS);
-int builtin_echo(ARGS);
-int builtin_exit(ARGS);
-int builtin_true(ARGS);
-int builtin_false(ARGS);
-int builtin_cd(ARGS);
-int builtin_pwd(ARGS);
-int builtin_history(ARGS);
-int builtin_builtin(ARGS);
-builtin_function find_builtin(char *name);
-int get_argc(char **argv);
-
+typedef int (*builtin_function)(int argc, char **argv);
 struct builtin
 {
     char *name;
     builtin_function proc;
 };
+
+int builtin_exec(int argc, char **argv);
+int builtin_echo(int argc, char **argv);
+int builtin_exit(int argc, char **argv);
+int builtin_true(int argc, char **argv);
+int builtin_false(int argc, char **argv);
+int builtin_cd(int argc, char **argv);
+int builtin_pwd(int argc, char **argv);
+int builtin_history(int argc, char **argv);
+int builtin_builtin(int argc, char **argv);
+
+builtin_function find_builtin(char *name);
+int get_argc(char **argv);
 
 extern const struct builtin builtins[];
 

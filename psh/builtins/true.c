@@ -20,6 +20,6 @@
 #include <stdio.h>
 
 #include "builtin.h"
-int builtin_true(ARGS) { return 1; }
+int builtin_true(int argc, char **argv) { return 0; }
 
-int builtin_false(ARGS) { return 2; }
+int builtin_false(int argc, char **argv) { return 1; }

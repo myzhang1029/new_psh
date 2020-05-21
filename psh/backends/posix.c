@@ -52,10 +52,7 @@ void sigchld_handler(__attribute__((unused)) int sig)
     return;
 }
 
-void sigintabrt_hadler(int sig)
-{
-    last_command_status = sig;
-}
+void sigintabrt_hadler(int sig) { last_command_status = sig; }
 
 int prepare(void)
 {
@@ -222,14 +219,14 @@ int do_run(struct command *arginfo)
  * Platform dependent builtins part
  * * *
  */
-#include "builtins/builtin.h"
+#include "builtin.h"
 
 /* Builtin exec */
-int builtin_exec(ARGS)
+int builtin_exec(int argc, char **argv)
 {
-    if (bltin_argv[1] == NULL)
-        return 1; /* Do nothing */
-    if (execv(bltin_argv[1], &bltin_argv[1]) == -1)
-        OUT2E("exec: %s: %s\n", bltin_argv[1], strerror(errno));
-    return 2;
+    if (argc < 2)
+        return 0; /* Do nothing */
+    if (execv(argv[1], &argv[1]) == -1)
+        OUT2E("exec: %s: %s\n", argv[1], strerror(errno));
+    return 127;
 }

@@ -66,84 +66,60 @@ static int create_new_pwd(char **cd_dir)
     else
     {
         char *oldpwd = getenv("PWD");
-        *cd_dir = realloc(*cd_dir, P_CS * (strlen(*cd_dir) + 1 /*\0*/ +
+        *cd_dir = xrealloc(*cd_dir, P_CS * (strlen(*cd_dir) + 1 /*\0*/ +
                                            strlen(oldpwd) + 1 /*'/'*/));
-        if (!cd_dir)
-        {
-            OUT2E("%s: create_new_pwd: realloc failed\n", argv0);
-            return 1;
-        }
-        {
-            int count = strlen(*cd_dir) + 1 /*\0*/;
-            char *d = (*cd_dir) + strlen(oldpwd) + 1 /*'/'*/ + count - 1;
-            char *s = (*cd_dir) + count - 1;
-            while (count--)
-                *d-- = *s--;
-        }
+        int count = strlen(*cd_dir) + 1 /*\0*/;
+        char *d = (*cd_dir) + strlen(oldpwd) + 1 /*'/'*/ + count - 1;
+        char *s = (*cd_dir) + count - 1;
+        while (count--)
+            *d-- = *s--;
         memmove(*cd_dir, oldpwd, strlen(oldpwd));
         (*cd_dir)[strlen(oldpwd)] = '/';
     }
     return 0;
 }
 
-int builtin_cd(ARGS)
+int builtin_cd(int argc, char **argv)
 {
     char *cd_path = NULL;
-    int argc = get_argc(bltin_argv);
     if (argc == 1) /* 'cd', the same as cd $HOME */
     {
         char *homedir = getenv("HOME");
         if (!homedir)
         {
-            OUT2E("%s: %s: HOME not set\n", argv0, bltin_argv[0]);
-            return 2;
+            OUT2E("%s: %s: HOME not set\n", argv0, argv[0]);
+            return 1;
         }
-        cd_path = malloc(P_CS * (strlen(homedir) + 1));
-        if (cd_path == NULL)
-        {
-            OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
-            return 2;
-        }
+        cd_path = xmalloc(P_CS * (strlen(homedir) + 1));
         strcpy(cd_path, homedir);
     }
-    else if (strcmp(bltin_argv[1], "-") ==
-             0) /* 'cd -', the same as cd $OLDPWD*/
+    else if (strcmp(argv[1], "-") == 0) /* 'cd -', the same as cd $OLDPWD*/
     {
         char *oldpwd = getenv("OLDPWD");
         if (!oldpwd)
         {
-            OUT2E("%s: %s: OLDPWD not set\n", argv0, bltin_argv[0]);
-            return 2;
+            OUT2E("%s: %s: OLDPWD not set\n", argv0, argv[0]);
+            return 1;
         }
-        cd_path = malloc(P_CS * (strlen(oldpwd) + 1));
-        if (cd_path == NULL)
-        {
-            OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
-            return 2;
-        }
+        cd_path = xmalloc(P_CS * (strlen(oldpwd) + 1));
         puts(oldpwd);
         strcpy(cd_path, oldpwd);
     }
     else
     {
-        cd_path = malloc(P_CS * (strlen(bltin_argv[1]) + 1));
-        if (cd_path == NULL)
-        {
-            OUT2E("%s: malloc failed: %s\n", bltin_argv[0], strerror(errno));
-            return 2;
-        }
-        psh_strncpy(cd_path, bltin_argv[1], strlen(bltin_argv[1]));
+        cd_path = xmalloc(P_CS * (strlen(argv[1]) + 1));
+        psh_strncpy(cd_path, argv[1], strlen(argv[1]));
     }
 
     create_new_pwd(&cd_path);
 
     if (pshchdir(cd_path) != 0)
-        OUT2E("%s: %s: %s\n", bltin_argv[0], strerror(errno), cd_path);
+        OUT2E("%s: %s: %s\n", argv[0], strerror(errno), cd_path);
     else
     {
         pshsetenv("OLDPWD", getenv("PWD"), 1);
         pshsetenv("PWD", cd_path, 1);
     }
-    free(cd_path);
-    return 1;
+    xfree(cd_path);
+    return 0;
 }

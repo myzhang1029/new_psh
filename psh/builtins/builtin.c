@@ -25,18 +25,16 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 
-int builtin_builtin(ARGS)
+int builtin_builtin(int argc, char **argv)
 {
-    if (bltin_argv[1] == NULL) /* No args */
-        return 1;
-    info->parameters++; /* Skip command name([0]) */
-    if (run_builtin(info) == 0)
+    builtin_function bltin;
+    if (argc < 2)
+        return 0;
+    bltin = find_builtin(argv[1]);
+    if (bltin == 0)
     {
-        info->parameters--;
-        OUT2E("%s: %s: %s: not a shell builtin\n", argv0, info->parameters[0],
-              info->parameters[1]);
-        return 2;
+        OUT2E("%s: %s: %s: not a shell builtin\n", argv0, argv[0], argv[1]);
+        return 1;
     }
-    info->parameters--;
-    return 1;
+    return (*bltin)(--argc, ++argv);
 }

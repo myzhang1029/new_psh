@@ -25,16 +25,16 @@
 
 extern int last_command_status;
 
-int builtin_exit(ARGS)
+int builtin_exit(int argc, char **argv)
 {
-    if (info->parameters[1] == NULL)
+    if (argc < 2)
     {
         exit_psh(last_command_status);
     }
     else
     {
-        int i = atoi(bltin_argv[1]);
+        int i = atoi(argv[1]);
         exit_psh(i);
     }
-    return 2; /* Noreturn */
+    return 1; /* Noreturn */
 }

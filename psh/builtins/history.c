@@ -1,6 +1,6 @@
 /*
     psh/builtins/history.c - builtin history
-    Copyright 2017 Zhang Maiyun.
+    Copyright 2017-2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
 
@@ -38,29 +38,21 @@
 #define CFLAG 0x40
 #define DFLAG 0x80
 
-int builtin_history(ARGS)
+int builtin_history(int argc, char **argv)
 {
 #ifdef NO_HISTORY
-    OUT2E("%s: libhistory not compiled!\n", bltin_argv[0]);
-    return 2;
+    OUT2E("%s: libhistory not compiled!\n", argv[0]);
+    return 1;
 #else
-    if (bltin_argv[1] != NULL)
+    if (argv[1] != NULL)
     {
         int count, ch, flags = 0, n;
-        char *filename = malloc(P_CS * MAXEACHARG);
+        char *filename = xmalloc(P_CS * MAXEACHARG);
         struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                     {NULL, 0, NULL, 0}};
-        if (!filename)
-        {
-            OUT2E("%s: %s: malloc failed\n", argv0, bltin_argv[0]);
-            return 2;
-        }
-
-        /*Get argc for getopt*/
-        for (count = 0; bltin_argv[count]; count++)
-            ;
-        while ((ch = getopt_long(count, bltin_argv, ":a::w::r::n::p::s::cd:",
-                                 longopts, NULL)) != -1)
+        
+        while ((ch = getopt_long(argc, argv, ":a::w::r::n::p::s::cd:", longopts,
+                                 NULL)) != -1)
         {
             switch (ch)
             {
@@ -75,7 +67,7 @@ int builtin_history(ARGS)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, bltin_argv[0]);
+                              argv0, argv[0]);
                         USAGE();
                         free(filename);
                         return 2;
@@ -90,7 +82,7 @@ int builtin_history(ARGS)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, bltin_argv[0]);
+                              argv0, argv[0]);
                         USAGE();
                         free(filename);
                         return 2;
@@ -105,7 +97,7 @@ int builtin_history(ARGS)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, bltin_argv[0]);
+                              argv0, argv[0]);
                         USAGE();
                         free(filename);
                         return 2;
@@ -126,21 +118,21 @@ int builtin_history(ARGS)
                     break;
                 case 'd':
                     flags |= DFLAG;
-                    n = atoi(bltin_argv[count]);
+                    n = atoi(argv[count]);
                     if (n < 0)
                     {
                         OUT2E("%s: %s: %d: invalid "
                               "option\n",
-                              argv0, bltin_argv[0], n);
+                              argv0, argv[0], n);
                         free(filename);
                         return 2;
                     }
                     if (!n)
                     {
                         int count2;
-                        for (count2 = 0; bltin_argv[count][count2]; ++count2)
-                            if (bltin_argv[count][count2] != '0' &&
-                                (!isspace(bltin_argv[count][count2])))
+                        for (count2 = 0; argv[count][count2]; ++count2)
+                            if (argv[count][count2] != '0' &&
+                                (!isspace(argv[count][count2])))
                             {
                                 OUT2E("%s: %s: "
                                       "%s: "
@@ -148,21 +140,21 @@ int builtin_history(ARGS)
                                       "argument "
                                       "required"
                                       "\n",
-                                      argv0, bltin_argv[0], bltin_argv[count]);
+                                      argv0, argv[0], argv[count]);
                                 free(filename);
                                 return 2;
                             }
                     }
                     break;
                 case '?':
-                    OUT2E("%s: %s: invalid option '-%c'\n", argv0,
-                          bltin_argv[0], optopt);
+                    OUT2E("%s: %s: invalid option '-%c'\n", argv0, argv[0],
+                          optopt);
                     free(filename);
                     return 2;
                 case ':':
                     OUT2E("%s: %s: -d: option requires an "
                           "argument\n",
-                          argv0, bltin_argv[0]);
+                          argv0, argv[0]);
                     free(filename);
                     return 2;
             }

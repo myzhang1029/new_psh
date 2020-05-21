@@ -70,7 +70,6 @@ struct command /* Everything about a command */
 
 char *ps_expander(char *prompt);
 int read_cmdline(char *prompt, char **result);
-int run_builtin(struct command *info);
 int filpinfo(char *buffer, struct command *info);
 int new_command(struct command **info);
 void free_command(struct command *info);
