@@ -41,6 +41,4 @@ int builtin_builtin(int argc, char **argv);
 builtin_function find_builtin(char *name);
 int get_argc(char **argv);
 
-extern const struct builtin builtins[];
-
 #endif

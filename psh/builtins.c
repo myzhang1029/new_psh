@@ -16,52 +16,9 @@
 
 extern int last_command_status;
 
-int get_argc(char **argv)
-{
-    int argc = 0;
-    for (; argv[argc]; ++argc)
-        ;
-    return argc;
-}
-
-static int builtin_unsupported(int argc, char **argv)
-{
-    OUT2E("%s: %s: Not supported, coming soon\n", argv0, argv[0]);
-    return 127;
-}
-
-static int builtin_about_handler(int argc, char **argv)
-{
-    printf("psh is a not fully implemented shell in UNIX.\n");
-    return 0;
-}
-
-static int builtin_getstat_handler(int argc, char **argv)
-{
-    printf("%d\n", last_command_status);
-    return 0;
-}
-
-int compare_builtin(const void *key, const void *cur)
-{
-    const struct builtin *bkey = (const struct builtin *)key;
-    const struct builtin *builtin = (const struct builtin *)cur;
-    return strcmp(bkey->name, builtin->name);
-}
-
-builtin_function find_builtin(char *name)
-{
-    struct builtin *key = xmalloc(sizeof(struct builtin));
-    struct builtin *result;
-
-    key->name = name;
-    result = (struct builtin *)bsearch(
-        key, builtins, 63, sizeof(struct builtin), &compare_builtin);
-
-    xfree(key);
-
-    return result != NULL ? result->proc : (builtin_function)0;
-}
+static int builtin_unsupported(int argc, char **argv);
+static int builtin_about_handler(int argc, char **argv);
+static int builtin_getstat_handler(int argc, char **argv);
 
 /* List of all builtins, sorted by name */
 const struct builtin builtins[] = {{".", &builtin_unsupported},
@@ -127,3 +84,52 @@ const struct builtin builtins[] = {{".", &builtin_unsupported},
                                    {"wait", &builtin_unsupported},
                                    {"which", &builtin_unsupported},
                                    {"while", &builtin_unsupported}};
+
+int get_argc(char **argv)
+{
+    int argc = 0;
+    for (; argv[argc]; ++argc)
+        ;
+    return argc;
+}
+
+static int builtin_unsupported(int argc, char **argv)
+{
+    OUT2E("%s: %s: Not supported, coming soon\n", argv0, argv[0]);
+    return 127;
+}
+
+static int builtin_about_handler(int argc, char **argv)
+{
+    printf("psh is a not fully implemented shell in UNIX.\n");
+    return 0;
+}
+
+static int builtin_getstat_handler(int argc, char **argv)
+{
+    printf("%d\n", last_command_status);
+    return 0;
+}
+
+int compare_builtin(const void *key, const void *cur)
+{
+    const struct builtin *bkey = (const struct builtin *)key;
+    const struct builtin *builtin = (const struct builtin *)cur;
+    return strcmp(bkey->name, builtin->name);
+}
+
+builtin_function find_builtin(char *name)
+{
+    struct builtin *key = xmalloc(sizeof(struct builtin));
+    struct builtin *result;
+
+    key->name = name;
+    result = (struct builtin *)bsearch(
+        key, builtins, sizeof(builtins) / sizeof(struct builtin),
+        sizeof(struct builtin), &compare_builtin);
+
+    xfree(key);
+
+    return result != NULL ? result->proc : (builtin_function)0;
+}
+

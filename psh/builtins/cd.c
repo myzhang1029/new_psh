@@ -67,7 +67,7 @@ static int create_new_pwd(char **cd_dir)
     {
         char *oldpwd = getenv("PWD");
         *cd_dir = xrealloc(*cd_dir, P_CS * (strlen(*cd_dir) + 1 /*\0*/ +
-                                           strlen(oldpwd) + 1 /*'/'*/));
+                                            strlen(oldpwd) + 1 /*'/'*/));
         int count = strlen(*cd_dir) + 1 /*\0*/;
         char *d = (*cd_dir) + strlen(oldpwd) + 1 /*'/'*/ + count - 1;
         char *s = (*cd_dir) + count - 1;

@@ -50,7 +50,7 @@ int builtin_history(int argc, char **argv)
         char *filename = xmalloc(P_CS * MAXEACHARG);
         struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                     {NULL, 0, NULL, 0}};
-        
+
         while ((ch = getopt_long(argc, argv, ":a::w::r::n::p::s::cd:", longopts,
                                  NULL)) != -1)
         {
