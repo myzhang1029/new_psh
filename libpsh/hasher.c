@@ -1,5 +1,5 @@
 /* hashlib.c -- functions to manage and access hash tables for bash. */
-/* hasher.c -- function to gen hash for psh, */
+/* hasher.c -- function to gen hash for psh. */
 
 /* Copyright (C) 1987,1989,1991,1995,1998,2001,2003,2005,2006,2008,2009 Free
    Software Foundation, Inc. Cpoyright (C) 2017 Zhang Maiyun.
@@ -26,9 +26,9 @@
 
 #include <stdio.h>
 
-unsigned int hasher(const char *s, unsigned int ulimit)
+size_t hasher(const char *s, size_t ulimit)
 {
-    unsigned int i;
+    size_t i;
     for (i = 0; *s; ++s)
     {
         i *= 16777619;

@@ -28,6 +28,11 @@
 
 #include "libpsh/xmalloc.h"
 
+#ifdef DEBUG
+/* Sequence counter to detect memory abuse */
+int nref = 0;
+#endif
+
 /* **************************************************************** */
 /*								    */
 /*		   Memory Allocation and Deallocation.		    */
@@ -49,6 +54,9 @@ xmalloc(bytes) size_t bytes;
     PTR_T temp;
 
     temp = malloc(bytes);
+#ifdef DEBUG
+    fprintf(stderr, "[xmalloc] %p(malloc %d)\n", temp, ++nref);
+#endif
     if (temp == 0)
         memory_error_and_abort("xmalloc");
     return (temp);
@@ -61,6 +69,9 @@ size_t bytes;
     PTR_T temp;
 
     temp = pointer ? realloc(pointer, bytes) : malloc(bytes);
+#ifdef DEBUG
+    fprintf(stderr, "[xmalloc] %p(realloc)\n", temp);
+#endif
 
     if (temp == 0)
         memory_error_and_abort("xrealloc");
@@ -69,6 +80,9 @@ size_t bytes;
 
 void xfree(string) PTR_T string;
 {
+#if DEBUG
+    fprintf(stderr, "%p(free %d)\n", string, nref--);
+#endif
     if (string)
         free(string);
 }
