@@ -18,13 +18,26 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <ctype.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Some evil implementations include no stdio.h is history.h */
+#ifndef NO_HISTORY
+#include <readline/history.h>
+#endif
+
 #include "builtin.h"
+#include "command.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+
+extern char *argv0;
 
 #define USAGE()                                                                \
     OUT2E("history: usage: history [-c] [-d offset] [n] or history -awrn "     \

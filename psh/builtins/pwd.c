@@ -18,12 +18,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
+
+extern char *argv0;
 
 int builtin_pwd(int argc, char **argv)
 {
@@ -73,7 +79,7 @@ int builtin_pwd(int argc, char **argv)
         else
             path = pshgetcwd_dm();
     }
-    else
+    else /* flag */
         path = pshgetcwd_dm();
 
     puts(path);

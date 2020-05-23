@@ -1,6 +1,7 @@
 /*
-    psh/builtins/misc.c - various non-standard builtins
-    Copyright 2017-2020 Zhang Maiyun.
+    psh/filpinfo.h - function to fill parse info(merges original preprocesser,
+    splitbuf, parser) and some other functions for command managing.
+    Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -17,3 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#ifndef _PSH_FILPINFO_H
+#define _PSH_FILPINFO_H
+int filpinfo(char *buffer, struct command *info);
+#endif

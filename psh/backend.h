@@ -23,10 +23,11 @@
 
 #include <stdio.h>
 
-#include "pshell.h"
+#include "command.h" /* For struct command */
 
 extern int last_command_status;
 extern int pipe_fd[2], in_fd, out_fd;
+#define MAXPIDTABLE 1024
 
 int prepare(void);
 char *gethd(void);

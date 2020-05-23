@@ -18,14 +18,28 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* Some evil implementations include no stdio.h is history.h */
+#ifndef NO_HISTORY
+#include <readline/history.h>
+#endif
+
 #include "backend.h"
 #include "builtin.h"
+#include "command.h"
+#include "filpinfo.h"
+#include "input.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "pshell.h"
+#include "prompts.h"
+#include "util.h"
 
 int last_command_status = 0; /* #8 TODO: $? */
 char *argv0;
@@ -62,11 +76,10 @@ int main(int argc, char **argv)
         xfree(buffer);
 
         /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in do_run() */
-        bltin = find_builtin(cmd->parameters[0]);
+        bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
-            last_command_status =
-                (*bltin)(get_argc(cmd->parameters), cmd->parameters);
+            last_command_status = (*bltin)(get_argc(cmd->argv), cmd->argv);
         }
         else
         {

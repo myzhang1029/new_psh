@@ -5,6 +5,10 @@
    Copyright 2017 Zhang Maiyun.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +17,8 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+
+extern char *argv0;
 
 static int create_new_pwd(char **cd_dir)
 {

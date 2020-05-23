@@ -5,6 +5,10 @@
    Copyright 2017 Zhang Maiyun.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,9 +16,10 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "pshell.h"
+#include "psh.h"
 
 extern int last_command_status;
+extern char *argv0;
 
 static int builtin_unsupported(int argc, char **argv);
 static int builtin_about_handler(int argc, char **argv);
@@ -132,4 +137,3 @@ builtin_function find_builtin(char *name)
 
     return result != NULL ? result->proc : (builtin_function)0;
 }
-

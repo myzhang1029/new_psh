@@ -1,5 +1,5 @@
 /*
-    prompts.c - Prompt generator and printer
+    psh/prompts.c - Prompt generator and printer
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -47,6 +47,10 @@
 \]	end a sequence of non-printing chars
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
@@ -55,7 +59,9 @@
 #include "libpsh/stringbuilder.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "pshell.h"
+#include "psh.h" /* For version */
+
+extern char *argv0;
 
 /* Expand \w and \W */
 static char *workdir_expander(int if_last_component)

@@ -1,5 +1,5 @@
 /*
-    filpinfo - function to fill parse info(merges original preprocesser,
+    psh/filpinfo.c - function to fill parse info(merges original preprocesser,
     splitbuf, parser) and some other functions for command managing.
     Copyright 2017-2018 Zhang Maiyun.
 
@@ -19,61 +19,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "backend.h"
+#include "command.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "pshell.h"
+#include "util.h"
 
-static void command_init(struct command *info)
-{
-    info->flag = 0;
-    info->rlist = NULL;
-    info->parameters = NULL;
-    info->next = NULL;
-}
-
-static void redirect_init(struct redirect *redir)
-{
-    redir->in.fd = 0;
-    redir->in.file = NULL;
-    redir->out.fd = 0;
-    redir->out.file = NULL;
-    redir->type = 0;
-    redir->next = NULL;
-}
-
-static void free_parameters(struct command *info)
-{
-    int count;
-    for (count = 0; count < MAXARG; ++count)
-    {
-        if (info->parameters[count] != NULL)
-        {
-            xfree(info->parameters[count]);
-            info->parameters[count] = NULL;
-        }
-        else
-            break; /* All parameters should be freed after here */
-    }
-    xfree(info->parameters);
-    info->parameters = NULL;
-}
-
-static void free_redirect(struct redirect *redir)
-{
-    struct redirect *temp;
-    while (redir != NULL)
-    {
-        temp = redir;
-        redir = redir->next;
-        xfree(temp);
-        temp = NULL;
-    }
-}
+extern char *argv0;
 
 /* Get the index of the last char in the buffer */
 static int ignore_IFSs(char *buffer, int count)
@@ -86,37 +46,6 @@ static int ignore_IFSs(char *buffer, int count)
             return --count;
     } while (++count);
     return -6; /* Reaching here impossible */
-}
-
-/* Malloc a command, enNULL all elements, malloc the first parameter[] and a
- * struct redirect */
-int new_command(struct command **info)
-{
-    *info = xmalloc(sizeof(struct command));
-    command_init(*info);
-    (*info)->parameters = xmalloc(sizeof(char *) * MAXARG);
-    memset((*info)->parameters, 0, MAXARG); /* This will be used to detect
-                           whether an element is used */
-    (*info)->parameters[0] = xmalloc(P_CS * MAXEACHARG);
-    memset((*info)->parameters[0], 0, MAXEACHARG);
-    (*info)->rlist = xmalloc(sizeof(struct redirect));
-    redirect_init((*info)->rlist);
-    return 0;
-}
-
-/* Free a command and its nexts */
-void free_command(struct command *info)
-{
-    struct command *temp;
-    while (info != NULL)
-    {
-        temp = info;
-        info = info->next;
-        free_parameters(temp);
-        free_redirect(temp->rlist);
-        xfree(temp);
-        temp = NULL;
-    }
 }
 
 /* Malloc and fill a command with a buffer,  returns the number of characters
@@ -147,8 +76,8 @@ int filpinfo(char *buffer, struct command *info)
         cnt_buffer = tmp;                                                      \
     } while (0)
 
-/* malloc() and zero-initialize an element in parameters[][] */
-#define malloc_one(n) (cmd_lastnode->parameters[n]) = calloc(MAXEACHARG, P_CS)
+/* malloc() and zero-initialize an element in argv[][] */
+#define malloc_one(n) (cmd_lastnode->argv[n]) = calloc(MAXEACHARG, P_CS)
 
 /* Write the current char in buffer to current command, increase cnt_return
  * only if current is neither blank nor 0 */
@@ -156,8 +85,7 @@ int filpinfo(char *buffer, struct command *info)
     do                                                                         \
     {                                                                          \
         if (stat_parsing_redirect == 0)                                        \
-            cmd_lastnode                                                       \
-                ->parameters[cnt_argument_element][cnt_argument_char++] =      \
+            cmd_lastnode->argv[cnt_argument_element][cnt_argument_char++] =    \
                 buffer[cnt_buffer];                                            \
         if (stat_parsing_redirect == 1) /* for an fd */                        \
         {                                                                      \
@@ -183,8 +111,7 @@ int filpinfo(char *buffer, struct command *info)
 #define write_char(c)                                                          \
     do                                                                         \
     {                                                                          \
-        cmd_lastnode->parameters[cnt_argument_element][cnt_argument_char++] =  \
-            c;                                                                 \
+        cmd_lastnode->argv[cnt_argument_element][cnt_argument_char++] = c;     \
         if (strchr(" \t", c) == NULL && c != 0)                                \
             cnt_return++;                                                      \
     } while (0)
@@ -287,8 +214,8 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        xfree(cmd_lastnode->parameters[cnt_argument_element]);
-                        cmd_lastnode->parameters[cnt_argument_element] = NULL;
+                        xfree(cmd_lastnode->argv[cnt_argument_element]);
+                        cmd_lastnode->argv[cnt_argument_element] = NULL;
                         cnt_argument_element--;
                     }
                     if (ignore_IFSs(buffer,
@@ -297,8 +224,8 @@ int filpinfo(char *buffer, struct command *info)
                     {
                         /* done */
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = BG_CMD; /* cmd & \0
-                                                          */
+                            cmd_lastnode->flag = BACKGROUND; /* cmd & \0
+                                                              */
                         else
                         {
                             synerr("&");
@@ -337,7 +264,7 @@ int filpinfo(char *buffer, struct command *info)
                     {
                         new_command(&(cmd_lastnode->next));
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = BG_CMD;
+                            cmd_lastnode->flag = BACKGROUND;
                         else
                         {
                             synerr("&");
@@ -359,8 +286,8 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        free(cmd_lastnode->parameters[cnt_argument_element]);
-                        cmd_lastnode->parameters[cnt_argument_element] = NULL;
+                        free(cmd_lastnode->argv[cnt_argument_element]);
+                        cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
                     new_command(&(cmd_lastnode->next));
                     if (buffer[cnt_buffer + 1] == '|')
@@ -468,8 +395,8 @@ int filpinfo(char *buffer, struct command *info)
                         write_current();
                         break;
                     }
-                    psh_strncpy(cmd_lastnode->parameters[cnt_argument_element],
-                                hdir, 4094 - cnt_argument_char);
+                    psh_strncpy(cmd_lastnode->argv[cnt_argument_element], hdir,
+                                4094 - cnt_argument_char);
                     cnt_buffer += strlen(username);
                     cnt_argument_char += strlen(hdir);
                     xfree(username);
@@ -477,8 +404,8 @@ int filpinfo(char *buffer, struct command *info)
                 else /* ~/ and ~ */
                 {
                     char *hdir = gethd();
-                    psh_strncpy(cmd_lastnode->parameters[cnt_argument_element],
-                                hdir, 4094 - cnt_argument_char);
+                    psh_strncpy(cmd_lastnode->argv[cnt_argument_element], hdir,
+                                4094 - cnt_argument_char);
                     cnt_argument_char += strlen(hdir);
                 }
                 break;
@@ -546,8 +473,8 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        xfree(cmd_lastnode->parameters[cnt_argument_element]);
-                        cmd_lastnode->parameters[cnt_argument_element] = NULL;
+                        xfree(cmd_lastnode->argv[cnt_argument_element]);
+                        cmd_lastnode->argv[cnt_argument_element] = NULL;
                         cnt_argument_element--;
                     }
                     int case_count = cnt_buffer, case_buf_cnt = 0;
@@ -686,8 +613,8 @@ int filpinfo(char *buffer, struct command *info)
                 if (cnt_argument_char == 0) /* Previously a blank reached */
                 {
                     cnt_argument_char = cnt_old_parameter;
-                    xfree(cmd_lastnode->parameters[cnt_argument_element]);
-                    cmd_lastnode->parameters[cnt_argument_element] = NULL;
+                    xfree(cmd_lastnode->argv[cnt_argument_element]);
+                    cmd_lastnode->argv[cnt_argument_element] = NULL;
                     cnt_argument_element--;
                 }
                 write_char(0);
@@ -701,8 +628,8 @@ int filpinfo(char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        xfree(cmd_lastnode->parameters[cnt_argument_element]);
-                        cmd_lastnode->parameters[cnt_argument_element] = NULL;
+                        xfree(cmd_lastnode->argv[cnt_argument_element]);
+                        cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
                     new_command(&(cmd_lastnode->next));
                     if (cmd_lastnode->flag == 0)

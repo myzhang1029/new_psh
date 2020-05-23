@@ -1,5 +1,5 @@
 /*
-    util.c - psh-specific utilities
+    psh/util.c - psh-specific utilities
     Copyright 2018-2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -18,11 +18,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdint.h>
 #include <stdlib.h>
 
 #include "libpsh/util.h"
-#include "pshell.h"
+#include "psh.h"
+#include "util.h"
+
+extern char *argv0;
 
 /* freeptrs[0] holds the current number of items */
 void *freeptrs[16] = {NULL};

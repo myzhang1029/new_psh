@@ -19,7 +19,7 @@
 */
 #ifndef BUILTIN_INCLUDED
 #define BUILTIN_INCLUDED
-#include "pshell.h"
+#include "psh.h"
 
 typedef int (*builtin_function)(int argc, char **argv);
 struct builtin

@@ -1,6 +1,6 @@
 /*
-    psh/builtins/exit.c - builtin exit
-    Copyright 2017 Zhang Maiyun.
+    psh/variables.c - psh variables
+    Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -23,23 +23,3 @@
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
-
-#include "builtin.h"
-#include "util.h"
-
-extern int last_command_status;
-
-int builtin_exit(int argc, char **argv)
-{
-    if (argc < 2)
-    {
-        exit_psh(last_command_status);
-    }
-    else
-    {
-        int i = atoi(argv[1]);
-        exit_psh(i);
-    }
-    return 1; /* Noreturn */
-}

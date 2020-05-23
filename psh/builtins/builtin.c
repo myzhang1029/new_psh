@@ -19,11 +19,17 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "builtin.h"
 #include "libpsh/util.h"
+
+extern char *argv0;
 
 int builtin_builtin(int argc, char **argv)
 {

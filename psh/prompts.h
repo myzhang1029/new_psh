@@ -1,6 +1,6 @@
 /*
-    psh/builtins/exit.c - builtin exit
-    Copyright 2017 Zhang Maiyun.
+    psh/prompts.h - Prompt generator and printer
+    Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -17,29 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef _PSH_PROMPTS_H
+#define _PSH_PROMPTS_H
+char *ps_expander(char *prompt);
 #endif
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "builtin.h"
-#include "util.h"
-
-extern int last_command_status;
-
-int builtin_exit(int argc, char **argv)
-{
-    if (argc < 2)
-    {
-        exit_psh(last_command_status);
-    }
-    else
-    {
-        int i = atoi(argv[1]);
-        exit_psh(i);
-    }
-    return 1; /* Noreturn */
-}
