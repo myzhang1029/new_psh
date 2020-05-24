@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     struct command *cmd = NULL;
     char *expanded_ps1, *buffer;
     char *ps1 = "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
-                "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\012\\s-\\V\\[\\e[0m\\]\\$ ";
+                "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
 
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
