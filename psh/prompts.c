@@ -518,7 +518,6 @@ char *ps_expander(char *prompt)
             case '#': /* #6 TODO */
                 OUT2E("Warning: Unsupported PS1 sequence \\%c\n", *cur);
                 /* fall through */
-                __attribute__((fallthrough));
             default:
                 /* When the escape is unknown, bash and dash keeps both
                    the backslash and the character. */
