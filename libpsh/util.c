@@ -18,6 +18,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #ifndef NO_READLINE
@@ -42,7 +46,7 @@ char *psh_fgets(char *prompt, FILE *fp)
     if (fp == stdin)
         printf("%s", prompt);
     {
-        size_t charcount = 0, nowhave = MAXLINE;
+        size_t charcount = 0, nowhave = 256;
         char *result = xmalloc(P_CS * nowhave);
         char *ptr = result;
         if (result == NULL)

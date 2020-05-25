@@ -24,11 +24,6 @@
 
 #include <stdio.h>
 
-#define MAXLINE 262144
-#define MAX_PROMPT 1024
-#define MAXARG 64
-#define MAXEACHARG 4096
-#define MAXPIDTABLE 1024
 #define OUT2E(...) fprintf(stderr, __VA_ARGS__)
 
 char *psh_fgets(char *prompt, FILE *fp);

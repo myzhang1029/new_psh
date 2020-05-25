@@ -18,6 +18,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 /* Some evil implementations include no stdio.h is history.h */
 #ifndef NO_HISTORY
@@ -26,9 +30,10 @@
 
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "pshell.h"
+#include "util.h"
 
 extern int last_command_status;
+extern char *argv0;
 
 /* read command line, shows PROMPT and result goes into *RESULT
  * *RESULT needs to be free()d
@@ -59,7 +64,6 @@ int read_cmdline(char *prompt, char **result)
         xfree(buffer);
         return -1;
     }
-    *result = buffer;
 #ifndef NO_HISTORY
     stat = history_expand(buffer, &expanded);
     if (stat < 0)
@@ -78,7 +82,8 @@ int read_cmdline(char *prompt, char **result)
     }
     xfree(buffer);
     add_history(expanded);
-    *result = expanded;
+    buffer = expanded;
 #endif /* NO_HISTORY */
+    *result = buffer;
     return 0;
 }

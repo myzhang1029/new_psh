@@ -1,6 +1,6 @@
 /*
     psh/builtins/echo.c - builtin echo
-    Copyright 2017 Zhang Maiyun.
+    Copyright 2017-2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
 
@@ -18,63 +18,67 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 
 #include "builtin.h"
 
-int builtin_echo(ARGS)
+int builtin_echo(int argc, char **argv)
 {
-    if (bltin_argv[1] == NULL)
+    if (argv[1] == NULL)
     {
         /* A blank line */
-        printf("\n");
-        return 1;
+        puts("");
+        return 0;
     }
-    else if (bltin_argv[1][0] == '-')
+    else if (argv[1][0] == '-')
     {
-        switch (bltin_argv[1][1])
+        switch (argv[1][1])
         {
             case 0:
                 /* Another blank line */
                 puts("");
-                return 1;
+                return 0;
             case 'n':
-                if (bltin_argv[2] == NULL)
+                if (argv[2] == NULL)
                     /* No more blank line */
-                    return 1;
+                    return 0;
                 else
                 {
                     int cnt = 2;
-                    printf("%s", bltin_argv[cnt]);
-                    while (bltin_argv[++cnt] != NULL)
+                    printf("%s", argv[cnt]);
+                    while (argv[++cnt] != NULL)
                     {
-                        printf(" %s", bltin_argv[cnt]);
+                        printf(" %s", argv[cnt]);
                     }
-                    return 1;
+                    return 0;
                 }
             default: {
                 int cnt = 1;
-                printf("%s", bltin_argv[cnt]);
-                while (bltin_argv[++cnt] != NULL)
+                printf("%s", argv[cnt]);
+                while (argv[++cnt] != NULL)
                 {
-                    printf(" %s", bltin_argv[cnt]);
+                    printf(" %s", argv[cnt]);
                     cnt++;
                 }
                 puts("");
-                return 1;
+                return 0;
             }
         } /* switch-case */
     }
     else
     {
         int cnt = 1;
-        printf("%s", bltin_argv[cnt]);
-        while (bltin_argv[++cnt] != NULL)
+        printf("%s", argv[cnt]);
+        while (argv[++cnt] != NULL)
         {
-            printf(" %s", bltin_argv[cnt]);
+            printf(" %s", argv[cnt]);
             cnt++;
         }
         puts("");
-        return 1;
+        return 0;
     }
 }

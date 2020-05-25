@@ -5,6 +5,10 @@
    Copyright 2017-present Zhang Maiyun.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <errno.h>
 #include <fcntl.h>
 #include <pwd.h>
@@ -18,14 +22,15 @@
 #include <sys/wait.h>
 
 #include "backend.h"
+#include "command.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 
 pid_t ChdPid, ChdPid2;
 pid_t BPTable[MAXPIDTABLE] = {0};
 int pipe_fd[2], in_fd, out_fd;
-extern char *argv0;         /*main.c*/
-extern jmp_buf reset_point; /*main.c*/
+
+extern char *argv0;
 
 void sigchld_handler(__attribute__((unused)) int sig)
 {
@@ -52,11 +57,7 @@ void sigchld_handler(__attribute__((unused)) int sig)
     return;
 }
 
-void sigintabrt_hadler(int sig)
-{
-    last_command_status = sig;
-    longjmp(reset_point, 1);
-}
+void sigintabrt_hadler(int sig) { last_command_status = sig; }
 
 int prepare(void)
 {
@@ -100,7 +101,7 @@ char *pshgetcwd(char *wd, size_t len) { return getcwd(wd, len); }
 
 char *pshgetcwd_dm(void)
 {
-    /* Providing NULL to getcwd isn't maiinstream POSIX */
+    /* Providing NULL to getcwd isn't mainstream POSIX */
     char *buf = psh_getstring((void *(*)(char *, size_t)) & pshgetcwd, NULL);
     return buf;
 }
@@ -175,16 +176,16 @@ int do_run(struct command *arginfo)
     struct command *info = arginfo;
     int i = 0;
     printf("--**--\nstub!\nflags won't be read\n");
-    printf("info position: %p\n", arginfo);
+    printf("info position: %p\n", (void *)arginfo);
     while (++i)
     {
         int j;
         printf("part %d:\n"
                "command: %s\n"
                "params:\n",
-               i, info->parameters[0]);
-        for (j = 0; info->parameters[j]; ++j)
-            printf("%s\n", info->parameters[j]);
+               i, info->argv[0]);
+        for (j = 0; info->argv[j]; ++j)
+            printf("%s\n", info->argv[j]);
         printf("flag: %d\n", info->flag);
         printf("redir type: %d\n",
                (info->rlist != NULL) ? info->rlist->type : 0);
@@ -200,18 +201,16 @@ int do_run(struct command *arginfo)
     }
     else /*command1*/
     {
-        if (execvp(info->parameters[0], (char **)info->parameters) == -1)
+        if (execvp(info->argv[0], (char **)info->argv) == -1)
         {
-            if (errno == ENOENT && !strchr(info->parameters[0], '/'))
+            if (errno == ENOENT && !strchr(info->argv[0], '/'))
             {
-                OUT2E("%s: %s: command not found\n", argv0,
-                      info->parameters[0]);
+                OUT2E("%s: %s: command not found\n", argv0, info->argv[0]);
                 _Exit(127);
             }
             else
             {
-                OUT2E("%s: %s: %s\n", argv0, info->parameters[0],
-                      strerror(errno));
+                OUT2E("%s: %s: %s\n", argv0, info->argv[0], strerror(errno));
                 /* Exit the failed command child process */
                 _Exit(126);
             }
@@ -223,14 +222,14 @@ int do_run(struct command *arginfo)
  * Platform dependent builtins part
  * * *
  */
-#include "builtins/builtin.h"
+#include "builtin.h"
 
 /* Builtin exec */
-int builtin_exec(ARGS)
+int builtin_exec(int argc, char **argv)
 {
-    if (bltin_argv[1] == NULL)
-        return 1; /* Do nothing */
-    if (execv(bltin_argv[1], &bltin_argv[1]) == -1)
-        OUT2E("exec: %s: %s\n", bltin_argv[1], strerror(errno));
-    return 2;
+    if (argc < 2)
+        return 0; /* Do nothing */
+    if (execv(argv[1], &argv[1]) == -1)
+        OUT2E("exec: %s: %s\n", argv[1], strerror(errno));
+    return 127;
 }

@@ -1,5 +1,5 @@
 /*
-    prompts.c - Prompt generator and printer
+    psh/prompts.c - Prompt generator and printer
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -47,6 +47,11 @@
 \]	end a sequence of non-printing chars
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <ctype.h>
 #include <string.h>
 #include <time.h>
 
@@ -54,7 +59,78 @@
 #include "libpsh/stringbuilder.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "pshell.h"
+#include "psh.h" /* For version */
+
+extern char *argv0;
+
+/* Expand \w and \W */
+static char *workdir_expander(int if_last_component)
+{
+    /* Actually $PWD should be used here
+     * But changing $PWD really isn't so meaningful
+     * so let pshgetcwd_dm decide it.
+     */
+    size_t count, lenhome;
+    char *last_occur, *home = gethd(), *pathname = pshgetcwd_dm();
+
+    /* Replace $HOME with a tlide */
+    for (count = 0, lenhome = strlen(home); count < lenhome; ++count)
+    {
+        if (home[count] != pathname[count])
+        {
+            /* Doesn't match, isn't under home. Set a marker. */
+            count = lenhome + 1;
+            break;
+        }
+    }
+    /* Matches */
+    if (count <= lenhome)
+    {
+        pathname[0] = '~';
+        /* pathname[lenhome] == '/', so the leading slash got kept.
+         * if pathname is the same as home, strlen(pathname) - lenhome == 0,
+         * only '0' gets moved
+         */
+        memmove(pathname + 1, pathname + lenhome,
+                strlen(pathname) + 1 /* move '0' also */ - lenhome);
+    }
+    if (if_last_component)
+    {
+        last_occur = strrchr(pathname, '/');
+        if (last_occur && last_occur != pathname)
+        {
+            size_t diff = last_occur - pathname;
+            /* Next line: first +1 to jump over '/', second +1 for '0', -1 for
+             * '/' again */
+            memmove(pathname, last_occur + 1, strlen(pathname) + 1 - 1 - diff);
+        }
+        /* if last_occur == pathname: only '/' is left, keep it */
+    }
+    return pathname;
+}
+
+/* psh_getstring for strftime, only uses current time */
+static char *get_strftime_string(const char *fmt)
+{
+    /* the time things */
+    time_t rt;
+    struct tm *ti;
+    /* Start with a reasonable guess */
+    size_t len = strlen(fmt) * 5;
+    char *result = xmalloc(P_CS * len);
+    /* Read the time */
+    time(&rt);
+    ti = localtime(&rt);
+
+    /* strftime returns 0 when buffer is too small */
+    while (strftime(result, len, fmt, ti) == 0)
+    {
+        result = xrealloc(result, len *= 2);
+    }
+
+    result = xrealloc(result, strlen(result) + 1);
+    return result;
+}
 
 /* Expands $PS1-4, result needs to be free()d */
 char *ps_expander(char *prompt)
@@ -64,6 +140,8 @@ char *ps_expander(char *prompt)
  * reset_start: reset start of current string
  */
 #define reset_start(newloc) (start = (newloc) + 1, cur = (newloc), count = 0)
+/* end_processing: skip everything remaining */
+#define end_processing() reset_start(cur + strlen(cur) - 1)
 /* replace_char: replace "\\x" with another character */
 #define replace_char(newch)                                                    \
     ((*(cur - 1) /* the '\\' */ = (newch)),                                    \
@@ -75,7 +153,11 @@ char *ps_expander(char *prompt)
     char *cur = start;
     /* Count of current number of characters to write */
     int count = 0;
+    /* Whether the last processed character is '\\' */
     int is_backslash = 0;
+    /* When \nnn is encountered, this records the number of integer characters
+     * got */
+    int num_level = 0;
     psh_stringbuilder *builder = psh_stringbuilder_create();
 
     do
@@ -125,16 +207,14 @@ char *ps_expander(char *prompt)
             case 'd':
                 if (is_backslash)
                 {
-                    char *timestr = xmalloc(P_CS * 11);
-                    time_t rt;
-                    struct tm *ti;
+                    char *timestr;
                     is_backslash = 0;
 
-                    time(&rt);
-                    ti = localtime(&rt);
-                    strftime(timestr, 11, "%a %b %e", ti);
+                    timestr = get_strftime_string("%a %b %e");
                     /* Strftime()'s %e prepends a space to single digits, but we
                      * want a '0' */
+                    /* FIXME: if the locale is different, '0' will be at a
+                     * strange position */
                     if (timestr[8] == ' ' /* space */)
                         timestr[8] = '0';
 
@@ -143,6 +223,103 @@ char *ps_expander(char *prompt)
                     reset_start(cur);
                 }
                 /* else write d */
+                break;
+            case 't':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%H:%M:%S");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write t */
+                break;
+            case 'T':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%I:%M:%S");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write T */
+                break;
+            case '@':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%I:%M %p");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write @ */
+                break;
+            case 'A':
+                if (is_backslash)
+                {
+                    char *timestr;
+                    is_backslash = 0;
+
+                    timestr = get_strftime_string("%H:%M");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    reset_start(cur);
+                }
+                /* else write A */
+                break;
+            case 'D':
+                if (is_backslash)
+                {
+                    /* in bash 5.0, if '{' isn't after 'D', then "\D" is
+                     * emitted. if '}' isn't found, the whole string after '{'
+                     * becomes FMT
+                     */
+                    char *fmt, *timestr, *end;
+                    is_backslash = 0;
+
+                    if (*(cur + 1) != '{')
+                    {
+                        /* So if 'D' is the last character, here things end, 'D'
+                         * gets written
+                         */
+                        /* For '\\' */
+                        ++count;
+                        break;
+                    }
+                    /* strftime's fmt starts here */
+                    fmt = cur + 2;
+                    end = strchr(fmt, '}');
+                    if (end)
+                        /* Needs no restoration */
+                        *end = 0;
+                    /* else fmt takes the whole remaining string */
+                    if (strlen(fmt))
+                        timestr = get_strftime_string(fmt);
+                    else
+                        /* Here bash uses HMS for empty fmt */
+                        timestr = get_strftime_string("%H:%M:%S");
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, timestr, 1);
+                    if (end)
+                        reset_start(end);
+                    else
+                        end_processing(); /* break */
+                }
+                /* else write D */
                 break;
             case 'e':
                 if (is_backslash)
@@ -236,31 +413,30 @@ char *ps_expander(char *prompt)
                 }
                 /* else write ] */
                 break;
-            case 'j':
-            case 'l':
-            case 's':
-            case 't':
-            case 'T':
-            case '@':
-            case 'A':
-            case 'D':
-            case 'v':
-            case 'V':
             case 'w':
                 if (is_backslash)
                 {
-                    char *pathname = pshgetcwd_dm();
+                    char *pathname = workdir_expander(0);
                     is_backslash = 0;
 
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
-                    psh_stringbuilder_add(builder, getun(), 0);
+                    psh_stringbuilder_add(builder, pathname, 1);
                     reset_start(cur);
                 }
-                /* else write u */
+                /* else write w */
                 break;
             case 'W':
-            case '!':
-            case '#':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+                    char *pathname = workdir_expander(1);
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, pathname, 1);
+                    reset_start(cur);
+                }
+                /* else write W */
+                break;
             case '1':
             case '2':
             case '3':
@@ -271,6 +447,77 @@ char *ps_expander(char *prompt)
             case '8':
             case '9':
             case '0':
+                if (num_level || is_backslash)
+                {
+                    --count; /* These numbers shouldn't be added */
+                    is_backslash = 0;
+                    ++num_level;
+                    /* Now *(cur-num_level) is always '\\' */
+                    if (num_level == 3 || !isdigit(*(cur + 1)))
+                    {
+                        char save = *(cur + 1);
+                        int ch;
+                        /* Manually mark an end to the string */
+                        *(cur + 1) = 0;
+                        sscanf(cur - num_level + 1, "%o", &ch);
+                        /* Restore the old character (possibly NUL) */
+                        *(cur + 1) = save;
+                        /* Replace '\\' with the new char */
+                        *(cur - num_level) = ch;
+                        /* Reset num_level as the current one is processed */
+                        num_level = 0;
+                        /* count wasn't increased since '\\', so +1 for the new
+                         * char */
+                        psh_stringbuilder_add_length(builder, start, count + 1,
+                                                     0);
+                        reset_start(cur);
+                    }
+                }
+                /* else write [0-9] */
+                break;
+            case 's':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, argv0, 0);
+                    reset_start(cur);
+                }
+                /* else write s */
+                break;
+            case 'v':
+                if (is_backslash)
+                {
+                    char *pv = psh_strdup(PSH_VERSION);
+                    char *occur = strrchr(pv, '.');
+                    is_backslash = 0;
+                    if (occur)
+                        *occur = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, pv, 1);
+                    reset_start(cur);
+                }
+                /* else write v */
+                break;
+            case 'V':
+                if (is_backslash)
+                {
+                    is_backslash = 0;
+
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
+                    psh_stringbuilder_add(builder, PSH_VERSION, 0);
+                    reset_start(cur);
+                }
+                /* else write s */
+                break;
+            case 'j': /* #9 TODO */
+            case 'l': /* #5 TODO */
+            case '!': /* #6 TODO */
+            case '#': /* #6 TODO */
+                OUT2E("Warning: Unsupported PS1 sequence \\%c\n", *cur);
+                /* fall through */
             default:
                 /* When the escape is unknown, bash and dash keeps both
                    the backslash and the character. */

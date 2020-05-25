@@ -1,6 +1,6 @@
 include(GNUInstallDirs)
 
-add_executable (psh prompts.c builtins.c util.c filpinfo.c select_backend.c builtins/history.c builtins/exit.c builtins/true.c builtins/pwd.c builtins/builtin.c builtins/cd.c builtins/misc.c builtins/echo.c input2.c main.c parser.c)
+add_executable (psh builtins.c command.c filpinfo.c input2.c main2.c parser.c prompts.c select_backend.c util.c variable.c builtins/builtin.c builtins/cd.c builtins/echo.c builtins/exit.c builtins/history.c builtins/pwd.c builtins/true.c)
 
 include_directories(.)
 target_link_libraries(psh libpsh)

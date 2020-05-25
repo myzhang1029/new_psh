@@ -18,6 +18,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -25,17 +29,20 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 
-int builtin_pwd(ARGS)
+extern char *argv0;
+
+int builtin_pwd(int argc, char **argv)
 {
     int flag = 0;
     char *path = NULL;
     /* Ignore any args after [1]
     unless it is started by '-' as in bash */
     {
-        int argc;
-        for (argc = 1; bltin_argv[argc] && bltin_argv[argc][0] == '-'; ++argc)
+        int arg_count;
+        for (arg_count = 1; argv[arg_count] && argv[arg_count][0] == '-';
+             ++arg_count)
         {
-            switch (bltin_argv[argc][1])
+            switch (argv[arg_count][1])
             {
                 case 'P':
                     flag = 1;
@@ -43,9 +50,9 @@ int builtin_pwd(ARGS)
                 case 'L':
                     break;
                 default: /* Invalid option */
-                    OUT2E("%s: %s: -%c: invalid option\n", argv0, bltin_argv[0],
-                          bltin_argv[argc][1]);
-                    return 2;
+                    OUT2E("%s: %s: -%c: invalid option\n", argv0, argv[0],
+                          argv[arg_count][1]);
+                    return 1;
             }
         }
     }
@@ -67,15 +74,15 @@ int builtin_pwd(ARGS)
         if (use_logical)
         {
             puts(wd);
-            return 1;
+            return 0;
         }
         else
             path = pshgetcwd_dm();
     }
-    else
+    else /* flag */
         path = pshgetcwd_dm();
 
     puts(path);
     free(path);
-    return 1;
+    return 0;
 }

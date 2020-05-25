@@ -1,7 +1,7 @@
 /*
     libpsh/hash.c - hash table manage functions of the psh
 
-    Copyright 2017 Zhang Maiyun.
+    Copyright 2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
 
@@ -19,211 +19,237 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <errno.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#include "hash.h"
+#include "libpsh/hash.h"
+#include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 
-/* Resize the hash table, the new size cannot be lower than the old size,
- * otherwise return 1. return 2 if realloc failed, 0 if success */
-PSH_HASH *realloc_hash(PSH_HASH *table, unsigned int newlen)
+#define FULL_RATE 0.7
+
+/* Variable naming in this file:
+    table: the psh_hash or _psh_hash_container structure in operation;
+    using: the _psh_hash_internal structure currently in operation or iterating
+over;
+    this: the _psh_hash_item structure currently in operation or iterating
+over.
+*/
+
+/* NUL-init the internal table */
+static void internal_initializer(struct _psh_hash_internal *internal,
+                                 size_t len)
 {
-    /* XXX: This algorithm uses a helping table */
-    PSH_HASH *newtable = new_hash(newlen);
-    unsigned int i;
-    for (i = 0; i < table->len; ++i)
-    {
-        unsigned int j;
-        if (table[i].key != NULL)
-        {
-            /* rehash */
-            add_hash(&newtable, table[i].key, table[i].val);
-        }
-        for (j = 0; j < table[i].next_count; ++j)
-        {
-            add_hash(&newtable, table[i].nexts[j].key, table[i].nexts[j].val);
-        }
-    }
-    del_hash(table);
-    return newtable;
+    memset(internal, 0, sizeof(struct _psh_hash_internal) * len);
 }
 
-/* Allocate a new hash table, return the table if success, NULL if not */
-PSH_HASH *new_hash(unsigned int len)
+/* Allocate a new hash table, return the table if succeeded */
+psh_hash *new_hash(size_t len)
 {
-    unsigned int i;
-    PSH_HASH *table;
-    if (len == 0)
-        return xmalloc(0); /* Ask the libc malloc for a value */
+    psh_hash *table = xmalloc(sizeof(psh_hash));
 
-    table = xmalloc(sizeof(PSH_HASH) * len);
+    table->len = len;
+    table->used = 0;
+    /* zero length gets handled too */
+    table->table = xmalloc(sizeof(struct _psh_hash_internal) * len);
 
-    table[0].len = len;
-
-    for (i = 0; i < len; ++i)
-    {
-        table[i].key = table[i].val = NULL;
-        table[i].used = 0;
-        table[i].next_count = 0;
-    }
+    internal_initializer(table->table, len);
 
     return table;
 }
 
-/* Edit the value of an element, return 0 if success, 1 if not */
-static int edit_hash_elem(PSH_HASH *elem, char *val)
+/* Same as add_hash, but resizes the hash table if the number of items gets
+greater.
+ * Table is potentially modified so a reference is passed in.
+ */
+int add_hash_chk(psh_hash **ptable, const char *key, void *value, int if_free)
 {
-    char *tmp;
-    /* Need more space/free extra space */
-    tmp = xrealloc(elem->val, strlen(val) + 1);
-    elem->val = tmp;
-    strcpy(elem->val, val);
+    /* = for zero-length'd initial allocation */
+    if (FULL_RATE * (*ptable)->len <= (*ptable)->used)
+    {
+        /* The table is almost full, performance degrades */
+        /* x<<1 is always greater than FULL_RATE*x where FULL_RATE < 2, so a
+         * infinite loop cannot occur */
+        *ptable =
+            realloc_hash(*ptable, (*ptable)->len ? (*ptable)->len << 1 : 1);
+    }
+    return add_hash(*ptable, key, value, if_free);
+}
+
+/* Add or edit a hash element.
+ * If IF_FREE is set, VALUE will be free()d upon the
+ * deallocation of the hash table. Returns 0 if succeeded, 1 if not */
+int add_hash(psh_hash *table, const char *key, void *value, int if_free)
+{
+    size_t hash_result;
+    struct _psh_hash_internal *using;
+
+    hash_result = hasher(key, table->len);
+    using = &(table->table[hash_result]);
+    if (using->used == 0)
+    {
+        /* This hash value is still empty, initialize, and put the key-value
+         * pair to add to the first place */
+        using->head = xmalloc(sizeof(struct _psh_hash_item));
+        using->tail = using->head;
+    }
+    else
+    {
+        /* This hash value's taken, first try to find duplicate keys and edit,
+         * then, if that failed, add a new one to the linked-list */
+        size_t count;
+        struct _psh_hash_item *this = using->head;
+        /* Iterate over the existing ones to see if an edit should occur, also
+         * filter out any duplicate keys */
+        for (count = 0; count < using->used; ++count)
+        {
+            if (strcmp(key, this->key) == 0)
+            {
+                if (this->if_free)
+                    xfree(this->value);
+                this->value = value;
+                /* Skip any further iterates, as every items should have been
+                 * done this with before being added */
+                return 0;
+            }
+            /* Last one: this->next is random, but the corresponding loop
+             * iterate won't be run, so no SEGV.
+             * "++count" gets run before evaluating "(count < using->used)", so
+             * count == using->used indicates that the for loop reached the end
+             * without finding a duplicate key */
+            this = this->next;
+        } /* for */
+        /* No duplicate keys found, append the key-value pair to add to the
+         * table */
+        using->tail->next = xmalloc(sizeof(struct _psh_hash_item));
+        using->tail = using->tail->next;
+    }
+    /* Duplicate key to prevent further modification */
+    using->tail->key = psh_strdup(key);
+    using->tail->value = value;
+    using->tail->if_free = if_free;
+    using->used++;
+    table->used++;
     return 0;
 }
 
-/* Add or edit a hash element, return 0 if success, 1 if not */
-int add_hash(PSH_HASH **arg_table, char *key, char *val)
-{
-    PSH_HASH *avail, *table = *arg_table;
-    int i;
-    unsigned int hash_result;
-recheck:
-    hash_result = hasher(key, table->len);
-    if (table[hash_result].used != 0)
-    {
-        /* Doing edit */
-        if (strcmp(table[hash_result].key, key) == 0)
-        {
-            return edit_hash_elem(&table[hash_result], val);
-        }
-        /* else */
-        /* save to nexts */
-        if (table[hash_result].next_count + 1 == 64) /*maximum exceeded*/
-        {
-            PSH_HASH *tmp;
-            tmp = realloc_hash(table,
-                               ((table->len) << 1) +
-                                   1); /*get an approx. twice bigger table */
-            if (tmp == NULL)
-                return 1;
-            table = tmp;
-            goto recheck;
-        }
-        if (table[hash_result].next_count == 0) /* No elements in nexts */
-        {
-            table[hash_result].nexts = xmalloc(sizeof(PSH_HASH) * 64);
-        }
-        avail = &(table[hash_result].nexts[(
-            table[hash_result].next_count)++]); /* The first blank element */
-        avail->used = 1;
-        avail->key = malloc(P_CS * (strlen(key) + 1));
-        strcpy(avail->key, key);
-        return edit_hash_elem(avail, val);
-    }
-    table[hash_result].used = 1;
-    table[hash_result].key = malloc(P_CS * (strlen(key) + 1));
-    strcpy(table[hash_result].key, key);
-    /* Write element */
-    i = edit_hash_elem(&table[hash_result], val);
-    *arg_table = table; /* Apply changes to the pointer if there are any */
-    return i;
-}
-
 /* Get a hash value by key, return value if success, NULL if not */
-char *get_hash(PSH_HASH *table, char *key)
+void *get_hash(psh_hash *table, const char *key)
 {
-    unsigned int hash_result = hasher(key, table->len);
-    if (table[hash_result].key != NULL)
+    struct _psh_hash_internal *using;
+    struct _psh_hash_item *this;
+    size_t count;
+    size_t hash_result = hasher(key, table->len);
+
+    using = &(table->table[hash_result]);
+    this = using->head;
+
+    for (count = 0; count < using->used; ++count)
     {
-        if (strcmp(table[hash_result].key, key) == 0)
-            return table[hash_result].val;
-        else
-        {
-            unsigned int i;
-            for (i = 0; i < table[hash_result].next_count; ++i)
-            {
-                if (strcmp(table[hash_result].nexts[i].key, key) == 0)
-                    return table[hash_result].nexts[i].val;
-            }
-        }
+        if (strcmp(key, this->key) == 0)
+            return this->value;
+        /* Same discussion as above */
+        this = this->next;
     }
     return NULL;
 }
 
-/* Remove an element from the hash table, return 0 if success, 1 if specified
- * element not found */
-int rm_hash(PSH_HASH *table, char *key)
+/* Resize the hash table, the new size cannot be lower than the old size,
+ * otherwise it returns 1. returns 2 if realloc failed, 0 if succeeded */
+psh_hash *realloc_hash(psh_hash *table, size_t newlen)
 {
-    unsigned int hash_result = hasher(key, table->len);
-    if (strcmp(table[hash_result].key, key) ==
-        0) /* Deleting the first element */
+    struct _psh_hash_internal *using;
+    struct _psh_hash_item *this;
+    size_t count, count2;
+    psh_hash *newtable = new_hash(newlen);
+#ifdef DEBUG
+    fprintf(stderr, "[hash] realloc %zu\n", newlen);
+#endif
+
+    /* Go over the old table and settle the items into the new table */
+    for (count = 0, using = table->table; count < table->len; ++count, ++using)
     {
-        if (table[hash_result].used == 0)
-            return 1;
-        table[hash_result].used = 0;
-        free(table[hash_result].key);
-        table[hash_result].key = NULL;
-        free(table[hash_result].val);
-        table[hash_result].val = NULL;
-        if (table[hash_result].next_count != 0)
+        this = using->head;
+        for (count2 = 0; count2 < using->used; ++count2)
         {
-            /* Move the last element in nexts here */
-            unsigned int i = table[hash_result].next_count - 1;
-            add_hash(&table, table[hash_result].nexts[i].key,
-                     table[hash_result].nexts[i].val);
-            table[hash_result].nexts[i].used = 0;
-            table[hash_result].next_count--;
-        }
-        return 0;
-    }
-    else
-    {
-        unsigned int i;
-        for (i = 0; i < table[hash_result].next_count; ++i)
-        {
-            if (strcmp(table[hash_result].nexts[i].key, key) == 0)
-            {
-                free(table[hash_result].nexts[i].key);
-                table[hash_result].nexts[i].key = NULL;
-                free(table[hash_result].nexts[i].val);
-                table[hash_result].nexts[i].val = NULL;
-                if ((i + 1) != table[hash_result].next_count)
-                {
-                    /* Move the last element in nexts here */
-                    i = table[hash_result].next_count - 1;
-                    add_hash(&table, table[hash_result].nexts[i].key,
-                             table[hash_result].nexts[i].val);
-                    table[hash_result].nexts[i].used = 0;
-                    table[hash_result].next_count--;
-                }
-            }
+            add_hash(newtable, this->key, this->value, this->if_free);
+            this = this->next;
         }
     }
-    return 0;
+    /* free the old table */
+    free_hash(table, 0);
+
+    return newtable;
 }
 
-/* Free a hash table. This function don’t return a value */
-void del_hash(PSH_HASH *table)
+/* Remove an element from the hash table, return 0 if success, 1 if specified
+ * element not found */
+int rm_hash(psh_hash *table, const char *key)
 {
-    unsigned int i;
-    for (i = 0; i < (table->len); ++i)
+    struct _psh_hash_internal *using;
+    struct _psh_hash_item *this, *old_this;
+    size_t count;
+    size_t hash_result = hasher(key, table->len);
+
+    using = &(table->table[hash_result]);
+    old_this = NULL;
+    this = using->head;
+
+    for (count = 0; count < using->used; ++count)
     {
-        if (table[i].used != 0)
+        if (strcmp(key, this->key) == 0)
         {
-            unsigned int j;
-            free(table[i].key);
-            free(table[i].val);
-            for (j = 0; j < table[i].next_count; ++j)
+            xfree(this->key);
+            xfree(this->value);
+            if (!old_this)
             {
-                free(table[i].nexts[j].key);
-                free(table[i].nexts[j].val);
+                /* Removing the first element, using->head == this */
+                using->head = this->next;
+                /* No modification to tail needed */
             }
-            if (table[i].next_count != 0)
-                free(table[i].nexts);
+            else
+                old_this->next = this->next;
+
+            /* Decrease local count */
+            using->used--;
+            /* Decrease global count */
+            table->used--;
+            /* Deallocate linked-list item */
+            xfree(this);
+            return 0;
+        }
+        /* Same discussion */
+        old_this = this;
+        this = this->next;
+    }
+    return 1;
+}
+
+/* Free a hash table. if if_free_val is 0, val won't be deallocated,
+ * useful in realloc_hash() */
+void free_hash(psh_hash *table, int if_free_val)
+{
+    struct _psh_hash_internal *using;
+    struct _psh_hash_item *this, *tmp;
+    size_t count, count2;
+
+    for (count = 0, using = table->table; count < table->len; ++count, ++using)
+    {
+        this = using->head;
+        for (count2 = 0; count2 < using->used; ++count2)
+        {
+            xfree(this->key);
+            if (if_free_val && this->if_free)
+                xfree(this->value);
+            tmp = this;
+            this = this->next;
+            xfree(tmp);
         }
     }
-    free(table);
+    xfree(table->table);
+    xfree(table);
 }

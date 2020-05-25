@@ -1,6 +1,6 @@
 /*
-    psh/builtins/exit.c - builtin exit
-    Copyright 2017 Zhang Maiyun.
+    psh/util.h - psh-specific utilities
+    Copyright 2018-2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -18,28 +18,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifndef _PSH_UTIL_H
+#define _PSH_UTIL_H
+
+#include <psh.h> /* For __attribute__ */
+
+void code_fault(char *file, int line) __attribute__((noreturn));
+void exit_psh(int status) __attribute__((noreturn));
+int add_atexit_free(void *ptr);
 #endif
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "builtin.h"
-#include "util.h"
-
-extern int last_command_status;
-
-int builtin_exit(int argc, char **argv)
-{
-    if (argc < 2)
-    {
-        exit_psh(last_command_status);
-    }
-    else
-    {
-        int i = atoi(argv[1]);
-        exit_psh(i);
-    }
-    return 1; /* Noreturn */
-}

@@ -5,7 +5,7 @@ include(CheckFunctionExists)
 include(CheckTypeSize)
 include(CheckLibraryExists)
 
-project(psh VERSION 0.14.0
+project(psh VERSION 0.18.0
     LANGUAGES "C")
 set(PROJECT_DESCRIPTION "P Shell")
 #enable_testing()
@@ -38,7 +38,7 @@ add_subdirectory(libpsh)
 add_subdirectory(psh)
 
 # pkg-config file
-configure_file(psh.pc.in psh.pc @ONLY)
+configure_file(libpsh.pc.in libpsh.pc @ONLY)
 
 # config.h
 #configure_file(config.h.in config.h)

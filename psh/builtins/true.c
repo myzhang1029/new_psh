@@ -17,9 +17,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 
 #include "builtin.h"
-int builtin_true(ARGS) { return 1; }
 
-int builtin_false(ARGS) { return 2; }
+int builtin_true(int argc, char **argv) { return 0; }
+
+int builtin_false(int argc, char **argv) { return 1; }

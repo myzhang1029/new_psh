@@ -1,5 +1,5 @@
 /*
-   parser.c - the parser and the tokenizer
+   psh/parser.c - the parser and the tokenizer
    Copyright 2018-2020 Zhang Maiyun.
 
    This file is part of Psh, P shell.
@@ -18,11 +18,14 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <ctype.h>
 #include <stddef.h>
 
 #include "backend.h"
-#include "pshell.h"
 #include "token.h"
 
 psh_tokenstream *parse(char *input) { return NULL; }
