@@ -13,13 +13,11 @@ add_executable (psh builtins.c command.c filpinfo.c input2.c main2.c parser.c pr
 
 include_directories(.)
 target_link_libraries(psh libpsh)
-if(HAVE_READLINE)
-    target_link_libraries(psh readline)
-elseif(HAVE_LIBEDIT)
-    target_link_libraries(psh edit)
+if(LIBREADLINE)
+    target_link_libraries(psh ${LIBREADLINE})
 endif()
-if(HAVE_HISTORY_H AND HAVE_HISTORY)
-    target_link_libraries(psh history)
+if(LIBHISTORY_WORKS)
+    target_link_libraries(psh ${LIBHISTORY})
 endif()
 
 install(TARGETS psh DESTINATION ${CMAKE_INSTALL_BINDIR})

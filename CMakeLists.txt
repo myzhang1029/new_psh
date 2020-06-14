@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.12)
 
 include(CheckIncludeFiles)
-include(CheckFunctionExists)
 include(CheckTypeSize)
-include(CheckLibraryExists)
+include(CheckSymbolExists)
 
 project(psh VERSION 0.18.0
     LANGUAGES "C")
@@ -12,20 +11,30 @@ set(PROJECT_DESCRIPTION "P Shell")
 include_directories(.)
 
 # checks
-check_include_files(readline/readline.h HAVE_READLINE_H)
-check_include_files(readline/history.h HAVE_HISTORY_H)
-check_library_exists(readline readline "" HAVE_READLINE)
-check_library_exists(history add_history "" HAVE_HISTORY)
-check_library_exists(edit readline "" HAVE_LIBEDIT)
+find_file(HAVE_READLINE_H readline/readline.h)
+find_file(HAVE_HISTORY_H readline/history.h)
+find_library(LIBREADLINE NAMES readline edit)
+find_library(LIBHISTORY NAMES history)
+string(REPLACE "readline/readline.h" "" INCLUDE_READLINE ${HAVE_READLINE_H})
+string(REPLACE "readline/history.h" "" INCLUDE_HISTORY ${HAVE_HISTORY_H})
+include_directories(${INCLUDE_READLINE} ${INCLUDE_HISTORY})
+message(STATUS ${HAVE_HISTORY_H})
+message(STATUS ${LIBHISTORY})
+# Check if libhistory has history_list()
+if(HAVE_HISTORY_H AND LIBHISTORY)
+	set(CMAKE_REQUIRED_LIBRARIES "${LIBHISTORY}")
+	set(CMAKE_REQUIRED_INCLUDES ${INCLUDE_READLINE} ${INCLUDE_HISTORY})
+	check_symbol_exists("history_list" "stdio.h;readline/history.h" LIBHISTORY_WORKS)
+endif()
 check_type_size(size_t SIZE_T)
 check_type_size(intptr_t INTPTR_T)
-if(NOT HAVE_READLINE AND NOT HAVE_LIBEDIT)
+if(NOT LIBREADLINE)
     set(CMAKE_C_FLAGS "-DNO_READLINE ${CMAKE_C_FLAGS}")
-    message(WARNING "No libreadline or libedit, disabling readline. If you think this is a mistake, try adding -DCMAKE_C_FLAGS_INIT=-I$location/include -DCMAKE_EXE_LD_FLAGS_INIT=-L$location/lib to the cmake command")
+    message(WARNING "No libreadline or libedit, disabling readline. If you think this is a mistake, try adding -DCMAKE_INCLUDE_PATH=$location/include -DCMAKE_LIBRARY_PATH=$location/lib to the cmake command")
 endif()
-if(NOT HAVE_HISTORY_H OR NOT HAVE_HISTORY)
+if(NOT LIBHISTORY_WORKS)
     set(CMAKE_C_FLAGS "-DNO_HISTORY ${CMAKE_C_FLAGS}")
-    message(WARNING "No libhistory, disabling history. If you think this is a mistake, try adding -DCMAKE_C_FLAGS_INIT=-I$location/include -DCMAKE_EXE_LD_FLAGS_INIT=-L$location/lib to the cmake command")
+    message(WARNING "No libhistory, disabling history. If you think this is a mistake, try adding -DCMAKE_INCLUDE_PATH=$location/include -DCMAKE_LIBRARY_PATH=$location/lib to the cmake command")
 endif()
 if(NOT SIZE_T)
     set(size_t int)
@@ -45,21 +54,21 @@ configure_file(config.h.in config.h)
 set(CMAKE_CPP_FLAGS "-DHAVE_CONFIG_H")
 
 # distclean target
-#add_custom_target(distclean
-#    COMMAND ${CMAKE_BUILD_TOOL} clean
-#    COMMAND ${CMAKE_COMMAND} -P
-#    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake
-#    COMMAND ${CMAKE_COMMAND} -DRUNNING_DIR=test -P
-#    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake
-#    COMMAND ${CMAKE_COMMAND} -DRUNNING_DIR=src -P
-#    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake)
+add_custom_target(distclean
+    COMMAND ${CMAKE_BUILD_TOOL} clean
+    COMMAND ${CMAKE_COMMAND} -P
+    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake
+    COMMAND ${CMAKE_COMMAND} -DRUNNING_DIR=test -P
+    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake
+    COMMAND ${CMAKE_COMMAND} -DRUNNING_DIR=src -P
+    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake)
 # uninstall target
-#configure_file(
-#    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake.in"
-#    "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
-#    IMMEDIATE @ONLY)
-#add_custom_target(uninstall
-#    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
+    IMMEDIATE @ONLY)
+add_custom_target(uninstall
+    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake")
 
 
 install(FILES ${CMAKE_BINARY_DIR}/libpsh.pc
