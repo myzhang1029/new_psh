@@ -41,8 +41,8 @@ add_subdirectory(psh)
 configure_file(libpsh.pc.in libpsh.pc @ONLY)
 
 # config.h
-#configure_file(config.h.in config.h)
-#set(CMAKE_CPP_FLAGS "-DHAVE_CONFIG_H")
+configure_file(config.h.in config.h)
+set(CMAKE_CPP_FLAGS "-DHAVE_CONFIG_H")
 
 # distclean target
 #add_custom_target(distclean
