@@ -48,7 +48,7 @@ static void internal_initializer(struct _psh_hash_internal *internal,
 }
 
 /* Allocate a new hash table, return the table if succeeded */
-psh_hash *new_hash(size_t len)
+psh_hash *psh_hash_create(size_t len)
 {
     psh_hash *table = xmalloc(sizeof(psh_hash));
 
@@ -62,11 +62,12 @@ psh_hash *new_hash(size_t len)
     return table;
 }
 
-/* Same as add_hash, but resizes the hash table if the number of items gets
+/* Same as psh_hash_add, but resizes the hash table if the number of items gets
 greater.
  * Table is potentially modified so a reference is passed in.
  */
-int add_hash_chk(psh_hash **ptable, const char *key, void *value, int if_free)
+int psh_hash_add_chk(psh_hash **ptable, const char *key, void *value,
+                     int if_free)
 {
     /* = for zero-length'd initial allocation */
     if (FULL_RATE * (*ptable)->len <= (*ptable)->used)
@@ -75,15 +76,15 @@ int add_hash_chk(psh_hash **ptable, const char *key, void *value, int if_free)
         /* x<<1 is always greater than FULL_RATE*x where FULL_RATE < 2, so a
          * infinite loop cannot occur */
         *ptable =
-            realloc_hash(*ptable, (*ptable)->len ? (*ptable)->len << 1 : 1);
+            psh_hash_realloc(*ptable, (*ptable)->len ? (*ptable)->len << 1 : 1);
     }
-    return add_hash(*ptable, key, value, if_free);
+    return psh_hash_add(*ptable, key, value, if_free);
 }
 
 /* Add or edit a hash element.
  * If IF_FREE is set, VALUE will be free()d upon the
  * deallocation of the hash table. Returns 0 if succeeded, 1 if not */
-int add_hash(psh_hash *table, const char *key, void *value, int if_free)
+int psh_hash_add(psh_hash *table, const char *key, void *value, int if_free)
 {
     size_t hash_result;
     struct _psh_hash_internal *using;
@@ -138,7 +139,7 @@ int add_hash(psh_hash *table, const char *key, void *value, int if_free)
 }
 
 /* Get a hash value by key, return value if success, NULL if not */
-void *get_hash(psh_hash *table, const char *key)
+void *psh_hash_get(psh_hash *table, const char *key)
 {
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this;
@@ -160,12 +161,12 @@ void *get_hash(psh_hash *table, const char *key)
 
 /* Resize the hash table, the new size cannot be lower than the old size,
  * otherwise it returns 1. returns 2 if realloc failed, 0 if succeeded */
-psh_hash *realloc_hash(psh_hash *table, size_t newlen)
+psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
 {
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this;
     size_t count, count2;
-    psh_hash *newtable = new_hash(newlen);
+    psh_hash *newtable = psh_hash_create(newlen);
 #ifdef DEBUG
     fprintf(stderr, "[hash] realloc %zu\n", newlen);
 #endif
@@ -176,19 +177,19 @@ psh_hash *realloc_hash(psh_hash *table, size_t newlen)
         this = using->head;
         for (count2 = 0; count2 < using->used; ++count2)
         {
-            add_hash(newtable, this->key, this->value, this->if_free);
+            psh_hash_add(newtable, this->key, this->value, this->if_free);
             this = this->next;
         }
     }
     /* free the old table */
-    free_hash(table, 0);
+    psh_hash_free(table, 0);
 
     return newtable;
 }
 
 /* Remove an element from the hash table, return 0 if success, 1 if specified
  * element not found */
-int rm_hash(psh_hash *table, const char *key)
+int psh_hash_rm(psh_hash *table, const char *key)
 {
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this, *old_this;
@@ -231,7 +232,7 @@ int rm_hash(psh_hash *table, const char *key)
 
 /* Free a hash table. if if_free_val is 0, val won't be deallocated,
  * useful in realloc_hash() */
-void free_hash(psh_hash *table, int if_free_val)
+void psh_hash_free(psh_hash *table, int if_free_val)
 {
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this, *tmp;

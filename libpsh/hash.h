@@ -50,12 +50,12 @@ typedef struct _psh_hash_container
     struct _psh_hash_internal *table;
 } psh_hash;
 
-psh_hash *realloc_hash(psh_hash *, size_t);
-psh_hash *new_hash(size_t);
-int add_hash(psh_hash *, const char *, void *, int if_free);
-int add_hash_chk(psh_hash **, const char *, void *, int if_free);
-void *get_hash(psh_hash *, const char *);
-int rm_hash(psh_hash *, const char *);
-void free_hash(psh_hash *, int if_free_val);
+psh_hash *psh_hash_realloc(psh_hash *, size_t);
+psh_hash *psh_hash_create(size_t);
+int psh_hash_add(psh_hash *, const char *, void *, int if_free);
+int psh_hash_add_chk(psh_hash **, const char *, void *, int if_free);
+void *psh_hash_get(psh_hash *, const char *);
+int psh_hash_rm(psh_hash *, const char *);
+void psh_hash_free(psh_hash *, int if_free_val);
 
 size_t hasher(const char *s, size_t ulimit);

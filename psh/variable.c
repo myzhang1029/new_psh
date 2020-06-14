@@ -42,9 +42,9 @@ psh_hash *variable_table_l = NULL;
 /* Init the two tables above, and try to get environment parameters */
 void psh_variable_init(void)
 {
-    variable_table_e = new_hash(10);
-    variable_table_g = new_hash(10);
-    variable_table_l = new_hash(10);
+    variable_table_e = psh_hash_create(10);
+    variable_table_g = psh_hash_create(10);
+    variable_table_l = psh_hash_create(10);
     /* #5 #12 #13 TODO: Retrieve all env vars,
      * for generic, only try to read those important to shell, such as HOME,
      * PATH, etc. */
