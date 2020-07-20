@@ -10,7 +10,7 @@
 #include "libpsh/hash.h"
 #include "libpsh/xmalloc.h"
 
-#define add_hash(a, b, c, d) add_hash_chk(&a, b, c, d)
+#define psh_hash_add(a, b, c, d) psh_hash_add_chk(&a, b, c, d)
 #define MAX 1000000
 
 int main(void)
@@ -21,16 +21,16 @@ int main(void)
     val1 = xmalloc(P_CS * 11);
     val1[10] = 0;
 
-    hash = new_hash(1);
+    hash = psh_hash_create(16);
     for (int i = 0; i < MAX; ++i)
     {
         for (int j = 0; j < 10; ++j)
         {
             val1[j] = rand() % 26 + 97;
-            add_hash(hash, val1, "a", 0);
+            psh_hash_add(hash, val1, "a", 0);
         }
     }
-    free_hash(hash, 1);
+    psh_hash_free(hash, 1);
     xfree(val1);
 
     return 0;
