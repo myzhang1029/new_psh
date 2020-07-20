@@ -53,12 +53,8 @@ set(CMAKE_CPP_FLAGS "-DHAVE_CONFIG_H")
 
 # distclean target
 add_custom_target(distclean
-    COMMAND ${CMAKE_BUILD_TOOL} clean
+    ${CMAKE_BUILD_TOOL} clean
     COMMAND ${CMAKE_COMMAND} -P
-    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake
-    COMMAND ${CMAKE_COMMAND} -DRUNNING_DIR=test -P
-    ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake
-    COMMAND ${CMAKE_COMMAND} -DRUNNING_DIR=src -P
     ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake)
 # uninstall target
 configure_file(

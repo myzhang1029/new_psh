@@ -2,6 +2,7 @@ set(cmake_generated
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/CMakeCache.txt
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/cmake_install.cmake
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/install_manifest.txt
+    ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/compile_commands.json
     ${CMAKE_BINARY_DIR}/uninstall.cmake
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/Makefile
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/CMakeFiles
@@ -19,6 +20,7 @@ set(cmake_generated
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/libpsh
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/psh
     ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/config.h
+    ${CMAKE_BINARY_DIR}/${RUNNING_DIR}/select_backend.c
 )
 foreach(file ${cmake_generated})
     file(GLOB file ${file})
