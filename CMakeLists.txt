@@ -54,7 +54,7 @@ set(CMAKE_CPP_FLAGS "-DHAVE_CONFIG_H")
 # distclean target
 add_custom_target(distclean
     ${CMAKE_BUILD_TOOL} clean
-    COMMAND ${CMAKE_COMMAND} -P
+    COMMAND ${CMAKE_COMMAND} -D "subdirs=.\;psh\;libpsh" -P
     ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake)
 # uninstall target
 configure_file(
