@@ -31,7 +31,7 @@
 
 /* Using three tables here, because both env vars and global vars live
  * throughout the life of the shell, while local vars can override them without
- * altering their vaule. */
+ * altering their value. */
 /* Environmental variables */
 psh_hash *variable_table_e = NULL;
 /* Global variables */
