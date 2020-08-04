@@ -1,5 +1,5 @@
 /*
-    libpsh/libpsh.h - Psh utilities
+    libpsh/path_searcher.c - path searcher
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -16,23 +16,15 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 */
 
-#ifndef _LIBPSH_UTIL_H
-#define _LIBPSH_UTIL_H
+#ifndef _LIBPSH_PATH_SEARCHER_H
+#define _LIBPSH_PATH_SEARCHER_H
 
-#include <stdio.h>
-
-#define OUT2E(...) fprintf(stderr, __VA_ARGS__)
-
-char *psh_fgets(char *prompt, FILE *fp);
-char *psh_gets(char *prompt);
-size_t psh_strncpy(char *dst, const char *src, size_t size);
-/* Compare the string str1 to a string as were produced by strcat(str2_1,
- * str2_2). */
-int strdblcmp(const char *str1, const char *str2_1, const char *str2_2);
-char *psh_strdup(const char *str);
-char *psh_getstring(void *(*func)(char *, size_t), void **result);
-
-#endif /* _LIBPSH_UTIL_H */
+/* Call CHK_FUNC on each (substr + TARGET) concatenated string in PATH
+ * separated by SEPARATOR.
+ * Returns the first conctenated string for which CHK_FUNC returns non-zero;
+ * or NULL if none succeeded. REsult should be free()d */
+char *psh_search_path(char *path, int separator, const char *target,
+                      int (*chk_func)(const char *));
+#endif

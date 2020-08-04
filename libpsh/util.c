@@ -104,6 +104,29 @@ size_t psh_strncpy(char *dst, const char *src, size_t size)
     return (s - src - 1);
 }
 
+/* Compare the string str1 to a string as were produced by strcat(str2_1,
+ * str2_2). */
+int strdblcmp(const char *str1, const char *str2_1, const char *str2_2)
+{
+    int diff;
+    /* End loop if str2_1 is empty */
+    while (*str2_1)
+    {
+        printf("%d %d\n", *str1, *str2_1);
+        diff = *(str1++) - *(str2_1++);
+        if (diff)
+            return diff;
+    }
+    do
+    {
+        printf("%d %d\n", *str1, *str2_2);
+        diff = *str1 - *str2_2;
+        if (diff)
+            return diff;
+    } while (*(str2_2++) && *(str1++));
+    return 0;
+}
+
 char *psh_strdup(const char *str)
 {
     size_t length = strlen(str) + 1;
