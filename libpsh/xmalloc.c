@@ -81,7 +81,7 @@ size_t bytes;
 void xfree(string) PTR_T string;
 {
 #if DEBUG
-    fprintf(stderr, "%p(free %d)\n", string, nref--);
+    fprintf(stderr, "[xmalloc] %p(free %d)\n", string, nref--);
 #endif
     if (string)
         free(string);
