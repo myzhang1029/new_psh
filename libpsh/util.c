@@ -26,6 +26,9 @@
 #include <string.h>
 #ifdef HAVE_READLINE_H
 #include <readline/readline.h>
+#elif defined(HAVE_READLINE)
+/* Have libreadline bu no header */
+char *readline(char *);
 #endif
 
 #include "libpsh/util.h"
