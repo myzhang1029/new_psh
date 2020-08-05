@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 /* Some evil implementations include no stdio.h is history.h */
-#ifndef NO_HISTORY
+#ifdef HAVE_HISTORY_H
 #include <readline/history.h>
 #endif
 
@@ -64,7 +64,7 @@ int read_cmdline(char *prompt, char **result)
         xfree(buffer);
         return -1;
     }
-#ifndef NO_HISTORY
+#ifdef HAVE_WORKING_HISTORY
     stat = history_expand(buffer, &expanded);
     if (stat < 0)
     {
@@ -83,7 +83,7 @@ int read_cmdline(char *prompt, char **result)
     xfree(buffer);
     add_history(expanded);
     buffer = expanded;
-#endif /* NO_HISTORY */
+#endif /* HAVE_WORKING_HISTORY */
     *result = buffer;
     return 0;
 }

@@ -1,5 +1,5 @@
 /* Test for stringbuilder, xmaloc and psh_strncpy
- * do `gcc -DNO_READLINE -Wall -Wextra -I. -g -fsanitize=address
+ * do `gcc -Wall -Wextra -I. -g -fsanitize=address
  * libpsh/test_stringbuilder.c libpsh/util.c libpsh/stringbuilder.c
  * libpsh/xmalloc.c`
  */

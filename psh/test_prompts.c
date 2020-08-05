@@ -1,4 +1,4 @@
-// Do: gcc -g -fsanitize=address -Wall -Wextra -I. -DNO_READLINE
+// Do: gcc -g -fsanitize=address -Wall -Wextra -I.
 // psh/test_prompts.c psh/prompts.c libpsh/stringbuilder.c libpsh/util.c
 // libpsh/xmalloc.c
 #include <stdio.h>

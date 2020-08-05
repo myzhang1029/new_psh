@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#ifndef NO_READLINE
+#ifdef HAVE_READLINE_H
 #include <readline/readline.h>
 #endif
 
@@ -37,7 +37,7 @@
  * not including the trailing EOF or \n. */
 char *psh_fgets(char *prompt, FILE *fp)
 {
-#ifndef NO_READLINE
+#ifdef HAVE_READLINE
     if (fp == stdin)
         return readline(prompt);
 #endif

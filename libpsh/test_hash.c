@@ -1,5 +1,5 @@
 /* Test for psh_hash
- * do `gcc -DNO_READLINE -Wall -Wextra -I. -g -fsanitize=address
+ * do `gcc -Wall -Wextra -I. -g -fsanitize=address
  * libpsh/test_hash.c libpsh/hash.c libpsh/hasher.c libpsh/util.c
  * libpsh/xmalloc.c`
  */

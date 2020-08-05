@@ -391,10 +391,10 @@ char *ps_expander(char *prompt)
                 if (is_backslash)
                 {
                     is_backslash = 0;
-#ifdef NO_READLINE
-                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
-#else
+#ifdef HAVE_READLINE_GNU
                     replace_char('\001'); /* RL_PROMPT_START_IGNORE */
+#else
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
 #endif
                     reset_start(cur);
                 }
@@ -404,10 +404,10 @@ char *ps_expander(char *prompt)
                 if (is_backslash)
                 {
                     is_backslash = 0;
-#ifdef NO_READLINE
-                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
-#else
+#ifdef HAVE_READLINE_GNU
                     replace_char('\002'); /* RL_PROMPT_END_IGNORE */
+#else
+                    psh_stringbuilder_add_length(builder, start, count - 1, 0);
 #endif
                     reset_start(cur);
                 }

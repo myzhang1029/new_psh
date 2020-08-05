@@ -1,5 +1,5 @@
 /* Hashing benchmark for psh_hash
- * do `gcc -DNO_READLINE -Wall -Wextra -I. -O3
+ * do `gcc -Wall -Wextra -I. -O3
  * libpsh/bench_hash.c libpsh/hash.c libpsh/hasher.c libpsh/util.c
  * libpsh/xmalloc.c`
  */

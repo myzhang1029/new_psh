@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
 /* Some evil implementations include no stdio.h is history.h */
-#ifndef NO_HISTORY
+#ifdef HAVE_HISTORY_H
 #include <readline/history.h>
 #endif
 
@@ -53,7 +53,7 @@ extern char *argv0;
 
 int builtin_history(int argc, char **argv)
 {
-#ifdef NO_HISTORY
+#ifndef HAVE_WORKING_HISTORY
     OUT2E("%s: libhistory not compiled!\n", argv[0]);
     return 1;
 #else

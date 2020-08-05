@@ -1,5 +1,5 @@
 /* Test for psh_getstring
- * do `gcc -DNO_READLINE -Wall -Wextra -I. -g -fsanitize=address
+ * do `gcc -Wall -Wextra -I. -g -fsanitize=address
  * libpsh/test_getstring.c libpsh/util.c libpsh/xmalloc.c`
  */
 
