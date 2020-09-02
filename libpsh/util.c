@@ -27,7 +27,7 @@
 #ifdef HAVE_READLINE_H
 #include <readline/readline.h>
 #elif defined(HAVE_READLINE)
-/* Have libreadline bu no header */
+/* Have libreadline but no header */
 char *readline(char *);
 #endif
 
