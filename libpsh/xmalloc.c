@@ -1,4 +1,6 @@
 /* xmalloc.c -- safe versions of malloc and realloc */
+/* Define DEBUG to show all pointers manipulated and show call count which
+ * should become 1 when the last xfree is called. */
 
 /* Copyright (C) 1991-2003 Free Software Foundation, Inc.
 
@@ -81,7 +83,8 @@ size_t bytes;
 void xfree(string) PTR_T string;
 {
 #if DEBUG
-    fprintf(stderr, "[xmalloc] %p(free %d)\n", string, nref--);
+    if (string)
+        fprintf(stderr, "[xmalloc] %p(free %d)\n", string, nref--);
 #endif
     if (string)
         free(string);
