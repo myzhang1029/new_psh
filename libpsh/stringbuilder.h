@@ -30,6 +30,7 @@ struct _psh_sb_item
     size_t length;
     int if_free;
     struct _psh_sb_item *next;
+    struct _psh_sb_item *previous;
 };
 
 typedef struct _psh_stringbuilder
@@ -47,6 +48,7 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
                                    size_t length, int if_free);
 char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string,
                             int if_free);
+void psh_stringbuilder_pop(psh_stringbuilder *builder);
 char *psh_stringbuilder_yield(psh_stringbuilder *builder);
 void psh_stringbuilder_free(psh_stringbuilder *builder);
 #endif

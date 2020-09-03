@@ -21,6 +21,8 @@ int main()
     psh_stringbuilder_add_length(builder, str1, 2, 0);
     psh_stringbuilder_add_length(builder, str2, 3, 1);
     psh_stringbuilder_add(builder, str1, 0);
+    psh_stringbuilder_pop(builder);
+    psh_stringbuilder_add(builder, str1, 0);
     result = psh_stringbuilder_yield(builder);
     psh_stringbuilder_free(builder);
     printf("%s: %s\n", result,

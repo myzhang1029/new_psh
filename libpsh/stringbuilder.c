@@ -42,6 +42,7 @@ psh_stringbuilder *psh_stringbuilder_create()
 char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
                                    size_t length, int if_free)
 {
+    struct _psh_sb_item *previous;
     /* Don't waste memory here */
     if (length == 0)
         return string;
@@ -49,7 +50,18 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
     if (builder->current)
     {
         /* Not empty */
+#ifdef DEBUG
+        printf("[psh_stringbuilder_add_length]\n");
+        printf("orig this: %p\n", builder->current->next);
+#endif
         builder->current->next = xmalloc(sizeof(struct _psh_sb_item));
+#ifdef DEBUG
+        printf("this: %p\n", builder->current->next);
+        printf("last: %p\n", builder->current);
+        printf("orig string: %p\n", builder->current->next->string);
+        printf("string: %s\n", string);
+#endif
+        previous = builder->current;
         builder->current = builder->current->next;
     }
     else
@@ -57,8 +69,10 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
         /* Empty */
         builder->first = xmalloc(sizeof(struct _psh_sb_item));
         builder->current = builder->first;
+        previous = NULL;
     }
-    /* Now current is empty */
+    /* Now current is to be filled */
+    builder->current->previous = previous;
     builder->current->length = length;
     builder->current->string = string;
     builder->current->if_free = if_free;
@@ -73,6 +87,17 @@ char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string,
 {
     size_t length = strlen(string);
     return psh_stringbuilder_add_length(builder, string, length, if_free);
+}
+
+/* Remove the last member of the builder */
+void psh_stringbuilder_pop(psh_stringbuilder *builder)
+{
+    builder->total_length -= builder->current->length;
+    if (builder->current->if_free)
+        xfree(builder->current->string);
+    builder->current = builder->current->previous;
+    xfree(builder->current->next);
+    builder->current->next = NULL;
 }
 
 /* Generate a string from the builder */
@@ -98,14 +123,18 @@ char *psh_stringbuilder_yield(psh_stringbuilder *builder)
 /* Free resources used by the builder */
 void psh_stringbuilder_free(psh_stringbuilder *builder)
 {
-    struct _psh_sb_item *tmp, *cur = builder->first;
-    while (cur)
+    struct _psh_sb_item *cur = builder->first;
+    while (1)
     {
-        tmp = cur;
+        if (cur->if_free)
+            xfree(cur->string);
+        xfree(cur->previous);
+        if (!cur->next)
+        {
+            xfree(cur);
+            break;
+        }
         cur = cur->next;
-        if (tmp->if_free)
-            xfree(tmp->string);
-        xfree(tmp);
     }
     xfree(builder);
 }
