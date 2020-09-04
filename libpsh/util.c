@@ -81,6 +81,8 @@ char *psh_fgets(char *prompt, FILE *fp)
 
 char *psh_gets(char *prompt) { return psh_fgets(prompt, stdin); }
 
+/* Reliable strncpy where size is best strlen(src)
+ * Return number of characters copied excluding NUL */
 size_t psh_strncpy(char *dst, const char *src, size_t size)
 {
     register char *d = dst;
