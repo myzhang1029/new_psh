@@ -60,11 +60,13 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 #define LFLAG 0x1
 #define PFLAG 0x2
@@ -74,7 +76,129 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
 extern char *argv0;
 
 /* TODO */
-static char *create_pwd(char *path, int flags) { return path; }
+/* XXX: Use less malloc/free */
+/* Get rid of ../"s and "./"s and extra "/"s.
+ * Resolve to realpath before expanding "../"s is ABSOLUTE is 1.
+ * Return NULL if PATH is NULL or cwd cannot be determined. */
+static char *canonicalize_path(const char *path, int flags)
+{
+    /* Not using psh_stringbuilder here because the frequent need to yield */
+    /* Excluding NUL */
+    size_t have_size;
+    char *allocated_path, *new_path, *xpath, *saved_xpath;
+    const char *slash = "/";
+
+    if (path == NULL)
+        return NULL;
+    if (*path == '\0')
+        return NULL;
+
+    /* Ignoring flags TODO */
+    if (*path == *slash)
+    {
+        have_size = strlen(path) * 2;
+        new_path = allocated_path = xmalloc(have_size + 2);
+        xpath = psh_strdup(path);
+    }
+    else
+    {
+        /* This is usually an real path TODO */
+        /* bash says: cd: error retrieving current directory: getcwd:
+         * cannot access parent directories: No such file or directory */
+        size_t len_cwd, len_path;
+        if (flags & PFLAG)
+            xpath = pshgetcwd_dm();
+        else
+        {
+            xpath = psh_strdup(getenv("PWD")); /* #8 TODO */
+            if (!xpath)
+                xpath = pshgetcwd_dm();
+        }
+        if (!xpath)
+            OUT2E("%s: cd: error retrieving current directory: %s\n", argv0,
+                  strerror(errno));
+        len_cwd = strlen(xpath);
+        len_path = strlen(path);
+        /* +2 for slash and \0 */
+        have_size = (len_cwd + len_path) * 2;
+        new_path = allocated_path = xmalloc(have_size + 3);
+        xpath = xrealloc(xpath, len_cwd + len_path + 2);
+        *(xpath + len_cwd) = *slash;
+        psh_strncpy(xpath + len_cwd + 1, path, len_path);
+    }
+    saved_xpath = xpath;
+    *new_path++ = *slash;
+    while (*xpath)
+    {
+        /* Get rid of extra slashes */
+        if (*xpath == *slash)
+        {
+            ++xpath;
+            continue;
+        }
+        if (*xpath == '.')
+        {
+            /* /.* */
+            if (xpath[1] == '\0' || xpath[1] == *slash)
+            {
+                /* /./ || /.NUL */
+                ++xpath;
+                continue;
+            }
+            if (xpath[1] == '.' && (xpath[2] == '\0' || xpath[2] == *slash))
+            {
+                if (new_path - allocated_path != 1)
+                {
+                    /* Find last slash */
+                    --new_path;
+                    while (*--new_path != *slash)
+                        ;
+                    *++new_path = '\0';
+                }
+                /* else: ../ at root */
+                /* skip one character and continue */
+                xpath += 2;
+                continue;
+            }
+        }
+        do
+        {
+            size_t length = new_path - allocated_path;
+            if (length >= have_size)
+            {
+                allocated_path = xrealloc(allocated_path, (have_size *= 2) + 2);
+                /* Deal with possible relocation of ALLOCATED_PATH */
+                new_path = allocated_path + length;
+            }
+            *new_path++ = *xpath++;
+        } while (*xpath && *xpath != *slash);
+        *new_path++ = *slash;
+    }
+    /* Don't leave a trailing slash */
+    if (new_path[-1] == *slash && new_path - allocated_path != 1)
+        new_path[-1] = '\0';
+    else
+        /* No need to check here because we've always left a byte */
+        *new_path = '\0';
+    xfree(saved_xpath);
+    allocated_path = xrealloc(allocated_path, strlen(allocated_path) + 1);
+    return allocated_path;
+}
+
+#if defined(TESTING_CANONICALIZE) && defined(DEBUG)
+#include <assert.h>
+char *argv0 = "";
+int last_command_status = 0;
+int main(int argc, char **argv)
+{
+    char *path = canonicalize_path(
+        "/..//aaaaa/b//////c/../../../../../d/./r./.d/asdf/../as/", 0);
+    puts(path);
+    assert(strcmp(path, "/d/r./.d/as") == 0);
+    xfree(path);
+    return 0;
+}
+#endif
 
 int builtin_cd(int argc, char **argv)
 {
@@ -136,8 +260,15 @@ int builtin_cd(int argc, char **argv)
     }
     if (strcmp(path, "-") == 0)
         path = getenv("OLDPWD"); /* #8 TODO */
+    if (!path)
+    {
+        OUT2E("%s: %s: OLDPWD not set\n", argv0, argv[0]);
+        return 1;
+    }
 
-    destination = create_pwd(path, flags);
+    destination = canonicalize_path(path, flags);
+    if (!destination)
+        return 1;
     if (pshchdir(destination) != 0)
         OUT2E("%s: %s: %s: %s\n", argv0, argv[0], path, strerror(errno));
     else
@@ -145,4 +276,6 @@ int builtin_cd(int argc, char **argv)
         pshsetenv("OLDPWD", getenv("PWD"), 1); /* #8 TODO */
         pshsetenv("PWD", destination, 1);      /* #8 TODO */
     }
+    xfree(destination);
+    return 0;
 }

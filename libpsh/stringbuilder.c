@@ -24,6 +24,9 @@
 
 #include <stddef.h>
 #include <string.h>
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 
 #include "libpsh/stringbuilder.h"
 #include "libpsh/xmalloc.h"
