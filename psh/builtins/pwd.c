@@ -77,10 +77,10 @@ int builtin_pwd(int argc, char **argv)
             return 0;
         }
         else
-            path = pshgetcwd_dm();
+            path = psh_backend_getcwd_dm();
     }
     else /* flag */
-        path = pshgetcwd_dm();
+        path = psh_backend_getcwd_dm();
 
     puts(path);
     free(path);

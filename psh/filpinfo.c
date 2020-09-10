@@ -387,7 +387,7 @@ int filpinfo(char *buffer, struct command *info)
                                 break;
                             }
                     }
-                    char *hdir = gethdnam(username);
+                    char *hdir = psh_backend_get_homedir_username(username);
                     if (hdir == NULL)
                     {
                         /* No such user, treat as a
@@ -403,7 +403,7 @@ int filpinfo(char *buffer, struct command *info)
                 }
                 else /* ~/ and ~ */
                 {
-                    char *hdir = gethd();
+                    char *hdir = psh_backend_get_homedir();
                     psh_strncpy(cmd_lastnode->argv[cnt_argument_element], hdir,
                                 4094 - cnt_argument_char);
                     cnt_argument_char += strlen(hdir);

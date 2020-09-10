@@ -53,11 +53,15 @@ int main(int argc, char **argv)
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
 
+    /* TODO: Store this as shell arguments */
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
     add_atexit_free(argv0);
-    prepare();
+
+    if (psh_backend_prepare() != 0)
+        exit_psh(1);
+
 #ifdef HAVE_WORKING_HISTORY
     using_history();
 #endif
@@ -76,7 +80,8 @@ int main(int argc, char **argv)
         }
         xfree(buffer);
 
-        /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in do_run() */
+        /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
+         * psh_backend_do_run() */
         bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
@@ -84,7 +89,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            do_run(cmd);
+            psh_backend_do_run(cmd);
         }
         free_command(cmd);
     }

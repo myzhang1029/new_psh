@@ -107,12 +107,12 @@ static char *canonicalize_path(const char *path, int flags)
          * cannot access parent directories: No such file or directory */
         size_t len_cwd, len_path;
         if (flags & PFLAG)
-            xpath = pshgetcwd_dm();
+            xpath = psh_backend_getcwd_dm();
         else
         {
             xpath = psh_strdup(getenv("PWD")); /* #8 TODO */
             if (!xpath)
-                xpath = pshgetcwd_dm();
+                xpath = psh_backend_getcwd_dm();
         }
         if (!xpath)
             OUT2E("%s: cd: error retrieving current directory: %s\n", argv0,
@@ -269,12 +269,12 @@ int builtin_cd(int argc, char **argv)
     destination = canonicalize_path(path, flags);
     if (!destination)
         return 1;
-    if (pshchdir(destination) != 0)
+    if (psh_backend_chdir(destination) != 0)
         OUT2E("%s: %s: %s: %s\n", argv0, argv[0], path, strerror(errno));
     else
     {
-        pshsetenv("OLDPWD", getenv("PWD"), 1); /* #8 TODO */
-        pshsetenv("PWD", destination, 1);      /* #8 TODO */
+        psh_backend_setenv("OLDPWD", getenv("PWD"), 1); /* #8 TODO */
+        psh_backend_setenv("PWD", destination, 1);      /* #8 TODO */
     }
     xfree(destination);
     return 0;

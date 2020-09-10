@@ -59,7 +59,7 @@ void sigchld_handler(__attribute__((unused)) int sig)
 
 void sigintabrt_hadler(int sig) { last_command_status = sig; }
 
-int prepare(void)
+int psh_backend_prepare(void)
 {
     int ret = 0;
     if (signal(SIGCHLD, sigchld_handler) == SIG_ERR)
@@ -73,7 +73,7 @@ int prepare(void)
     return ret;
 }
 
-char *gethd(void)
+char *psh_backend_get_homedir(void)
 {
     struct passwd *pwd = getpwuid(getuid());
     if (pwd == NULL)
@@ -81,7 +81,7 @@ char *gethd(void)
     return pwd->pw_dir;
 }
 
-char *gethdnam(char *username)
+char *psh_backend_get_homedir_username(char *username)
 {
     struct passwd *pwd = getpwnam(username);
     if (pwd == NULL)
@@ -89,7 +89,7 @@ char *gethdnam(char *username)
     return pwd->pw_dir;
 }
 
-char *getun(void)
+char *psh_backend_get_username(void)
 {
     struct passwd *pwd = getpwuid(getuid());
     if (pwd == NULL)
@@ -97,29 +97,33 @@ char *getun(void)
     return pwd->pw_name;
 }
 
-char *pshgetcwd(char *wd, size_t len) { return getcwd(wd, len); }
+char *psh_backend_getcwd(char *wd, size_t len) { return getcwd(wd, len); }
 
-char *pshgetcwd_dm(void)
+char *psh_backend_getcwd_dm(void)
 {
     /* Providing NULL to getcwd isn't mainstream POSIX */
-    char *buf = psh_getstring((void *(*)(char *, size_t)) & pshgetcwd, NULL);
-    return buf;
-}
-
-int pshgethostname(char *dest, size_t len) { return gethostname(dest, len); }
-
-char *pshgethostname_dm(void)
-{
     char *buf =
-        psh_getstring((void *(*)(char *, size_t)) & pshgethostname, NULL);
+        psh_getstring((void *(*)(char *, size_t)) & psh_backend_getcwd, NULL);
     return buf;
 }
 
-int pshgetuid(void) { return geteuid(); }
+int psh_backend_gethostname(char *dest, size_t len)
+{
+    return gethostname(dest, len);
+}
 
-int pshchdir(char *dir) { return chdir(dir); }
+char *psh_backend_gethostname_dm(void)
+{
+    char *buf = psh_getstring(
+        (void *(*)(char *, size_t)) & psh_backend_gethostname, NULL);
+    return buf;
+}
 
-int pshsetenv(const char *name, const char *value, int overwrite)
+int psh_backend_getuid(void) { return geteuid(); }
+
+int psh_backend_chdir(char *dir) { return chdir(dir); }
+
+int psh_backend_setenv(const char *name, const char *value, int overwrite)
 {
     return setenv(name, value, overwrite);
 }
@@ -171,7 +175,7 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
     return pid;
 }
 
-int do_run(struct command *arginfo)
+int psh_backend_do_run(struct command *arginfo)
 {
     struct command *info = arginfo;
     int i = 0;

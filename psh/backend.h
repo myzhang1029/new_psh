@@ -29,17 +29,21 @@ extern int last_command_status;
 extern int pipe_fd[2], in_fd, out_fd;
 #define MAXPIDTABLE 1024
 
-int prepare(void);
-char *gethd(void);
-char *gethdnam(char *);
-char *getun(void);
-char *pshgetcwd(char *, size_t);
-char *pshgetcwd_dm(void);
-int pshgethostname(char *, size_t);
-char *pshgethostname_dm(void);
-int pshsetenv(const char *, const char *, int);
-int do_run(struct command *info);
-int pshgetuid(void);
-int pshchdir(char *);
+/* Platform dependent shell initializaion.
+ *
+ * @return A non-zero return value aborts shell shartup.
+ */
+int psh_backend_prepare(void);
+char *psh_backend_get_homedir(void);
+char *psh_backend_get_homedir_username(char *);
+char *psh_backend_get_username(void);
+char *psh_backend_getcwd(char *, size_t);
+char *psh_backend_getcwd_dm(void);
+int psh_backend_gethostname(char *, size_t);
+char *psh_backend_gethostname_dm(void);
+int psh_backend_setenv(const char *, const char *, int);
+int psh_backend_do_run(struct command *info);
+int psh_backend_getuid(void);
+int psh_backend_chdir(char *);
 
 #endif /* _PSH_BACKEND_H*/

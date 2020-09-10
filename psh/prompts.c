@@ -68,10 +68,11 @@ static char *workdir_expander(int if_last_component)
 {
     /* Actually $PWD should be used here
      * But changing $PWD really isn't so meaningful
-     * so let pshgetcwd_dm decide it.
+     * so let psh_backend_getcwd_dm decide it.
      */
     size_t count, lenhome;
-    char *last_occur, *home = gethd(), *pathname = pshgetcwd_dm();
+    char *last_occur, *home = psh_backend_get_homedir(),
+                      *pathname = psh_backend_getcwd_dm();
 
     /* Replace $HOME with a tlide */
     for (count = 0, lenhome = strlen(home); count < lenhome; ++count)
@@ -187,7 +188,7 @@ char *ps_expander(char *prompt)
                 if (is_backslash)
                 {
                     is_backslash = 0;
-                    if (pshgetuid() == 0) /* root */
+                    if (psh_backend_getuid() == 0) /* root */
                         replace_char('#');
                     else
                         replace_char('$');
@@ -333,7 +334,7 @@ char *ps_expander(char *prompt)
             case 'h':
                 if (is_backslash)
                 {
-                    char *dot, *hostname = pshgethostname_dm();
+                    char *dot, *hostname = psh_backend_gethostname_dm();
                     is_backslash = 0;
 
                     dot = strchr(hostname, '.');
@@ -349,7 +350,7 @@ char *ps_expander(char *prompt)
             case 'H':
                 if (is_backslash)
                 {
-                    char *hostname = pshgethostname_dm();
+                    char *hostname = psh_backend_gethostname_dm();
                     is_backslash = 0;
 
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
@@ -382,7 +383,8 @@ char *ps_expander(char *prompt)
                     is_backslash = 0;
 
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
-                    psh_stringbuilder_add(builder, getun(), 0);
+                    psh_stringbuilder_add(builder, psh_backend_get_username(),
+                                          0);
                     reset_start(cur);
                 }
                 /* else write u */
