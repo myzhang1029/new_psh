@@ -53,11 +53,11 @@ DerivePointerAlignment: false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeCategories:
-  - Regex:       '^".*"'
+  - Regex:       '^".+"'
     Priority:    3
-  - Regex:       '^<.*/.*>'
+  - Regex:       '^<.+\/.+>'
     Priority:    2
-  - Regex:       '^<.*>'
+  - Regex:       '^<.+>'
     Priority:    1
 IncludeIsMainRegex: '(Test)?$'
 IndentCaseLabels: true
