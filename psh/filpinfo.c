@@ -409,7 +409,8 @@ int filpinfo(char *buffer, struct command *info)
                     cnt_argument_char += strlen(hdir);
                 }
                 break;
-            case '\\': {
+            case '\\':
+            {
                 int case_count;
                 for (case_count = 1; buffer[cnt_buffer];
                      ++case_count, ++cnt_buffer)

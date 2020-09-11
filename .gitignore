@@ -131,3 +131,7 @@ tags
 .clangd
 test.c
 select_backend.c
+
+# Doxygen
+html/
+latex/

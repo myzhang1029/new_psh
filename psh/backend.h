@@ -29,21 +29,87 @@ extern int last_command_status;
 extern int pipe_fd[2], in_fd, out_fd;
 #define MAXPIDTABLE 1024
 
-/* Platform dependent shell initializaion.
+/** Platform dependent shell initializaion.
  *
  * @return A non-zero return value aborts shell shartup.
  */
 int psh_backend_prepare(void);
+
+/** Get the home directory of current user.
+ *
+ * @return Path of the home directory, no need to free.
+ */
 char *psh_backend_get_homedir(void);
-char *psh_backend_get_homedir_username(char *);
+
+/** Get the home directory of a user.
+ *
+ * @param username The username of which we want to know about.
+ * @return Path of the home directory, no need to free.
+ */
+char *psh_backend_get_homedir_username(char *username);
+
+/** Get current user's username.
+ *
+ * @return Username, no need to free.
+ */
 char *psh_backend_get_username(void);
-char *psh_backend_getcwd(char *, size_t);
+
+/** Get the pathname of the current working directory.
+ *
+ * @param buffer Buffer to which the path will be stored.
+ * @param size Size of BUFFER.
+ * @return NULL if the directory couldn't be determined or SIZE was too small,
+ * BUF if successful.
+ */
+char *psh_backend_getcwd(char *buffer, size_t size);
+
+/** Get the pathname of the current working directory.
+ *
+ * @return The current working directory, needs to be free()d.
+ */
 char *psh_backend_getcwd_dm(void);
-int psh_backend_gethostname(char *, size_t);
+
+/** Get host name.
+ *
+ * @param buffer Buffer to which the host name will be stored.
+ * @param size Size of BUFFER.
+ * @return NULL if the directory couldn't be determined or SIZE was too small,
+ * BUF if successful.
+ */
+int psh_backend_gethostname(char *buffer, size_t size);
+
+/** Get host name.
+ *
+ * @return The host name, needs to be free()d.
+ */
 char *psh_backend_gethostname_dm(void);
-int psh_backend_setenv(const char *, const char *, int);
-int psh_backend_do_run(struct command *info);
+
+/** Set environmental variable.
+ *
+ * @param name The name of the variable.
+ * @param value The corresponding value.
+ * @param overwrite Whether we can overwrite existing value.
+ * @return Zero if succeeded.
+ */
+int psh_backend_setenv(const char *name, const char *value, int overwrite);
+
+/** Get the user id of the current user.
+ *
+ * @return UID.
+ */
 int psh_backend_getuid(void);
+
+/** Change working directory.
+ *
+ * @return Zero if succeeded.
+ */
 int psh_backend_chdir(char *);
+
+/** Run a command.
+ *
+ * @param command The command struct about command details.
+ * @return Zero if succeeded.
+ */
+int psh_backend_do_run(struct command *command);
 
 #endif /* _PSH_BACKEND_H*/
