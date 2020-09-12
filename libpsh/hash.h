@@ -1,6 +1,5 @@
+/** @file libpsh/hash.h - @brief Hash functions and structures */
 /*
-   libpsh/hash.h - hash functions and structures
-
    Copyright 2017-2020 Zhang Maiyun.
 
    This file is part of Psh, P shell.

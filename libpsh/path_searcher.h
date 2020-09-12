@@ -1,5 +1,6 @@
+/** @file libpsh/path_searcher.h - @brief Path searcher */
 /*
-    libpsh/path_searcher.c - path searcher
+
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -21,10 +22,19 @@
 #ifndef _LIBPSH_PATH_SEARCHER_H
 #define _LIBPSH_PATH_SEARCHER_H
 
-/* Call CHK_FUNC on each (substr + TARGET) concatenated string in PATH
+/** @brief Search path list for the first path matching a condition.
+ * @details Call CHK_FUNC on each (substr + TARGET) concatenated string in PATH
  * separated by SEPARATOR.
- * Returns the first conctenated string for which CHK_FUNC returns non-zero;
- * or NULL if none succeeded. REsult should be free()d */
+ *
+ * @param path List of paths separated by @ref separator to call @ref chk_func
+ * with.
+ * @param separator Separator of @ref path.
+ * @param target The string to be appended to each item in @ref path before
+ * calling @ref chk_func.
+ * @param chk_func Function to determine whether the correct path is found.
+ * @return The first concatenated string for which CHK_FUNC returns non-zero;
+ * or NULL if none succeeded, should be free()d.
+ */
 char *psh_search_path(char *path, int separator, const char *target,
                       int (*chk_func)(const char *));
 #endif
