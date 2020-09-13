@@ -57,7 +57,7 @@ char *psh_gets(char *prompt);
 size_t psh_strncpy(char *dst, const char *src, size_t size);
 
 /** Compare a string and the concatenation of two strings.
- * @details Psuedo code: strdblcmp = strcmp(str1, strcat(str2_1, str2_2))
+ * @details Pseudo code: strdblcmp = strcmp(str1, strcat(str2_1, str2_2))
  *
  * @param str1 The base string to be compared.
  * @param str2_1 The first part of the other string.

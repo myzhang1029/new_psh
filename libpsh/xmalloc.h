@@ -1,5 +1,5 @@
+/** @file libpsh/xmalloc.h - @brief Safe versions of malloc and realloc */
 /*
-    libpsh/xmalloc.h - safe versions of malloc and realloc
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
