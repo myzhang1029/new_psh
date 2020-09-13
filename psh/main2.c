@@ -47,6 +47,7 @@ char *argv0;
 int main(int argc, char **argv)
 {
     builtin_function bltin;
+    int stat;
     struct command *cmd = NULL;
     char *expanded_ps1, *buffer;
     char *ps1 =
@@ -68,17 +69,18 @@ int main(int argc, char **argv)
     while (1)
     {
         expanded_ps1 = ps_expander(ps1);
-        if (read_cmdline(expanded_ps1, &buffer) < 0)
-            continue;
+        stat = read_cmdline(expanded_ps1, &buffer);
         xfree(expanded_ps1);
+        if (stat < 0)
+            continue;
         cmd = new_command();
-        if (filpinfo(buffer, cmd) < 0)
+        stat = filpinfo(buffer, cmd);
+        xfree(buffer);
+        if (stat < 0)
         {
-            xfree(buffer);
             free_command(cmd);
             continue;
         }
-        xfree(buffer);
 
         /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
          * psh_backend_do_run() */
