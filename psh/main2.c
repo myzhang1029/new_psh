@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         if (read_cmdline(expanded_ps1, &buffer) < 0)
             continue;
         xfree(expanded_ps1);
-        new_command(&cmd);
+        cmd = new_command();
         if (filpinfo(buffer, cmd) < 0)
         {
             xfree(buffer);

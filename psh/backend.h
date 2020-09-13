@@ -1,5 +1,5 @@
+/** @file psh/backend.h - @brief Backend definitions of psh */
 /*
-   psh/backend.h - backend definitions of psh
 
    Copyright 2017-2020 Zhang Maiyun.
 
