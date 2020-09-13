@@ -74,17 +74,17 @@ psh_hash *psh_hash_create(size_t size);
  * @param table The table to operate.
  * @param key The key.
  * @param value The value.
- * @param if_free Whether @ref value should be free()d upon table deallocation.
+ * @param if_free Whether @p value should be free()d upon table deallocation.
  * @return 0 if succeeded, 1 if not.
  */
 int psh_hash_add(psh_hash *table, const char *key, void *value, int if_free);
 
-/** Add an item to the hash table, expand @ref table if FULL_RATE is reached.
+/** Add an item to the hash table, expand @p table if FULL_RATE is reached.
  *
  * @param ptable Pointer to the table to operate.
  * @param key The key.
  * @param value The value.
- * @param if_free Whether @ref value should be free()d upon table deallocation.
+ * @param if_free Whether @p value should be free()d upon table deallocation.
  * @return 0 if succeeded, 1 otherwise.
  */
 int psh_hash_add_chk(psh_hash **ptable, const char *key, void *value,

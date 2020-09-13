@@ -26,13 +26,13 @@
  * @details Call CHK_FUNC on each (substr + TARGET) concatenated string in PATH
  * separated by SEPARATOR.
  *
- * @param path List of paths separated by @ref separator to call @ref chk_func
+ * @param path List of paths separated by @p separator to call @p chk_func
  * with.
- * @param separator Separator of @ref path.
- * @param target The string to be appended to each item in @ref path before
- * calling @ref chk_func.
+ * @param separator Separator of @p path.
+ * @param target The string to be appended to each item in @p path before
+ * calling @p chk_func.
  * @param chk_func Function to determine whether the correct path is found.
- * @return The first concatenated string for which CHK_FUNC returns non-zero;
+ * @return The first concatenated string for which @p chk_func returns non-zero;
  * or NULL if none succeeded, should be free()d.
  */
 char *psh_search_path(char *path, int separator, const char *target,

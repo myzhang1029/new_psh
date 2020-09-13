@@ -61,8 +61,8 @@ psh_stringbuilder *psh_stringbuilder_create();
  * @param builder The string bulider to use.
  * @param string The string to be added.
  * @param length Number of characters to include.
- * @param if_free Whether @ref string should be free()d upon deallocation.
- * @return @ref string.
+ * @param if_free Whether @p string should be free()d upon deallocation.
+ * @return @p string.
  */
 char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
                                    size_t length, int if_free);
@@ -71,8 +71,8 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
  *
  * @param builder The string bulider to use.
  * @param string The string to be added.
- * @param if_free Whether @ref string should be free()d upon deallocation.
- * @return @ref string.
+ * @param if_free Whether @p string should be free()d upon deallocation.
+ * @return @p string.
  */
 char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string,
                             int if_free);
