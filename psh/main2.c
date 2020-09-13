@@ -73,7 +73,7 @@ int main(int argc, char **argv)
         xfree(expanded_ps1);
         if (stat < 0)
             continue;
-        new_command(&cmd);
+        cmd = new_command();
         stat = filpinfo(buffer, cmd);
         xfree(buffer);
         if (stat < 0)

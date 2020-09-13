@@ -1,5 +1,5 @@
+/** @file psh/prompts.h - @brief Prompt generator and printer */
 /*
-    psh/prompts.h - Prompt generator and printer
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -19,5 +19,10 @@
 */
 #ifndef _PSH_PROMPTS_H
 #define _PSH_PROMPTS_H
+/** Expand $PSn.
+ *
+ * @param prompt The $PSn string to be expanded.
+ * @return Expanded prompt.
+ */
 char *ps_expander(char *prompt);
 #endif

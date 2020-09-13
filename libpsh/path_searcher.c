@@ -25,8 +25,8 @@
 
 /* Call CHK_FUNC on each (substr + TARGET) concatenated string in PATH
  * separated by SEPARATOR.
- * Returns the first conctenated string for which CHK_FUNC returns non-zero;
- * or NULL if none succeeded. REsult should be free()d */
+ * Returns the first concatenated string for which CHK_FUNC returns non-zero;
+ * or NULL if none succeeded. Result should be free()d */
 char *psh_search_path(char *path, int separator, const char *target,
                       int (*chk_func)(const char *))
 {

@@ -235,7 +235,7 @@ int filpinfo(char *buffer, struct command *info)
                     }
                     else if (buffer[cnt_buffer + 1] == '&')
                     {
-                        new_command(&(cmd_lastnode->next));
+                        cmd_lastnode->next = new_command();
                         if (cmd_lastnode->flag == 0)
                             cmd_lastnode->flag = RUN_AND;
                         else
@@ -262,7 +262,7 @@ int filpinfo(char *buffer, struct command *info)
                     }
                     else
                     {
-                        new_command(&(cmd_lastnode->next));
+                        cmd_lastnode->next = new_command();
                         if (cmd_lastnode->flag == 0)
                             cmd_lastnode->flag = BACKGROUND;
                         else
@@ -289,7 +289,7 @@ int filpinfo(char *buffer, struct command *info)
                         free(cmd_lastnode->argv[cnt_argument_element]);
                         cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
-                    new_command(&(cmd_lastnode->next));
+                    cmd_lastnode->next = new_command();
                     if (buffer[cnt_buffer + 1] == '|')
                     {
                         if (cmd_lastnode->flag == 0)
@@ -409,8 +409,7 @@ int filpinfo(char *buffer, struct command *info)
                     cnt_argument_char += strlen(hdir);
                 }
                 break;
-            case '\\':
-            {
+            case '\\': {
                 int case_count;
                 for (case_count = 1; buffer[cnt_buffer];
                      ++case_count, ++cnt_buffer)
@@ -632,7 +631,7 @@ int filpinfo(char *buffer, struct command *info)
                         xfree(cmd_lastnode->argv[cnt_argument_element]);
                         cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
-                    new_command(&(cmd_lastnode->next));
+                    cmd_lastnode->next = new_command();
                     if (cmd_lastnode->flag == 0)
                         cmd_lastnode->flag = MULTICMD;
                     else

@@ -1,5 +1,5 @@
+/** @file psh/input.h - @brief Read input */
 /*
-    psh/input.h - Read input
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -19,5 +19,14 @@
 */
 #ifndef _PSH_INPUT_H
 #define _PSH_INPUT_H
+
+/** Read command line.
+ *
+ * @param prompt Prompt to print.
+ * @param result Pointer to the resulting string, the string needs to be
+ * free()d.
+ * @return 0 if everything goes well; -1 if the cmd doesn't need to be run; -2
+ * if anything went wrong, @p result is untouched.
+ */
 int read_cmdline(char *prompt, char **result);
 #endif

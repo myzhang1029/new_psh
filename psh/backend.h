@@ -1,5 +1,5 @@
+/** @file psh/backend.h - @brief Backend definitions of psh */
 /*
-   psh/backend.h - backend definitions of psh
 
    Copyright 2017-2020 Zhang Maiyun.
 
@@ -25,8 +25,9 @@
 
 #include "command.h" /* For struct command */
 
+/** The exit status of the previous command, $? */
 extern int last_command_status;
-extern int pipe_fd[2], in_fd, out_fd;
+/** @deprecated Maximum number of background jobs. */
 #define MAXPIDTABLE 1024
 
 /** Platform dependent shell initializaion.

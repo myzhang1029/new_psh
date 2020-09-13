@@ -1,6 +1,5 @@
+/** @file libpsh/hash.h - @brief Hash functions and structures */
 /*
-   libpsh/hash.h - hash functions and structures
-
    Copyright 2017-2020 Zhang Maiyun.
 
    This file is part of Psh, P shell.
@@ -20,42 +19,104 @@
 */
 #include <stdio.h>
 
-/* A single key-value pair */
+/** @brief A single key-value pair with @ref next pointer. */
 struct _psh_hash_item
 {
+    /** The key. */
     char *key;
+    /** Whether @ref value should be free()d afterwards. */
     int if_free;
+    /** The value */
     void *value;
+    /** Linked-list of all items with the same hash value. */
     struct _psh_hash_item *next;
 };
 
-/* Internal structure. Used as arrays to hold the hash table */
+/** @brief Internal structure used as arrays to hold the hash table. */
 struct _psh_hash_internal
 {
-    /* Number of used items */
+    /** Number of used items. */
     size_t used;
-    /* Array. all data with the same hash value goes here.
-     */
+    /** Linked-list of all data with the same hash value. */
     struct _psh_hash_item *head;
-    /* The last item for easy insert */
+    /** Pointer to the last item. */
     struct _psh_hash_item *tail;
 };
 
-/* The exported structure for hash tables */
+/** @brief Container structure of hash tables. */
 typedef struct _psh_hash_container
 {
-    /* size of this _psh_hash_internal list */
+    /** Number of total slots in @ref table. */
     size_t len;
+    /** Number of used slots in @ref table. */
     size_t used;
+    /** List of items. */
     struct _psh_hash_internal *table;
 } psh_hash;
 
-psh_hash *psh_hash_realloc(psh_hash *, size_t);
-psh_hash *psh_hash_create(size_t);
-int psh_hash_add(psh_hash *, const char *, void *, int if_free);
-int psh_hash_add_chk(psh_hash **, const char *, void *, int if_free);
-void *psh_hash_get(psh_hash *, const char *);
-int psh_hash_rm(psh_hash *, const char *);
-void psh_hash_free(psh_hash *, int if_free_val);
+/** Resize the hash table.
+ *
+ * @param table The table to resize.
+ * @param newsize New size of the table.
+ * @return A new table with the new size and original data.
+ */
+psh_hash *psh_hash_realloc(psh_hash *table, size_t newsize);
 
+/** Create a new hash table.
+ *
+ * @param size Initial size of the table.
+ * @return Pointer to the created psh_hash structure (_the table_).
+ */
+psh_hash *psh_hash_create(size_t size);
+
+/** Add an item to the hash table.
+ *
+ * @param table The table to operate.
+ * @param key The key.
+ * @param value The value.
+ * @param if_free Whether @p value should be free()d upon table deallocation.
+ * @return 0 if succeeded, 1 if not.
+ */
+int psh_hash_add(psh_hash *table, const char *key, void *value, int if_free);
+
+/** Add an item to the hash table, expand @p table if FULL_RATE is reached.
+ *
+ * @param ptable Pointer to the table to operate.
+ * @param key The key.
+ * @param value The value.
+ * @param if_free Whether @p value should be free()d upon table deallocation.
+ * @return 0 if succeeded, 1 otherwise.
+ */
+int psh_hash_add_chk(psh_hash **ptable, const char *key, void *value,
+                     int if_free);
+
+/** Get an item by key.
+ *
+ * @param table The table to look up from.
+ * @param key The key.
+ * @return The corresponding value if found, NULL otherwise.
+ */
+void *psh_hash_get(psh_hash *table, const char *key);
+
+/** Remove an item by key.
+ *
+ * @param table The table to operate.
+ * @param key The key.
+ * @return 0 if succeeded, 1 if no such item exists.
+ */
+int psh_hash_rm(psh_hash *table, const char *key);
+
+/** Deallocate a hash table.
+ *
+ * @param table The table free.
+ * @param if_free_val Set to 0 if values shouldn't be free()d/
+ */
+void psh_hash_free(psh_hash *table, int if_free_val);
+
+/** Hash function.
+ *
+ * @param s The key.
+ * @param ulimit Upper limit of the value.
+ * @return The value.
+ */
 size_t hasher(const char *s, size_t ulimit);

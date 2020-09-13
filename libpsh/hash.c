@@ -105,7 +105,7 @@ int psh_hash_add(psh_hash *table, const char *key, void *value, int if_free)
         size_t count;
         struct _psh_hash_item *this = using->head;
         /* Iterate over the existing ones to see if an edit should occur, also
-         * filter out any duplicate keys */
+         * filtering out any duplicate keys */
         for (count = 0; count < using->used; ++count)
         {
             if (strcmp(key, this->key) == 0)
@@ -159,8 +159,9 @@ void *psh_hash_get(psh_hash *table, const char *key)
     return NULL;
 }
 
-/* Resize the hash table, the new size cannot be lower than the old size,
- * otherwise it returns 1. returns 2 if realloc failed, 0 if succeeded */
+/* Resize the hash table.
+ * A new table is always created and original items are moved in.
+ */
 psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
 {
     struct _psh_hash_internal *using;
@@ -188,7 +189,7 @@ psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
 }
 
 /* Remove an element from the hash table, return 0 if success, 1 if specified
- * element not found */
+ * item not found */
 int psh_hash_rm(psh_hash *table, const char *key)
 {
     struct _psh_hash_internal *using;

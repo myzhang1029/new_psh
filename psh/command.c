@@ -51,37 +51,38 @@ void free_redirect(struct redirect *redir)
 
 /* Malloc a command, enNULL all elements, malloc the first element in argv[] and
  * a struct redirect */
-int new_command(struct command **info)
+struct command *new_command()
 {
     /* XXX: Remove MAXARG, MAXEACHARG */
-    *info = xmalloc(sizeof(struct command));
-    command_init(*info);
-    (*info)->argv = xmalloc(sizeof(char *) * MAXARG);
-    memset((*info)->argv, 0, MAXARG); /* This will be used to detect
+    struct command *cmd;
+    cmd = xmalloc(sizeof(struct command));
+    command_init(cmd);
+    cmd->argv = xmalloc(sizeof(char *) * MAXARG);
+    memset(cmd->argv, 0, MAXARG); /* This will be used to detect
                            whether an element is used */
-    (*info)->argv[0] = xmalloc(P_CS * MAXEACHARG);
-    memset((*info)->argv[0], 0, MAXEACHARG);
-    (*info)->rlist = xmalloc(sizeof(struct redirect));
-    redirect_init((*info)->rlist);
-    return 0;
+    cmd->argv[0] = xmalloc(P_CS * MAXEACHARG);
+    memset(cmd->argv[0], 0, MAXEACHARG);
+    cmd->rlist = xmalloc(sizeof(struct redirect));
+    redirect_init(cmd->rlist);
+    return cmd;
 }
 
-void command_init(struct command *info)
+void command_init(struct command *cmd)
 {
-    info->flag = 0;
-    info->rlist = NULL;
-    info->argv = NULL;
-    info->next = NULL;
+    cmd->flag = 0;
+    cmd->rlist = NULL;
+    cmd->argv = NULL;
+    cmd->next = NULL;
 }
 
 /* Free a command and its nexts */
-void free_command(struct command *info)
+void free_command(struct command *cmd)
 {
     struct command *temp;
-    while (info != NULL)
+    while (cmd != NULL)
     {
-        temp = info;
-        info = info->next;
+        temp = cmd;
+        cmd = cmd->next;
         free_argv(temp);
         free_redirect(temp->rlist);
         xfree(temp);
@@ -89,19 +90,19 @@ void free_command(struct command *info)
     }
 }
 
-void free_argv(struct command *info)
+void free_argv(struct command *cmd)
 {
     int count;
     for (count = 0; count < MAXARG; ++count)
     {
-        if (info->argv[count] != NULL)
+        if (cmd->argv[count] != NULL)
         {
-            xfree(info->argv[count]);
-            info->argv[count] = NULL;
+            xfree(cmd->argv[count]);
+            cmd->argv[count] = NULL;
         }
         else
             break; /* All args should be freed after here */
     }
-    xfree(info->argv);
-    info->argv = NULL;
+    xfree(cmd->argv);
+    cmd->argv = NULL;
 }

@@ -1,5 +1,5 @@
+/** @file /psh/util.h - @brief Psh-specific utilities */
 /*
-    psh/util.h - psh-specific utilities
     Copyright 2018-2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -21,9 +21,25 @@
 #ifndef _PSH_UTIL_H
 #define _PSH_UTIL_H
 
-#include <psh.h> /* For __attribute__ */
+#include "psh.h" /* For __attribute__ */
 
+/** Report a fault in programming.
+ *
+ * @param file __FILE__
+ * @param line __LINE__
+ */
 void code_fault(char *file, int line) __attribute__((noreturn));
+
+/** Exit after cleaning up.
+ *
+ * @param status Exit status.
+ */
 void exit_psh(int status) __attribute__((noreturn));
+
+/** Add a pointer to be free()d upon exit.
+ *
+ * @param ptr The pointer.
+ * @return The index of this pointer.
+ */
 int add_atexit_free(void *ptr);
 #endif

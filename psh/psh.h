@@ -1,5 +1,5 @@
+/** @file psh/psh.h - @brief Psh generic definitions */
 /*
-    psh/psh.c - psh generic definitions
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -21,7 +21,9 @@
 #ifndef _PSH_H
 #define _PSH_H
 #ifndef __GNUC__
+/** GNU attribute macro */
 #define __attribute__(x)
 #endif
+/** Version of psh. */
 #define PSH_VERSION "0.18.0"
 #endif
