@@ -262,7 +262,7 @@ int filpinfo(char *buffer, struct command *info)
                     }
                     else
                     {
-                        cmd_lastnode->next = new_command());
+                        cmd_lastnode->next = new_command();
                         if (cmd_lastnode->flag == 0)
                             cmd_lastnode->flag = BACKGROUND;
                         else
