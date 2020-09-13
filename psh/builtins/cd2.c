@@ -76,7 +76,6 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
 extern char *argv0;
 
 /* TODO */
-/* XXX: Use less malloc/free */
 /* Get rid of ../"s and "./"s and extra "/"s.
  * Resolve to realpath before expanding "../"s is ABSOLUTE is 1.
  * Return NULL if PATH is NULL or cwd cannot be determined. */

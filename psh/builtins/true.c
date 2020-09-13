@@ -22,8 +22,6 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
-
 #include "builtin.h"
 
 int builtin_true(int argc, char **argv) { return 0; }

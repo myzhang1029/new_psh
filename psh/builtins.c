@@ -16,7 +16,6 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-#include "psh.h"
 
 extern int last_command_status;
 extern char *argv0;

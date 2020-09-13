@@ -19,7 +19,6 @@
 */
 #ifndef BUILTIN_INCLUDED
 #define BUILTIN_INCLUDED
-#include "psh.h"
 
 /** Type for builtin entrypoints. */
 typedef int (*builtin_function)(int argc, char **argv);

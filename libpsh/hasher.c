@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
+#include <stddef.h>
 
 size_t hasher(const char *s, size_t ulimit)
 {

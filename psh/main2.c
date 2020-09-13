@@ -23,7 +23,6 @@
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 /* Some evil implementations include no stdio.h is history.h */

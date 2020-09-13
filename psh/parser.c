@@ -22,7 +22,6 @@
 #include "config.h"
 #endif
 
-#include <ctype.h>
 #include <stddef.h>
 
 #include "backend.h"

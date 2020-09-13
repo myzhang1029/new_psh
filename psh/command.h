@@ -21,7 +21,7 @@
 #ifndef _PSH_COMMAND_H
 #define _PSH_COMMAND_H
 
-#include <stdio.h>
+#include <stdio.h> /* For FILE */
 
 /** @deprecated Maximum characters in a line */
 #define MAXLINE 262144

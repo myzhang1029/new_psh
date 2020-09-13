@@ -5,7 +5,6 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
 
 #include "libpsh/hash.h"
 #include "libpsh/xmalloc.h"

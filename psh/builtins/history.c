@@ -33,7 +33,7 @@
 #endif
 
 #include "builtin.h"
-#include "command.h"
+#include "command.h" /* For MAXEACHARG */
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 
@@ -82,7 +82,7 @@ int builtin_history(int argc, char **argv)
                               "than one of -anrw\n",
                               argv0, argv[0]);
                         USAGE();
-                        free(filename);
+                        xfree(filename);
                         return 2;
                     }
                     flags |= RFLAG;
@@ -97,7 +97,7 @@ int builtin_history(int argc, char **argv)
                               "than one of -anrw\n",
                               argv0, argv[0]);
                         USAGE();
-                        free(filename);
+                        xfree(filename);
                         return 2;
                     }
                     if (optarg)
@@ -112,7 +112,7 @@ int builtin_history(int argc, char **argv)
                               "than one of -anrw\n",
                               argv0, argv[0]);
                         USAGE();
-                        free(filename);
+                        xfree(filename);
                         return 2;
                     }
                     if (optarg)
@@ -137,7 +137,7 @@ int builtin_history(int argc, char **argv)
                         OUT2E("%s: %s: %d: invalid "
                               "option\n",
                               argv0, argv[0], n);
-                        free(filename);
+                        xfree(filename);
                         return 2;
                     }
                     if (!n)
@@ -154,7 +154,7 @@ int builtin_history(int argc, char **argv)
                                       "required"
                                       "\n",
                                       argv0, argv[0], argv[count]);
-                                free(filename);
+                                xfree(filename);
                                 return 2;
                             }
                     }
@@ -162,25 +162,25 @@ int builtin_history(int argc, char **argv)
                 case '?':
                     OUT2E("%s: %s: invalid option '-%c'\n", argv0, argv[0],
                           optopt);
-                    free(filename);
+                    xfree(filename);
                     return 2;
                 case ':':
                     OUT2E("%s: %s: -d: option requires an "
                           "argument\n",
                           argv0, argv[0]);
-                    free(filename);
+                    xfree(filename);
                     return 2;
             }
         }
         if (flags == 0)
         {
-            free(filename);
+            xfree(filename);
             goto noopts;
         }
         else
         {
             /* TODO:Code here */
-            free(filename);
+            xfree(filename);
         }
     }
     else
