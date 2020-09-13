@@ -1,5 +1,5 @@
+/** @file token.h - @brief Parser tokens */
 /*
-   token.h - parser tokens
 
    Copyright 2018 Zhang Maiyun.
 
@@ -19,6 +19,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+/** Valid psh tokens. */
 enum psh_tokens
 {
     IF,                  /* if */
@@ -62,8 +63,11 @@ enum psh_tokens
     BAR_AND,             /* -& */
 };
 
+/** Token stream. */
 typedef struct psh_token_stream
 {
+    /** Type of this token */
     enum psh_tokens the_token;
+    /** Additional arguments */
     char *arg;
 } psh_tokenstream;

@@ -23,8 +23,11 @@
 
 #include <stdio.h>
 
+/** @deprecated Maximum characters in a line */
 #define MAXLINE 262144
+/** @deprecated Maximum number of arguments */
 #define MAXARG 64
+/** @deprecated Maximum characters in an argument */
 #define MAXEACHARG 4096
 
 /** @brief Redirection of a command.
