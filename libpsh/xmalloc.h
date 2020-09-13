@@ -25,9 +25,9 @@
 /** Size of char. Keep this although c99 says it's always 1. */
 #define P_CS sizeof(char)
 
-/* Generic pointer type. */
 #include <stddef.h>
 
+/** Generic pointer type. */
 #ifndef PTR_T
 #if defined(__STDC__)
 #define PTR_T void *
