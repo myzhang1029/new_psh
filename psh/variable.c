@@ -1,5 +1,5 @@
 /*
-    psh/variables.c - psh variables
+    psh/variables.c - psh variables, functions and aliases
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
@@ -17,6 +17,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+/* From `bash -c "help declare"`:
+Variables:
+      -a        to make NAMEs indexed arrays (if supported)
+      -A        to make NAMEs associative arrays (if supported)
+      -i        to make NAMEs have the `integer' attribute
+      -n        make NAME a reference to the variable named by its value
+      -r        to make NAMEs readonly
+      -t        to make NAMEs have the `trace' attribute
+      -x        to make NAMEs export
+
+Different from what bash does, aliases are also psh variables.
+To avoid name collisions, functions have a prefix of "f_", aliases have "a_",
+and variables have "v_".
+*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,21 +43,18 @@
 #include "libpsh/xmalloc.h"
 #include "variable.h"
 
-/* Using three tables here, because both env vars and global vars live
+/* Using two tables here, because both env vars and global vars live
  * throughout the life of the shell, while local vars can override them without
  * altering their value. */
-/* Environmental variables */
-psh_hash *variable_table_e = NULL;
-/* Global variables */
-psh_hash *variable_table_g = NULL;
+/* Environmental and global variables */
+psh_hash *variable_table_eg = NULL;
 /* Local variables */
 psh_hash *variable_table_l = NULL;
 
 /* Init the two tables above, and try to get environment parameters */
 void psh_variable_init(void)
 {
-    variable_table_e = psh_hash_create(10);
-    variable_table_g = psh_hash_create(10);
+    variable_table_eg = psh_hash_create(10);
     variable_table_l = psh_hash_create(10);
     /* #5 #12 #13 TODO: Retrieve all env vars,
      * for generic, only try to read those important to shell, such as HOME,
