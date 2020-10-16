@@ -50,14 +50,15 @@ char *psh_fgets(char *prompt, FILE *fp)
         printf("%s", prompt);
     {
         size_t charcount = 0, nowhave = 256;
+        int ch;
         char *result = xmalloc(P_CS * nowhave);
         char *ptr = result;
         if (result == NULL)
             return NULL;
         while (1)
         {
-            *ptr = fgetc(fp);
-            if (*ptr == EOF)
+            ch = fgetc(fp);
+            if (ch == EOF)
             {
                 if (ptr == result) /* nothing read */
                 {
@@ -66,9 +67,9 @@ char *psh_fgets(char *prompt, FILE *fp)
                 }
                 break;
             }
-            if (*ptr == '\n')
+            if (ch == '\n')
                 break;
-            ++ptr;
+            *ptr++ = ch;
             if ((++charcount) == nowhave)
                 result = xrealloc(result, P_CS * (nowhave <<= 1));
         }
