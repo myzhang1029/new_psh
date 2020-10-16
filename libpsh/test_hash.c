@@ -50,7 +50,7 @@ int main(void)
 
     printf("%p\n", psh_hash_get(hash, "1")); /* 0x0 */
 
-    psh_hash_free(hash, 1);
+    psh_hash_free(hash);
 
     return 0;
 }

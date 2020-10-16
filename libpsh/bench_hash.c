@@ -5,6 +5,9 @@
  */
 
 #include <stdlib.h>
+#ifdef GPERF
+#include <gperftools/profiler.h>
+#endif
 
 #include "libpsh/hash.h"
 #include "libpsh/xmalloc.h"
@@ -16,6 +19,9 @@ int main(void)
 {
     char *val1;
     psh_hash *hash;
+#ifdef GPERF
+    ProfilerStart("bench_hash.prof");
+#endif
 
     val1 = xmalloc(P_CS * 11);
     val1[10] = 0;
@@ -29,8 +35,11 @@ int main(void)
             psh_hash_add(hash, val1, "a", 0);
         }
     }
-    psh_hash_free(hash, 1);
+    psh_hash_free(hash);
     xfree(val1);
 
+#ifdef GPERF
+    ProfilerStop();
+#endif
     return 0;
 }

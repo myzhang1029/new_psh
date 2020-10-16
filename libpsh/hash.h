@@ -24,6 +24,8 @@ struct _psh_hash_item
 {
     /** The key. */
     char *key;
+    /** The hasher() value for this item. */
+    size_t hash;
     /** Whether @ref value should be free()d afterwards. */
     int if_free;
     /** The value */
@@ -108,15 +110,13 @@ int psh_hash_rm(psh_hash *table, const char *key);
 
 /** Deallocate a hash table.
  *
- * @param table The table free.
- * @param if_free_val Set to 0 if values shouldn't be free()d/
+ * @param table The table to free.
  */
-void psh_hash_free(psh_hash *table, int if_free_val);
+void psh_hash_free(psh_hash *table);
 
 /** Hash function.
  *
  * @param s The key.
- * @param ulimit Upper limit of the value.
  * @return The value.
  */
-size_t hasher(const char *s, size_t ulimit);
+size_t hasher(const char *s);
