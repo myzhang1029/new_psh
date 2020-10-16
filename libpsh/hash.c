@@ -47,6 +47,28 @@ static void internal_initializer(struct _psh_hash_internal *internal,
     memset(internal, 0, sizeof(struct _psh_hash_internal) * len);
 }
 
+/** Add an allocated and filled struct _psh_hash_item to a table.
+ * @note @ref item->next should be NULL or empty.
+ * @param table The table to which to add.
+ * @param item Pointer to the struct _psh_hash_item to add.
+ * @return 0 if succeeded, 1 if not.
+ */
+static int add__psh_hash_item(psh_hash *table, struct _psh_hash_item *item)
+{
+    struct _psh_hash_internal *using;
+
+    using = &(table->table[item->hash % table->len]);
+    if (using->used == 0)
+        /* This hash value is still empty, initialize, and put the key-value
+         * pair to add to the first place */
+        using->head = using->tail = item;
+    else
+        using->tail = using->tail->next = item;
+    using->used++;
+    table->used++;
+    return 0;
+}
+
 /* Allocate a new hash table, return the table if succeeded */
 psh_hash *psh_hash_create(size_t len)
 {
@@ -60,29 +82,6 @@ psh_hash *psh_hash_create(size_t len)
     internal_initializer(table->table, len);
 
     return table;
-}
-
-/** Add an allocated and filled struct _psh_hash_item to a table.
- * @note @ref item->next should be NULL or empty.
- * @param table The table to which to add.
- * @param item Pointer to the struct _psh_hash_item to add.
- * @return 0 if succeeded, 1 if not.
- */
-static int add__psh_hash_item(psh_hash *table, struct _psh_hash_item *item)
-{
-    struct _psh_hash_internal *using;
-    size_t hash = item->hash;
-
-    using = &(table->table[hash % table->len]);
-    if (using->used == 0)
-        /* This hash value is still empty, initialize, and put the key-value
-         * pair to add to the first place */
-        using->head = using->tail = item;
-    else
-        using->tail = using->tail->next = item;
-    using->used++;
-    table->used++;
-    return 0;
 }
 
 /* Same as psh_hash_add, but resizes the hash table if the number of items gets
@@ -162,9 +161,8 @@ void *psh_hash_get(psh_hash *table, const char *key)
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this;
     size_t count;
-    size_t hash_result = hasher(key);
 
-    using = &(table->table[hash_result % table->len]);
+    using = &(table->table[hasher(key) % table->len]);
     this = using->head;
 
     for (count = 0; count < using->used; ++count)
@@ -184,8 +182,7 @@ void *psh_hash_get(psh_hash *table, const char *key)
 psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
 {
     struct _psh_hash_internal *using;
-    struct _psh_hash_item *this;
-    size_t count, count2, oldlen = table->len;
+    size_t count, oldlen = table->len;
     struct _psh_hash_internal *oldtable = table->table;
 #ifdef DEBUG
     fprintf(stderr, "[hash] realloc %zu\n", newlen);
@@ -195,10 +192,10 @@ psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
     table->table = xmalloc(sizeof(struct _psh_hash_internal) * newlen);
     table->used = 0;
     /* Go through the old table and settle the items into the new table */
-    for (count = 0, using = oldtable; count < oldlen; ++count, ++using)
+    for (using = oldtable; using < (size_t)(oldtable + oldlen); ++using)
     {
-        this = using->head;
-        for (count2 = 0; count2 < using->used; ++count2)
+        struct _psh_hash_item *this = using->head;
+        for (count = 0; count < using->used; ++count)
         {
             add__psh_hash_item(table, this);
             this = this->next;
@@ -217,9 +214,8 @@ int psh_hash_rm(psh_hash *table, const char *key)
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this, *old_this;
     size_t count;
-    size_t hash_result = hasher(key);
 
-    using = &(table->table[hash_result % table->len]);
+    using = &(table->table[hasher(key) % table->len]);
     old_this = NULL;
     this = using->head;
 
@@ -258,12 +254,13 @@ void psh_hash_free(psh_hash *table)
 {
     struct _psh_hash_internal *using;
     struct _psh_hash_item *this, *tmp;
-    size_t count, count2;
+    size_t count;
 
-    for (count = 0, using = table->table; count < table->len; ++count, ++using)
+    for (using = table->table; using < (size_t)(table->table + table->len);
+         ++count, ++using)
     {
         this = using->head;
-        for (count2 = 0; count2 < using->used; ++count2)
+        for (count = 0; count < using->used; ++count)
         {
             xfree(this->key);
             if (this->if_free)
