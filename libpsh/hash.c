@@ -192,7 +192,7 @@ psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
     table->table = xmalloc(sizeof(struct _psh_hash_internal) * newlen);
     table->used = 0;
     /* Go through the old table and settle the items into the new table */
-    for (using = oldtable; using < (size_t)(oldtable + oldlen); ++using)
+    for (using = oldtable; using < oldtable + oldlen; ++using)
     {
         struct _psh_hash_item *this = using->head;
         for (count = 0; count < using->used; ++count)
@@ -256,8 +256,7 @@ void psh_hash_free(psh_hash *table)
     struct _psh_hash_item *this, *tmp;
     size_t count;
 
-    for (using = table->table; using < (size_t)(table->table + table->len);
-         ++count, ++using)
+    for (using = table->table; using < table->table + table->len; ++using)
     {
         this = using->head;
         for (count = 0; count < using->used; ++count)
