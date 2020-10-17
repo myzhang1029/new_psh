@@ -46,14 +46,6 @@ int read_cmdline(char *prompt, char **result)
     char *buffer, *expanded;
     int stat;
     buffer = psh_gets(prompt);
-#if 0
-	/* This branch seems redundant, keep and see if things break */
-    if (feof(stdin)) /* EOF reached */
-    {
-        puts("");
-        exit_psh(last_command_status);
-    }
-#endif
     if (!buffer) /* EOF reached */
     {
         puts("");
