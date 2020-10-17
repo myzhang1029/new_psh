@@ -43,8 +43,12 @@ extern char *argv0;
  */
 int read_cmdline(char *prompt, char **result)
 {
-    char *buffer, *expanded;
+    char *buffer;
+#ifdef HAVE_WORKING_HISTORY
+    char *expanded;
     int stat;
+#endif
+
     buffer = psh_gets(prompt);
     if (!buffer) /* EOF reached */
     {
