@@ -10,7 +10,7 @@
 #include "libpsh/hash.h"
 #include "libpsh/xmalloc.h"
 
-#define psh_hash_add(a, b, c, d) psh_hash_add_chk(&a, b, c, d)
+#define psh_hash_add psh_hash_add_chk
 
 int main(void)
 {
@@ -23,7 +23,7 @@ int main(void)
     val2 = xmalloc(sizeof(int));
     *val2 = 42;
 
-    hash = psh_hash_create(1);
+    hash = psh_hash_create(3);
     psh_hash_add(hash, "1", val1, 1);
     printf("%p\n", hash);
     psh_hash_add(hash, "2", val1, 0);
