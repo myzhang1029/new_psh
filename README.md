@@ -2,6 +2,7 @@ FORK OF https://github.com/myzhang1029/psh
 
 IT COMPILES AND RUNS BUT STILL SOME WARNINGS ABOUT UNUSED PARAMETERS SHOW UP
 
+The output folder contains a pre-compiled executable.
 
 ## Description
 Psh is a shell implementation. It tries to mimic most of bash's
