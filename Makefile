@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS := -Wall -Wextra -g
-LFLAGS = -llib
+LFLAGS = -l:xmalloc.a -l:util.a -l:stringbuilder.a -l:path_searcher.a -l:hashing.a -l:bench_hash.a
 OUTPUT := output
 SRC := src
 INCLUDE := include
