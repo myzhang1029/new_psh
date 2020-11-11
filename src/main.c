@@ -1,5 +1,5 @@
 /*
-    psh/main2.c - psh entry point
+    psh/main.c - psh entry point
     Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.

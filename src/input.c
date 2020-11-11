@@ -1,5 +1,5 @@
 /*
-    psh/input2.c - new input handler as opposed to the blog-based one
+    psh/input.c - input handler
     Copyright 2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
