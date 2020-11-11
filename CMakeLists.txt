@@ -59,7 +59,7 @@ endif()
 configure_file(psh.pc.in psh.pc @ONLY)
 
 # config.h
-configure_file(config.h.in config.h)
+configure_file(config.h.cm config.h)
 set(CMAKE_C_FLAGS "-I${CMAKE_BINARY_DIR} -DHAVE_CONFIG_H ${CMAKE_C_FLAGS}")
 
 add_subdirectory(lib)
