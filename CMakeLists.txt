@@ -8,7 +8,7 @@ project(psh VERSION 0.18.0
     LANGUAGES "C")
 set(PROJECT_DESCRIPTION "P Shell")
 #enable_testing()
-include_directories(.)
+include_directories(./include)
 
 # checks
 # Check for libreadline
@@ -56,27 +56,19 @@ if(NOT INTPTR_T)
 endif()
 
 # pkg-config file
-configure_file(libpsh.pc.in libpsh.pc @ONLY)
+configure_file(psh.pc.in psh.pc @ONLY)
 
 # config.h
 configure_file(config.h.in config.h)
 set(CMAKE_C_FLAGS "-I${CMAKE_BINARY_DIR} -DHAVE_CONFIG_H ${CMAKE_C_FLAGS}")
 
-message(VERBOSE "HAVE_HISTORY: " ${HAVE_HISTORY})
-message(VERBOSE "HAVE_WORKING_HISTORY: " ${HAVE_WORKING_HISTORY})
-message(VERBOSE "HAVE_HISTORY_H: " ${HAVE_HISTORY_H})
-message(VERBOSE "HAVE_READLINE: " ${HAVE_READLINE})
-message(VERBOSE "HAVE_READLINE_GNU: " ${HAVE_READLINE_GNU})
-message(VERBOSE "HAVE_READLINE_ALTS: " ${HAVE_READLINE_ALTS})
-message(VERBOSE "HAVE_READLINE_H: " ${HAVE_READLINE_H})
-
-add_subdirectory(libpsh)
-add_subdirectory(psh)
+add_subdirectory(lib)
+add_subdirectory(src)
 
 # distclean target
 add_custom_target(distclean
     ${CMAKE_BUILD_TOOL} clean
-    COMMAND ${CMAKE_COMMAND} -D "subdirs=.\;psh\;libpsh" -P
+    COMMAND ${CMAKE_COMMAND} -D "subdirs=.\;src\;lib" -P
     ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake)
 # uninstall target
 configure_file(
@@ -87,5 +79,5 @@ add_custom_target(uninstall
     COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake")
 
 
-install(FILES ${CMAKE_BINARY_DIR}/libpsh.pc
+install(FILES ${CMAKE_BINARY_DIR}/psh.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
