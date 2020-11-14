@@ -32,13 +32,14 @@ AC_PROG_RANLIB
 AC_SEARCH_LIBS([readline],
                [readline],
                [
-                AC_DEFINE_UNQUOTED([HAVE_READLINE_GNU], [1],
-                                   [Define to 1 if GNU libreadline is found])
+                AC_DEFINE_UNQUOTED([HAVE_READLINE_GNU], [1], [Define to 1 if GNU libreadline is found])
+                AC_DEFINE_UNQUOTED([HAVE_READLINE], [1], [Define to 1 if libreadline is found])
                ],
                [AC_SEARCH_LIBS([readline],
                                [edit],
-                               [AC_DEFINE_UNQUOTED([HAVE_READLINE_ALTS], [1],
-                                                   [Define to 1 if alternative readline implementations are found])
+                               [
+                                AC_DEFINE_UNQUOTED([HAVE_READLINE_ALTS], [1], [Define to 1 if alternative readline implementations are found])
+                                AC_DEFINE_UNQUOTED([HAVE_READLINE], [1], [Define to 1 if libreadline is found])
                                ],
                                [AC_MSG_WARN(
                                 [No libreadline or libedit, disabling readline. If yout think this is a mistake, try adding its path to CFLAGS and LDFLAGS.])
