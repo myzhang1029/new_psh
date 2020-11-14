@@ -6,8 +6,23 @@ AC_INIT([psh], [0.18.0], [myzhang1029@hotmail.com])
 AC_CONFIG_SRCDIR([config.h.in], [src], [lib])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
-# Assuming all platforms with autotools is POSIX
-AM_CONDITIONAL([POSIX], [true])
+
+# Code to select a backend
+AC_CANONICAL_HOST
+
+posix_backend=false
+generic_backend=false
+case "${host_os}" in
+    cygwin*|darwin*|linux*|bsd*)
+        posix_backend=true
+        ;;
+    *)
+        AC_MSG_ERROR(["Currently unsupported host system: $host_os"])
+        #generic_backend=true
+        ;;
+esac
+AM_CONDITIONAL([POSIX], [test "$posix_backend" = "true"])
+AM_CONDITIONAL([GENERIC], [test "$generic_backend" = "true"])
 
 # Checks for programs.
 AC_PROG_CC

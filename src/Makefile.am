@@ -14,6 +14,6 @@ psh_LDADD = $(top_srcdir)/lib/libpsh.a
 
 if POSIX
 psh_SOURCES += backends/posix/posix.c
-else
-ERROR
+else # Unfinished platforms should be captured by configure
+psh_SOURCES += backends/generic/generic.c
 endif
