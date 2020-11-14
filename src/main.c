@@ -26,7 +26,7 @@
 #include <string.h>
 
 /* Some evil implementations include no stdio.h is history.h */
-#ifdef HAVE_HISTORY_H
+#ifdef HAVE_READLINE_HISTORY_H
 #include <readline/history.h>
 #endif
 

@@ -1,7 +1,7 @@
 /* config.h.in.  Was generated from configure.ac by autoheader.  */
 
 /* Define if you have <readline/readline.h>. */
-#cmakedefine HAVE_READLINE_H 1
+#cmakedefine HAVE_READLINE_READLINE_H 1
 
 /* Define if you have libreadline. */
 #cmakedefine HAVE_READLINE 1
@@ -13,7 +13,7 @@
 #cmakedefine HAVE_READLINE_ALTS 1
 
 /* Define if you have <readline/history.h>. */
-#cmakedefine HAVE_HISTORY_H 1
+#cmakedefine HAVE_READLINE_HISTORY_H 1
 
 /* Define if libhistory works. */
 #cmakedefine HAVE_WORKING_HISTORY 1
