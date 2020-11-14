@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([psh], [0.18.0], [myzhang1029@hotmail.com])
-AC_CONFIG_SRCDIR([config.h.in], [src], [lib])
+AC_CONFIG_SRCDIR([src/main.c], [lib/util.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -26,12 +26,34 @@ AM_CONDITIONAL([GENERIC], [test "$generic_backend" = "true"])
 
 # Checks for programs.
 AC_PROG_CC
-
-# Checks for libraries.
 AC_PROG_RANLIB
 
+# Checks for libraries.
+AC_SEARCH_LIBS([readline],
+               [readline],
+               [
+                AC_DEFINE_UNQUOTED([HAVE_READLINE_GNU], [1],
+                                   [Define to 1 if GNU libreadline is found])
+               ],
+               [AC_SEARCH_LIBS([readline],
+                               [edit],
+                               [AC_DEFINE_UNQUOTED([HAVE_READLINE_ALTS], [1],
+                                                   [Define to 1 if alternative readline implementations are found])
+                               ],
+                               [AC_MSG_WARN(
+                                [No libreadline or libedit, disabling readline. If yout think this is a mistake, try adding its path to CFLAGS and LDFLAGS.])
+                               ])
+               ])
+
+AC_SEARCH_LIBS([history_list],
+               [history],
+               [AC_DEFINE_UNQUOTED([HAVE_WORKING_HISTORY], [1],
+                                   [Define to 1 if working libhistory if found])
+               ],
+               [AC_MSG_WARN([No libhistory, disabling history. If you think this is a mistake, try adding its path to CFLAGS and LDFLAGS.])])
+
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h stddef.h stdint.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h stddef.h stdint.h stdlib.h string.h unistd.h readline/readline.h readline/history.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

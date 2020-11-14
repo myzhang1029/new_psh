@@ -1,3 +1,6 @@
+# psh specific
+src/psh
+psh.pc
 # C.gitignore
 # Prerequisites
 *.d
@@ -157,6 +160,7 @@ autom4te.cache
 /compile
 /config.guess
 /config.h.in
+/config.h
 /config.log
 /config.status
 /config.sub
