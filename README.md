@@ -19,7 +19,7 @@ _backends_.
 Psh is now my UWC FP _free summer_ project.
 
 ## Usage
-Psh is equipped with CMake build system.
+Psh is equipped with CMake build system, autotools support is in progress.
 ```
 mkdir build
 cd build
@@ -29,7 +29,7 @@ make
 
 Now just run:
 ```
-psh/psh
+src/psh
 ```
 
 ## Future Plans
