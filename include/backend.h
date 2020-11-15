@@ -111,6 +111,6 @@ int psh_backend_chdir(char *);
  * @param command The command struct about command details.
  * @return Zero if succeeded.
  */
-int psh_backend_do_run(struct command *command);
+int psh_backend_do_run(struct command *command, char __verbose);
 
 #endif /* _PSH_BACKEND_H*/

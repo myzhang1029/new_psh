@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 {
 
     char arg;
-    char verbose;
+    char verbose = 0;
 
     while((arg = getopt(argc, argv, ":v")) != -1){
         switch(arg){
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            //psh_backend_do_run(cmd);
+            psh_backend_do_run(cmd, verbose);
         }
         free_command(cmd);
     }
