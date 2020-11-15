@@ -179,6 +179,7 @@ int psh_backend_do_run(struct command *arginfo, char verbose)
 {
     struct command *info = arginfo;
 
+    //verbose can be 0 or 1, if is only true when verbose == 1
     if(verbose){
         int i = 0;
         printf("--**--\nstub!\nflags won't be read\n");

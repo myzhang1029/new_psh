@@ -46,13 +46,14 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
-
     char arg;
     char verbose = 0;
 
+    //goes through every arg and checks
     while((arg = getopt(argc, argv, ":v")) != -1){
         switch(arg){
 
+            //if -v is present set verbose to 1
             case 'v':
                 verbose = 1;
                 break;
