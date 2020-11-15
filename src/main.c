@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 /* Some evil implementations include no stdio.h is history.h */
 #ifdef HAVE_READLINE_HISTORY_H
@@ -45,6 +46,20 @@ char *argv0;
 
 int main(int argc, char **argv)
 {
+
+    char arg;
+    char verbose;
+
+    while((arg = getopt(argc, argv, ":v")) != -1){
+        switch(arg){
+
+            case 'v':
+                verbose = 1;
+                break;
+
+        }
+    }
+
     builtin_function bltin;
     int stat;
     struct command *cmd = NULL;
@@ -83,14 +98,15 @@ int main(int argc, char **argv)
 
         /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
          * psh_backend_do_run() */
-        bltin = find_builtin(cmd->argv[0]);
+        
+		bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
             last_command_status = (*bltin)(get_argc(cmd->argv), cmd->argv);
         }
         else
         {
-            psh_backend_do_run(cmd);
+            //psh_backend_do_run(cmd);
         }
         free_command(cmd);
     }
