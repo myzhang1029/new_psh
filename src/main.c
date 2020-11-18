@@ -42,6 +42,7 @@
 
 int last_command_status = 0; /* #8 TODO: $? */
 char *argv0;
+extern int optopt;
 
 int main(int argc, char **argv)
 {
@@ -52,6 +53,27 @@ int main(int argc, char **argv)
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
+    int arg;
+    int verbose = 0;
+
+    /* Parse shell options */
+    while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
+    {
+        switch (arg)
+        {
+            /* Verbose flag */
+            case 'v':
+                verbose = 1;
+                break;
+            case ':':
+                OUT2E("%s: option requires an argument\n", argv0);
+                break;
+            case '?':
+            default:
+                OUT2E("%s: unknown option -%c\n", argv0, optopt);
+                break;
+        }
+    }
 
     /* TODO: Store this as shell arguments */
     argv0 = psh_strdup(
@@ -83,6 +105,7 @@ int main(int argc, char **argv)
 
         /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
          * psh_backend_do_run() */
+
         bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
@@ -90,7 +113,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            psh_backend_do_run(cmd);
+            psh_backend_do_run(cmd, verbose);
         }
         free_command(cmd);
     }

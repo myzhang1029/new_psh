@@ -128,6 +128,11 @@ int psh_backend_setenv(const char *name, const char *value, int overwrite)
     return setenv(name, value, overwrite);
 }
 
+int psh_backend_getopt(int argc, char **argv, const char *optstring)
+{
+    return getopt(argc, argv, optstring);
+}
+
 static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
                          char **env)
 {
@@ -175,30 +180,35 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
     return pid;
 }
 
-int psh_backend_do_run(struct command *arginfo)
+int psh_backend_do_run(struct command *arginfo, char verbose)
 {
     struct command *info = arginfo;
-    int i = 0;
-    printf("--**--\nstub!\nflags won't be read\n");
-    printf("info position: %p\n", (void *)arginfo);
-    while (++i)
-    {
-        int j;
-        printf("part %d:\n"
-               "command: %s\n"
-               "params:\n",
-               i, info->argv[0]);
-        for (j = 0; info->argv[j]; ++j)
-            printf("%s\n", info->argv[j]);
-        printf("flag: %d\n", info->flag);
-        printf("redir type: %d\n",
-               (info->rlist != NULL) ? info->rlist->type : 0);
 
-        if (info->next == NULL)
-            break;
-        info = info->next;
+    /* verbose can be 0 or 1, if is only true when verbose == 1 */
+    if (verbose)
+    {
+        int i = 0;
+        printf("--**--\nstub!\nflags won't be read\n");
+        printf("info position: %p\n", (void *)arginfo);
+        while (++i)
+        {
+            int j;
+            printf("part %d:\n"
+                   "command: %s\n"
+                   "params:\n",
+                   i, info->argv[0]);
+            for (j = 0; info->argv[j]; ++j)
+                printf("%s\n", info->argv[j]);
+            printf("flag: %d\n", info->flag);
+            printf("redir type: %d\n",
+                   (info->rlist != NULL) ? info->rlist->type : 0);
+
+            if (info->next == NULL)
+                break;
+            info = info->next;
+        }
+        printf("--*END*--\n");
     }
-    printf("--*END*--\n");
     if ((ChdPid = fork()) != 0) /*shell*/
     {
         waitpid(ChdPid, &last_command_status, 0); /*wait command1*/
