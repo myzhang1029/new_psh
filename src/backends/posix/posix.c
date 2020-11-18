@@ -180,9 +180,11 @@ static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
     return pid;
 }
 
-int psh_backend_do_run(struct command *arginfo, char verbose)
+int psh_backend_do_run(struct command *arginfo)
 {
     struct command *info = arginfo;
+
+    extern int verbose;
 
     /* verbose can be 0 or 1, if is only true when verbose == 1 */
     if (verbose)

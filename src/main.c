@@ -39,6 +39,7 @@
 #include "libpsh/xmalloc.h"
 #include "prompts.h"
 #include "util.h"
+#include "args.h"
 
 int last_command_status = 0; /* #8 TODO: $? */
 char *argv0;
@@ -53,31 +54,13 @@ int main(int argc, char **argv)
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
-    int arg;
-    int verbose = 0;
 
-	/* TODO: Store this as shell arguments */
+    /* TODO: Store this as shell arguments */
     argv0 = psh_strdup(
 			(strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
-    /* Parse shell options */
-    while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
-    {
-        switch (arg)
-        {
-            /* Verbose flag */
-            case 'v':
-                verbose = 1;
-                break;
-            case ':':
-                OUT2E("%s: option requires an argument\n", argv0);
-                break;
-            case '?':
-            default:
-                OUT2E("%s: unknown option -%c\n", argv0, optopt);
-                break;
-        }
-    }
+    /* Sets the given parameters and gives them its values */
+    setargs(argc, argv, ":v", argv0);
 
     add_atexit_free(argv0);
 
@@ -113,7 +96,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            psh_backend_do_run(cmd, verbose);
+            psh_backend_do_run(cmd);
         }
         free_command(cmd);
     }

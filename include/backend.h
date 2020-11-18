@@ -119,6 +119,6 @@ int psh_backend_getopt(int argc, char **argv, const char *optstring);
  * @param command The command struct about command details.
  * @return Zero if succeeded.
  */
-int psh_backend_do_run(struct command *command, char __verbose);
+int psh_backend_do_run(struct command *command);
 
 #endif /* _PSH_BACKEND_H*/
