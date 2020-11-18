@@ -12,7 +12,7 @@ void setargs(int argc, char **argv, const char *optstring, char *argv0)
     int arg;
 
     /* Parse shell options */
-    while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
+    while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
     {
         switch (arg)
         {
