@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 /* Some evil implementations include no stdio.h is history.h */
 #ifdef HAVE_READLINE_HISTORY_H
@@ -43,24 +42,10 @@
 
 int last_command_status = 0; /* #8 TODO: $? */
 char *argv0;
+extern int optopt;
 
 int main(int argc, char **argv)
 {
-    char arg;
-    char verbose = 0;
-
-    //goes through every arg and checks
-    while((arg = getopt(argc, argv, ":v")) != -1){
-        switch(arg){
-
-            //if -v is present set verbose to 1
-            case 'v':
-                verbose = 1;
-                break;
-
-        }
-    }
-
     builtin_function bltin;
     int stat;
     struct command *cmd = NULL;
@@ -68,6 +53,27 @@ int main(int argc, char **argv)
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
+    int arg;
+    int verbose = 0;
+
+    /* Parse shell options */
+    while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
+    {
+        switch (arg)
+        {
+            /* Verbose flag */
+            case 'v':
+                verbose = 1;
+                break;
+            case ':':
+                OUT2E("%s: option requires an argument\n", argv0);
+                break;
+            case '?':
+            default:
+                OUT2E("%s: unknown option -%c\n", argv0, optopt);
+                break;
+        }
+    }
 
     /* TODO: Store this as shell arguments */
     argv0 = psh_strdup(
@@ -99,8 +105,8 @@ int main(int argc, char **argv)
 
         /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
          * psh_backend_do_run() */
-        
-		bltin = find_builtin(cmd->argv[0]);
+
+        bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
             last_command_status = (*bltin)(get_argc(cmd->argv), cmd->argv);

@@ -56,7 +56,8 @@ int builtin_echo(int argc, char **argv)
                     }
                     return 0;
                 }
-            default: {
+            default:
+            {
                 int cnt = 1;
                 printf("%s", argv[cnt]);
                 while (argv[++cnt] != NULL)

@@ -128,6 +128,11 @@ int psh_backend_setenv(const char *name, const char *value, int overwrite)
     return setenv(name, value, overwrite);
 }
 
+int psh_backend_getopt(int argc, char **argv, const char *optstring)
+{
+    return getopt(argc, argv, optstring);
+}
+
 static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
                          char **env)
 {
@@ -179,8 +184,9 @@ int psh_backend_do_run(struct command *arginfo, char verbose)
 {
     struct command *info = arginfo;
 
-    //verbose can be 0 or 1, if is only true when verbose == 1
-    if(verbose){
+    /* verbose can be 0 or 1, if is only true when verbose == 1 */
+    if (verbose)
+    {
         int i = 0;
         printf("--**--\nstub!\nflags won't be read\n");
         printf("info position: %p\n", (void *)arginfo);

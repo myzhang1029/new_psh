@@ -106,6 +106,14 @@ int psh_backend_getuid(void);
  */
 int psh_backend_chdir(char *);
 
+/** POSIX-style getopt.
+ *
+ * @param argc argc passsed to main()
+ * @param argv argv passsed to main()
+ * @param optstring Options specification.
+ */
+int psh_backend_getopt(int argc, char **argv, const char *optstring);
+
 /** Run a command.
  *
  * @param command The command struct about command details.
