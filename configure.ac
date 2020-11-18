@@ -66,4 +66,4 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 
-AC_OUTPUT([Makefile lib/Makefile src/Makefile])
+AC_OUTPUT([Makefile lib/Makefile src/Makefile src/backends/posix2/Makefile])

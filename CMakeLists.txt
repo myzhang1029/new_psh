@@ -68,7 +68,7 @@ add_subdirectory(src)
 # distclean target
 add_custom_target(distclean
     ${CMAKE_BUILD_TOOL} clean
-    COMMAND ${CMAKE_COMMAND} -D "subdirs=.\;src\;lib" -P
+    COMMAND ${CMAKE_COMMAND} -D "subdirs=.\;src\;lib\;src/backends/posix2" -P
     ${CMAKE_SOURCE_DIR}/cmake/distclean.cmake)
 # uninstall target
 configure_file(

@@ -27,6 +27,7 @@
 
 #include "backend.h"
 #include "builtin.h"
+#include "libpsh/util.h"
 
 /* Builtin exec */
 int builtin_exec(int argc, char **argv)

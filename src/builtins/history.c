@@ -184,7 +184,8 @@ int builtin_history(int argc, char **argv)
         }
     }
     else
-    noopts : {
+    noopts:
+    {
         HIST_ENTRY **histlist;
         int i;
 

@@ -13,7 +13,8 @@ noinst_HEADERS = $(top_srcdir)/include/backend.h $(top_srcdir)/include/builtin.h
 psh_LDADD = $(top_srcdir)/lib/libpsh.a
 
 if POSIX
-psh_SOURCES += backends/posix/posix.c
+SUBDIRS = backends/posix2
+psh_LDADD += backends/posix2/libpsh_backend.a
 else # Unfinished platforms should be captured by configure
-psh_SOURCES += backends/generic/generic.c
+psh_LDADD += backends/generic/libpsh_backend.a
 endif
