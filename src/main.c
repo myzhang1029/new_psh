@@ -56,6 +56,8 @@ int main(int argc, char **argv)
     int arg;
     int verbose = 0;
 
+    argv0 = psh_strdup((strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
+
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
     {
@@ -74,10 +76,6 @@ int main(int argc, char **argv)
                 break;
         }
     }
-
-    /* TODO: Store this as shell arguments */
-    argv0 = psh_strdup(
-        (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
     add_atexit_free(argv0);
 
