@@ -22,7 +22,7 @@
 #include "libpsh/util.h"
 
 /* Set variable thats globally avaliable */
-int verbose = 0;
+int VerbosE = 0;
 extern int optopt;
 extern char *argv0;
 
@@ -38,7 +38,7 @@ void parse_shell_args(int argc, char **argv)
         {
             /* Verbose flag */
             case 'v':
-                verbose = 1;
+                VerbosE = 1;
                 break;
             case ':':
                 OUT2E("%s: option requires an argument\n", argv0);
