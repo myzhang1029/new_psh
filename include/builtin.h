@@ -20,8 +20,10 @@
 #ifndef BUILTIN_INCLUDED
 #define BUILTIN_INCLUDED
 
+#include "psh.h"
+
 /** Type for builtin entrypoints. */
-typedef int (*builtin_function)(int argc, char **argv);
+typedef int (*builtin_function)(int argc, char **argv, psh_state *state);
 /** Structure for bsearch()ing builtins */
 struct builtin
 {
@@ -32,23 +34,23 @@ struct builtin
 };
 
 /** Builtin exec */
-int builtin_exec(int argc, char **argv);
+int builtin_exec(int argc, char **argv, psh_state *state);
 /** Builtin echo */
-int builtin_echo(int argc, char **argv);
+int builtin_echo(int argc, char **argv, psh_state *state);
 /** Builtin exit */
-int builtin_exit(int argc, char **argv);
+int builtin_exit(int argc, char **argv, psh_state *state);
 /** Builtin true */
-int builtin_true(int argc, char **argv);
+int builtin_true(int argc, char **argv, psh_state *state);
 /** Builtin false */
-int builtin_false(int argc, char **argv);
+int builtin_false(int argc, char **argv, psh_state *state);
 /** Builtin cd */
-int builtin_cd(int argc, char **argv);
+int builtin_cd(int argc, char **argv, psh_state *state);
 /** Builtin pwd */
-int builtin_pwd(int argc, char **argv);
+int builtin_pwd(int argc, char **argv, psh_state *state);
 /** Builtin history */
-int builtin_history(int argc, char **argv);
+int builtin_history(int argc, char **argv, psh_state *state);
 /** Builtin builtin */
-int builtin_builtin(int argc, char **argv);
+int builtin_builtin(int argc, char **argv, psh_state *state);
 
 /** Find the entrypoint of a builtin by name.
  *

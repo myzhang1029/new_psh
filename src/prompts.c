@@ -61,8 +61,6 @@
 #include "libpsh/xmalloc.h"
 #include "psh.h" /* For version */
 
-extern char *argv0;
-
 /* Expand \w and \W */
 static char *workdir_expander(int if_last_component)
 {
@@ -134,7 +132,7 @@ static char *get_strftime_string(const char *fmt)
 }
 
 /* Expands $PS1-4, result needs to be free()d */
-char *ps_expander(char *prompt)
+char *ps_expander(psh_state *state, char *prompt)
 {
 /* cur: current char in process
  * start: start of current piece of string
@@ -483,7 +481,7 @@ char *ps_expander(char *prompt)
                     is_backslash = 0;
 
                     psh_stringbuilder_add_length(builder, start, count - 1, 0);
-                    psh_stringbuilder_add(builder, argv0, 0);
+                    psh_stringbuilder_add(builder, state->argv0, 0);
                     reset_start(cur);
                 }
                 /* else write s */

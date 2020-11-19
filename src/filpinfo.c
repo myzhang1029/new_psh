@@ -31,9 +31,8 @@
 #include "command.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 #include "util.h"
-
-extern char *argv0;
 
 /* Get the index of the last char in the buffer */
 static int ignore_IFSs(char *buffer, int count)
@@ -50,11 +49,12 @@ static int ignore_IFSs(char *buffer, int count)
 
 /* Malloc and fill a command with a buffer,  returns the number of characters
  * processed */
-int filpinfo(char *buffer, struct command *info)
+int filpinfo(psh_state *state, char *buffer, struct command *info)
 {
 /* Report a syntax error bashly */
 #define synerr(token)                                                          \
-    OUT2E("%s: syntax error near unexpected token `%s'\n", argv0, (token))
+    OUT2E("%s: syntax error near unexpected token `%s'\n", state->argv0,       \
+          (token))
 
 /* Increase cnt_buffer to the last space from buffer[cnt_buffer] */
 #define ignIFS()                                                               \
@@ -96,7 +96,7 @@ int filpinfo(char *buffer, struct command *info)
             }                                                                  \
             if (!isdigit(buffer[cnt_buffer]))                                  \
             {                                                                  \
-                OUT2E("%s: %c: Digit input required\n", argv0,                 \
+                OUT2E("%s: %c: Digit input required\n", state->argv0,          \
                       buffer[cnt_buffer]);                                     \
                 cnt_return = -2;                                               \
                 goto done;                                                     \
@@ -150,7 +150,7 @@ int filpinfo(char *buffer, struct command *info)
     /* The input command should be initialized in main.c, otherwise report a
      * programming error */
     if (info == NULL)
-        code_fault(__FILE__, __LINE__);
+        code_fault(state, __FILE__, __LINE__);
     ignIFS(); /* Ignore starting spaces */
     cnt_first_nonIFS = ++cnt_buffer;
     do
@@ -455,7 +455,7 @@ int filpinfo(char *buffer, struct command *info)
                 if (buffer[cnt_buffer + 1] != '>')
                 {
                     if (redir_lastnode->type != 0)
-                        code_fault(__FILE__, __LINE__);
+                        code_fault(state, __FILE__, __LINE__);
                     else if (buffer[cnt_buffer + 1] == '&')
                         redir_lastnode->type = FD2FD;
                     else if (buffer[cnt_buffer + 1] == 0)
@@ -532,7 +532,7 @@ int filpinfo(char *buffer, struct command *info)
                         break;
                     case '>': /* Out append */
                         if (redir_lastnode->type != 0)
-                            code_fault(__FILE__, __LINE__);
+                            code_fault(state, __FILE__, __LINE__);
                         redir_lastnode->type = OUT_APPN;
                         ++cnt_buffer;
                         switch (buffer[cnt_buffer + 1])

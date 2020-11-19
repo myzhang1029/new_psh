@@ -19,10 +19,13 @@
 */
 #ifndef _PSH_PROMPTS_H
 #define _PSH_PROMPTS_H
+
+#include "psh.h" /* for psh_state */
+
 /** Expand $PSn.
  *
  * @param prompt The $PSn string to be expanded.
  * @return Expanded prompt.
  */
-char *ps_expander(char *prompt);
+char *ps_expander(psh_state *state, char *prompt);
 #endif

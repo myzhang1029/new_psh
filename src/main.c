@@ -38,14 +38,13 @@
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "prompts.h"
+#include "psh.h"
 #include "util.h"
-
-int last_command_status = 0; /* #8 TODO: $? */
-char *argv0;
 
 int main(int argc, char **argv)
 {
     builtin_function bltin;
+    psh_state *internal_state;
     int stat;
     struct command *cmd = NULL;
     char *expanded_ps1, *buffer;
@@ -53,21 +52,21 @@ int main(int argc, char **argv)
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
 
+    internal_state = xmalloc(sizeof(psh_state));
+
     /* TODO: Store this as shell arguments */
-    argv0 = psh_strdup(
+    internal_state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
-    add_atexit_free(argv0);
-
     if (psh_backend_prepare() != 0)
-        exit_psh(1);
+        exit_psh(internal_state, 1);
 
 #ifdef HAVE_WORKING_HISTORY
     using_history();
 #endif
     while (1)
     {
-        expanded_ps1 = ps_expander(ps1);
+        expanded_ps1 = ps_expander(internal_state, ps1);
         stat = read_cmdline(expanded_ps1, &buffer);
         xfree(expanded_ps1);
         if (stat < 0)
@@ -86,7 +85,8 @@ int main(int argc, char **argv)
         bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
-            last_command_status = (*bltin)(get_argc(cmd->argv), cmd->argv);
+            internal_state->last_command_status =
+                (*bltin)(get_argc(cmd->argv), cmd->argv, internal_state);
         }
         else
         {

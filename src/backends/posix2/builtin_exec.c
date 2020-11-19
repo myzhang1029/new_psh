@@ -23,6 +23,7 @@
 #endif
 
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "backend.h"
@@ -30,7 +31,7 @@
 #include "libpsh/util.h"
 
 /* Builtin exec */
-int builtin_exec(int argc, char **argv)
+int builtin_exec(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
         return 0; /* Do nothing */

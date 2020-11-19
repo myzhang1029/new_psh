@@ -23,7 +23,8 @@
 #endif
 
 #include "builtin.h"
+#include "psh.h"
 
-int builtin_true(int argc, char **argv) { return 0; }
+int builtin_true(int argc, char **argv, psh_state *state) { return 0; }
 
-int builtin_false(int argc, char **argv) { return 1; }
+int builtin_false(int argc, char **argv, psh_state *state) { return 1; }

@@ -24,9 +24,11 @@
 #endif
 
 #include <pwd.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "backend.h"
+#include "libpsh/util.h"
 
 char *psh_backend_get_homedir(void)
 {

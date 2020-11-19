@@ -1,8 +1,21 @@
 /*
-   psh/builtins.c - builtins caller file of the psh
+    psh/builtins.c - Builtin commands driver
+    Copyright 2017-2020 Zhang Maiyun.
 
-   Copyright 2013 wuyve.
-   Copyright 2017 Zhang Maiyun.
+    This file is part of Psh, P shell.
+
+    Psh is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Psh is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -16,18 +29,14 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 
-extern int last_command_status;
-extern char *argv0;
-
-static int builtin_unsupported(int argc, char **argv);
-static int builtin_about_handler(int argc, char **argv);
-static int builtin_getstat_handler(int argc, char **argv);
+static int builtin_unsupported(int argc, char **argv, psh_state *state);
+static int builtin_getstat_handler(int argc, char **argv, psh_state *state);
 
 /* List of all builtins, sorted by name */
 const struct builtin builtins[] = {{".", &builtin_unsupported},
                                    {":", &builtin_true},
-                                   {"about", &builtin_about_handler},
                                    {"alias", &builtin_unsupported},
                                    {"bg", &builtin_unsupported},
                                    {"bind", &builtin_unsupported},
@@ -57,6 +66,7 @@ const struct builtin builtins[] = {{".", &builtin_unsupported},
                                    {"getopts", &builtin_unsupported},
                                    {"getstat", &builtin_getstat_handler},
                                    {"hash", &builtin_unsupported},
+                                   {"help", &builtin_unsupported},
                                    {"history", &builtin_history},
                                    {"if", &builtin_unsupported},
                                    {"jobid", &builtin_unsupported},
@@ -97,21 +107,15 @@ int get_argc(char **argv)
     return argc;
 }
 
-static int builtin_unsupported(int argc, char **argv)
+static int builtin_unsupported(int argc, char **argv, psh_state *state)
 {
-    OUT2E("%s: %s: Not supported, coming soon\n", argv0, argv[0]);
+    OUT2E("%s: %s: Not supported, coming soon\n", state->argv0, argv[0]);
     return 127;
 }
 
-static int builtin_about_handler(int argc, char **argv)
+static int builtin_getstat_handler(int argc, char **argv, psh_state *state)
 {
-    printf("psh is a not fully implemented shell in UNIX.\n");
-    return 0;
-}
-
-static int builtin_getstat_handler(int argc, char **argv)
-{
-    printf("%d\n", last_command_status);
+    printf("%d\n", state->last_command_status);
     return 0;
 }
 

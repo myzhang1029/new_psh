@@ -30,10 +30,8 @@
 
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 #include "util.h"
-
-extern int last_command_status;
-extern char *argv0;
 
 /* read command line, shows PROMPT and result goes into *RESULT
  * *RESULT needs to be free()d
@@ -41,7 +39,7 @@ extern char *argv0;
  * and -1 if the cmd doesn't need to be run;
  * and -2 if anything went wrong, RESULT is untouched.
  */
-int read_cmdline(char *prompt, char **result)
+int read_cmdline(psh_state *state, char *prompt, char **result)
 {
     char *buffer;
 #ifdef HAVE_WORKING_HISTORY
@@ -53,7 +51,7 @@ int read_cmdline(char *prompt, char **result)
     if (!buffer) /* EOF reached */
     {
         puts("");
-        exit_psh(last_command_status);
+        exit_psh(state, state->last_command_status);
     }
     if (*buffer == 0)
     {
@@ -64,7 +62,7 @@ int read_cmdline(char *prompt, char **result)
     stat = history_expand(buffer, &expanded);
     if (stat < 0)
     {
-        OUT2E("%s: Error on history expansion: %s\n", argv0, expanded);
+        OUT2E("%s: Error on history expansion: %s\n", state->argv0, expanded);
         xfree(expanded);
         return -2;
     }

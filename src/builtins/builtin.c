@@ -27,10 +27,9 @@
 
 #include "builtin.h"
 #include "libpsh/util.h"
+#include "psh.h"
 
-extern char *argv0;
-
-int builtin_builtin(int argc, char **argv)
+int builtin_builtin(int argc, char **argv, psh_state *state)
 {
     builtin_function bltin;
     if (argc < 2)
@@ -38,8 +37,9 @@ int builtin_builtin(int argc, char **argv)
     bltin = find_builtin(argv[1]);
     if (bltin == 0)
     {
-        OUT2E("%s: %s: %s: not a shell builtin\n", argv0, argv[0], argv[1]);
+        OUT2E("%s: %s: %s: not a shell builtin\n", state->argv0, argv[0],
+              argv[1]);
         return 1;
     }
-    return (*bltin)(--argc, ++argv);
+    return (*bltin)(--argc, ++argv, state);
 }

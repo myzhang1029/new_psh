@@ -25,8 +25,9 @@
 #include <stdio.h>
 
 #include "builtin.h"
+#include "psh.h"
 
-int builtin_echo(int argc, char **argv)
+int builtin_echo(int argc, char **argv, psh_state *state)
 {
     if (argv[1] == NULL)
     {

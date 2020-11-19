@@ -10,7 +10,7 @@ noinst_HEADERS = $(top_srcdir)/include/backend.h $(top_srcdir)/include/builtin.h
 				 $(top_srcdir)/include/input.h $(top_srcdir)/include/prompts.h \
 				 $(top_srcdir)/include/psh.h $(top_srcdir)/include/token.h \
 				 $(top_srcdir)/include/util.h $(top_srcdir)/include/variable.h
-psh_LDADD = $(top_srcdir)/lib/libpsh.a
+psh_LDADD = ../lib/libpsh.a
 
 if POSIX
 SUBDIRS = backends/posix2

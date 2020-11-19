@@ -67,19 +67,18 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
 #include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 
 #define LFLAG 0x1
 #define PFLAG 0x2
 #define EFLAG 0x4
 #define ATFLAG 0x8
 
-extern char *argv0;
-
 /* TODO */
 /* Get rid of ../"s and "./"s and extra "/"s.
  * Resolve to realpath before expanding "../"s is ABSOLUTE is 1.
  * Return NULL if PATH is NULL or cwd cannot be determined. */
-static char *canonicalize_path(const char *path, int flags)
+static char *canonicalize_path(psh_state *state, const char *path, int flags)
 {
     /* Not using psh_stringbuilder here because the frequent need to yield */
     /* Excluding NUL */
@@ -114,8 +113,8 @@ static char *canonicalize_path(const char *path, int flags)
                 xpath = psh_backend_getcwd_dm();
         }
         if (!xpath)
-            OUT2E("%s: cd: error retrieving current directory: %s\n", argv0,
-                  strerror(errno));
+            OUT2E("%s: cd: error retrieving current directory: %s\n",
+                  state->argv0, strerror(errno));
         len_cwd = strlen(xpath);
         len_path = strlen(path);
         /* +2 for slash and \0 */
@@ -186,8 +185,9 @@ static char *canonicalize_path(const char *path, int flags)
 
 #if defined(TESTING_CANONICALIZE) && defined(DEBUG)
 #include <assert.h>
-char *argv0 = "";
-int last_command_status = 0;
+psh_state test_state = {
+
+};
 int main(int argc, char **argv)
 {
     char *path = canonicalize_path(
@@ -199,7 +199,7 @@ int main(int argc, char **argv)
 }
 #endif
 
-int builtin_cd(int argc, char **argv)
+int builtin_cd(int argc, char **argv, psh_state *state)
 {
     char *destination, *path = NULL;
     int current_arg, flags = 0;
@@ -234,8 +234,8 @@ int builtin_cd(int argc, char **argv)
                         flags |= ATFLAG;
                         break;
                     default:
-                        OUT2E("%s: %s: -%c: invalid option\n", argv0, argv[0],
-                              argv[current_arg][current_char]);
+                        OUT2E("%s: %s: -%c: invalid option\n", state->argv0,
+                              argv[0], argv[current_arg][current_char]);
                         OUT2E("cd: usage: cd [-L|[-P [-e]] [-@]] [dir]\n");
                         return 1;
                 }
@@ -245,7 +245,7 @@ int builtin_cd(int argc, char **argv)
             path = argv[current_arg];
         else
         {
-            OUT2E("%s: %s: too many arguments\n", argv0, argv[0]);
+            OUT2E("%s: %s: too many arguments\n", state->argv0, argv[0]);
             return 1;
         }
     }
@@ -254,22 +254,22 @@ int builtin_cd(int argc, char **argv)
         path = getenv("HOME"); /* #8 TODO */
     if (!path)
     {
-        OUT2E("%s: %s: HOME not set\n", argv0, argv[0]);
+        OUT2E("%s: %s: HOME not set\n", state->argv0, argv[0]);
         return 1;
     }
     if (strcmp(path, "-") == 0)
         path = getenv("OLDPWD"); /* #8 TODO */
     if (!path)
     {
-        OUT2E("%s: %s: OLDPWD not set\n", argv0, argv[0]);
+        OUT2E("%s: %s: OLDPWD not set\n", state->argv0, argv[0]);
         return 1;
     }
 
-    destination = canonicalize_path(path, flags);
+    destination = canonicalize_path(state, path, flags);
     if (!destination)
         return 1;
     if (psh_backend_chdir(destination) != 0)
-        OUT2E("%s: %s: %s: %s\n", argv0, argv[0], path, strerror(errno));
+        OUT2E("%s: %s: %s: %s\n", state->argv0, argv[0], path, strerror(errno));
     else
     {
         psh_backend_setenv("OLDPWD", getenv("PWD"), 1); /* #8 TODO */

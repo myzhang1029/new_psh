@@ -25,20 +25,19 @@
 #include <stdlib.h>
 
 #include "builtin.h"
+#include "psh.h"
 #include "util.h"
 
-extern int last_command_status;
-
-int builtin_exit(int argc, char **argv)
+int builtin_exit(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
     {
-        exit_psh(last_command_status);
+        exit_psh(state, state->last_command_status);
     }
     else
     {
         int i = atoi(argv[1]);
-        exit_psh(i);
+        exit_psh(state, i);
     }
     return 1; /* Noreturn */
 }

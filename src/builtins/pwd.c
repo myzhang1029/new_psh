@@ -30,9 +30,7 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 
-extern char *argv0;
-
-int builtin_pwd(int argc, char **argv)
+int builtin_pwd(int argc, char **argv, psh_state *state)
 {
     int flag = 0;
     char *path = NULL;
@@ -51,8 +49,8 @@ int builtin_pwd(int argc, char **argv)
                 case 'L':
                     break;
                 default: /* Invalid option */
-                    OUT2E("%s: %s: -%c: invalid option\n", argv0, argv[0],
-                          argv[arg_count][1]);
+                    OUT2E("%s: %s: -%c: invalid option\n", state->argv0,
+                          argv[0], argv[arg_count][1]);
                     return 1;
             }
         }

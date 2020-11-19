@@ -26,4 +26,19 @@
 #endif
 /** Version of psh. */
 #define PSH_VERSION "0.18.0"
+
+/** @brief The internal state of psh. */
+typedef struct _psh_state
+{
+    /** A list of pending signals. */
+    int *signals_pending;
+    /** @deprecated Shell argv[0]. */
+    char *argv0;
+    /** @deprecated $?. */
+    int last_command_status; /* #8 TODO: $? */
+    /** Verbose flag. */
+    unsigned int verbose:1;
+    /** Placeholder. */
+    unsigned int other_flags:3;
+} psh_state;
 #endif

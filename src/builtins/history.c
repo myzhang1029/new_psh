@@ -36,8 +36,7 @@
 #include "command.h" /* For MAXEACHARG */
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
-
-extern char *argv0;
+#include "psh.h"
 
 #define USAGE()                                                                \
     OUT2E("history: usage: history [-c] [-d offset] [n] or history -awrn "     \
@@ -51,7 +50,7 @@ extern char *argv0;
 #define CFLAG 0x40
 #define DFLAG 0x80
 
-int builtin_history(int argc, char **argv)
+int builtin_history(int argc, char **argv, psh_state *state)
 {
 #ifndef HAVE_WORKING_HISTORY
     OUT2E("%s: libhistory not compiled!\n", argv[0]);
@@ -80,7 +79,7 @@ int builtin_history(int argc, char **argv)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, argv[0]);
+                              state->argv0, argv[0]);
                         USAGE();
                         xfree(filename);
                         return 2;
@@ -95,7 +94,7 @@ int builtin_history(int argc, char **argv)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, argv[0]);
+                              state->argv0, argv[0]);
                         USAGE();
                         xfree(filename);
                         return 2;
@@ -110,7 +109,7 @@ int builtin_history(int argc, char **argv)
                     {
                         OUT2E("%s: %s: cannot use more "
                               "than one of -anrw\n",
-                              argv0, argv[0]);
+                              state->argv0, argv[0]);
                         USAGE();
                         xfree(filename);
                         return 2;
@@ -136,7 +135,7 @@ int builtin_history(int argc, char **argv)
                     {
                         OUT2E("%s: %s: %d: invalid "
                               "option\n",
-                              argv0, argv[0], n);
+                              state->argv0, argv[0], n);
                         xfree(filename);
                         return 2;
                     }
@@ -153,21 +152,21 @@ int builtin_history(int argc, char **argv)
                                       "argument "
                                       "required"
                                       "\n",
-                                      argv0, argv[0], argv[count]);
+                                      state->argv0, argv[0], argv[count]);
                                 xfree(filename);
                                 return 2;
                             }
                     }
                     break;
                 case '?':
-                    OUT2E("%s: %s: invalid option '-%c'\n", argv0, argv[0],
-                          optopt);
+                    OUT2E("%s: %s: invalid option '-%c'\n", state->argv0,
+                          argv[0], optopt);
                     xfree(filename);
                     return 2;
                 case ':':
                     OUT2E("%s: %s: -d: option requires an "
                           "argument\n",
-                          argv0, argv[0]);
+                          state->argv0, argv[0]);
                     xfree(filename);
                     return 2;
             }
