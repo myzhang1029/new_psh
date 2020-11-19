@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "libpsh/hash.h"
 #include "libpsh/util.h"
 #include "psh.h"
 #include "util.h"
@@ -44,6 +45,7 @@ void exit_psh(psh_state *state, int status)
 {
     free(state->argv0);
     free(state->signals_pending);
+    psh_hash_free(state->command_table);
     free(state);
     exit(status);
 }

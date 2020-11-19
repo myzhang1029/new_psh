@@ -2,7 +2,7 @@ include(GNUInstallDirs)
 
 include("${CMAKE_SOURCE_DIR}/cmake/select_backend.cmake")
 
-add_executable (psh builtins.c command.c filpinfo.c input.c main.c parser.c prompts.c util.c variable.c builtins/builtin.c builtins/cd.c builtins/echo.c builtins/exit.c builtins/help.c builtins/history.c builtins/pwd.c builtins/true.c)
+add_executable (psh builtins.c command.c filpinfo.c input.c main.c parser.c prompts.c util.c variable.c builtins/builtin.c builtins/cd.c builtins/echo.c builtins/exit.c builtins/hash.c builtins/help.c builtins/history.c builtins/pwd.c builtins/true.c)
 
 include_directories(../include)
 target_link_libraries(psh libpsh)

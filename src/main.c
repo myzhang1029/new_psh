@@ -35,6 +35,7 @@
 #include "command.h"
 #include "filpinfo.h"
 #include "input.h"
+#include "libpsh/hash.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "prompts.h"
@@ -55,8 +56,10 @@ int main(int argc, char **argv)
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
     int arg;
 
+    /* Initiate the internal state */
     internal_state = xmalloc(sizeof(psh_state));
     memset(internal_state, 0, sizeof(psh_state));
+    internal_state->command_table = psh_hash_create(32);
     /* TODO: Store this as shell arguments */
     internal_state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));

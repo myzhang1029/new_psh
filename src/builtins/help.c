@@ -120,8 +120,8 @@ int builtin_help(int argc, char **argv, psh_state *state)
 {
 #ifndef WITHOUT_BUILTIN_HELP
     int type = MAN;
-    int count = 0;
-    /* countalways points to the next possible command name */
+    size_t count = 0;
+    /* count always points to the next possible command name */
     while (++count < argc)
     {
         if (argv[count][0] != '-')

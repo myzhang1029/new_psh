@@ -27,11 +27,22 @@
 /** Version of psh. */
 #define PSH_VERSION "0.18.0"
 
+#include "libpsh/hash.h"
+
 /** @brief The internal state of psh. */
 typedef struct _psh_state
 {
     /** A list of pending signals. */
     int *signals_pending;
+    /* Using two tables here, because both env vars and global vars live
+     * throughout the life of the shell, while local vars can override them without
+     * altering their value. */
+    /** Environmental and global variables */
+    psh_hash *variable_table_eg;
+    /** Local variables */
+    psh_hash *variable_table_l;
+    /** Command hash table */
+    psh_hash *command_table;
     /** @deprecated Shell argv[0]. */
     char *argv0;
     /** @deprecated $?. */

@@ -47,6 +47,8 @@ int builtin_false(int argc, char **argv, psh_state *state);
 int builtin_cd(int argc, char **argv, psh_state *state);
 /** Builtin pwd */
 int builtin_pwd(int argc, char **argv, psh_state *state);
+/** Builtin hash */
+int builtin_hash(int argc, char **argv, psh_state *state);
 /** Builtin help */
 int builtin_help(int argc, char **argv, psh_state *state);
 /** Builtin history */

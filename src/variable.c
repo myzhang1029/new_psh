@@ -41,21 +41,14 @@ and variables have "v_".
 #include "libpsh/hash.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 #include "variable.h"
 
-/* Using two tables here, because both env vars and global vars live
- * throughout the life of the shell, while local vars can override them without
- * altering their value. */
-/* Environmental and global variables */
-psh_hash *variable_table_eg = NULL;
-/* Local variables */
-psh_hash *variable_table_l = NULL;
-
 /* Init the two tables above, and try to get environment parameters */
-void psh_variable_init(void)
+void psh_variable_init(psh_state *state)
 {
-    variable_table_eg = psh_hash_create(10);
-    variable_table_l = psh_hash_create(10);
+    state->variable_table_eg = psh_hash_create(10);
+    state->variable_table_l = psh_hash_create(10);
     /* #5 #12 #13 TODO: Retrieve all env vars,
      * for generic, only try to read those important to shell, such as HOME,
      * PATH, etc. */
@@ -64,19 +57,19 @@ void psh_variable_init(void)
 /* Set or update a variable, either name or scope.
  * Moving a variable among scopes should be fast, as they should be only pointer
  * operations. */
-int psh_variable_set(const char *varname, const char *value,
+int psh_variable_set(psh_state *state, const char *varname, const char *value,
                      psh_variable_scope scope)
 {
 }
 
 /* Get a variable's value, based on scope precedence, i.e. local->global,env */
-char *psh_variable_get(const char *varname) {}
+char *psh_variable_get(psh_state *state, const char *varname) {}
 
 /* Clear all local variables. */
-void psh_variable_exit_local(void) {}
+void psh_variable_exit_local(psh_state *state) {}
 
 /* Unset a variable. Removes any matching entry in all three tables. */
-void psh_variable_unset(const char *varname) {}
+void psh_variable_unset(psh_state *state, const char *varname) {}
 
 /* Called upon shell exit, destroy the whole variable database */
-void psh_variable_destroy(void) {}
+void psh_variable_destroy(psh_state *state) {}

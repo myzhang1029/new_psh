@@ -28,6 +28,7 @@
 #include <readline/history.h>
 #endif
 
+#include "input.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"
