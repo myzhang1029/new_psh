@@ -1,15 +1,15 @@
-#include <unistd.h>
-
-#include "libpsh/util.h"
 #include "backend.h"
+#include "libpsh/util.h"
 
 /* Set variable thats globally avaliable */
 int verbose = 0;
+extern int optopt;
+extern char *argv0;
 
-void setargs(int argc, char **argv, const char *optstring, char *argv0)
+void parse_shell_args(int argc, char **argv)
 {
-
     int arg;
+    const char *optstring = ":v";
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
@@ -29,5 +29,4 @@ void setargs(int argc, char **argv, const char *optstring, char *argv0)
                 break;
         }
     }
-
 }

@@ -30,6 +30,7 @@
 #include <readline/history.h>
 #endif
 
+#include "args.h"
 #include "backend.h"
 #include "builtin.h"
 #include "command.h"
@@ -39,7 +40,6 @@
 #include "libpsh/xmalloc.h"
 #include "prompts.h"
 #include "util.h"
-#include "args.h"
 
 int last_command_status = 0; /* #8 TODO: $? */
 char *argv0;
@@ -57,10 +57,9 @@ int main(int argc, char **argv)
 
     /* TODO: Store this as shell arguments */
     argv0 = psh_strdup(
-			(strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
+        (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
-    /* Sets the given parameters and gives them its values */
-    setargs(argc, argv, ":v", argv0);
+    parse_shell_args(argc, argv);
 
     add_atexit_free(argv0);
 
