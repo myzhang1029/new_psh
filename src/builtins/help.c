@@ -120,7 +120,7 @@ int builtin_help(int argc, char **argv, psh_state *state)
 {
 #ifndef WITHOUT_BUILTIN_HELP
     int type = MAN;
-    size_t count = 0;
+    int count = 0;
     /* count always points to the next possible command name */
     while (++count < argc)
     {
@@ -150,10 +150,12 @@ int builtin_help(int argc, char **argv, psh_state *state)
     }
     if (count == argc)
     {
+        size_t count2;
         /* Print all help */
-        for (count = 0; count < NBUILTIN; ++count)
+        for (count2 = 0; count2 < NBUILTIN; ++count2)
         {
-            printf("%s %s\n", builtin_helps[count][0], builtin_helps[count][1]);
+            printf("%s %s\n", builtin_helps[count2][0],
+                   builtin_helps[count2][1]);
         }
         return 0;
     }
