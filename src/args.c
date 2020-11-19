@@ -21,6 +21,7 @@
 #include "backend.h"
 #include "libpsh/util.h"
 #include "psh.h"
+#include "util.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -41,6 +42,14 @@ void parse_shell_args(int argc, char **argv)
     {
         if(strcmp(argv[i], "--version") == 0)
             print_version_exit();
+        if(strcmp(argv[i], "--verbose") == 0){
+            VerbosE = 1;
+            argv[i][0] = '\0';
+        }
+        else if (strstr(argv[i], "--") != NULL){
+            OUT2E("%s: unknown option %s\n", argv0, argv[i]);
+            argv[i][0] = '\0';
+        }
     }
 
 
@@ -71,6 +80,6 @@ void print_version_exit()
 {
 
     puts("psh version: "PSH_VERSION);
-    exit(0);
+    exit_psh(0);
 
 }
