@@ -20,6 +20,12 @@
 
 #include "backend.h"
 #include "libpsh/util.h"
+#include "psh.h"
+
+#include <string.h>
+#include <stdlib.h>
+
+void print_version_exit();
 
 /* Set variable thats globally avaliable */
 int VerbosE = 0;
@@ -28,6 +34,16 @@ extern char *argv0;
 
 void parse_shell_args(int argc, char **argv)
 {
+
+    /* Only checks for -- arguments */
+    short i;
+    for(i = 0; i < argc; i++)
+    {
+        if(strcmp(argv[i], "--version") == 0)
+            print_version_exit();
+    }
+
+
     int arg;
     const char *optstring = ":v";
 
@@ -49,4 +65,12 @@ void parse_shell_args(int argc, char **argv)
                 break;
         }
     }
+}
+
+void print_version_exit()
+{
+
+    puts("psh version: "PSH_VERSION);
+    exit(0);
+
 }
