@@ -84,3 +84,8 @@ int psh_backend_setenv(const char *name, const char *value, int overwrite)
 {
     return setenv(name, value, overwrite);
 }
+
+int psh_backend_getopt(int argc, char **argv, const char *optstring)
+{
+    return getopt(argc, argv, optstring);
+}

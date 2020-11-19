@@ -181,5 +181,4 @@ void free_command(struct command *command);
  * @param command Pointer to the redirect struct.
  */
 void free_argv(struct command *command);
-
 #endif
