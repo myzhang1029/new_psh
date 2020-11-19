@@ -29,6 +29,7 @@
 
 #include "backend.h"
 #include "command.h"
+#include "filpinfo.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"

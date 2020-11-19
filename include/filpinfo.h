@@ -21,11 +21,13 @@
 */
 #ifndef _PSH_FILPINFO_H
 #define _PSH_FILPINFO_H
+#include "psh.h"
 
 /** Fill struct command with an input string.
  *
+ * @param state Psh internal state.
  * @param buffer Input string.
  * @param command The struct command to fill.
  * @return The number of characters processed. */
-int filpinfo(char *buffer, struct command *command);
+int filpinfo(psh_state *state, char *buffer, struct command *command);
 #endif

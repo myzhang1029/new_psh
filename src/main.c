@@ -41,6 +41,8 @@
 #include "psh.h"
 #include "util.h"
 
+extern int optopt;
+
 int main(int argc, char **argv)
 {
     builtin_function bltin;
@@ -51,15 +53,36 @@ int main(int argc, char **argv)
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
+    int arg;
 
     internal_state = xmalloc(sizeof(psh_state));
-
+    memset(internal_state, 0, sizeof(psh_state));
     /* TODO: Store this as shell arguments */
     internal_state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
-
     if (psh_backend_prepare() != 0)
         exit_psh(internal_state, 1);
+
+    /* Parse shell options */
+    while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
+    {
+        switch (arg)
+        {
+            /* Verbose flag */
+            case 'v':
+                internal_state->verbose = 1;
+                break;
+            case ':':
+                OUT2E("%s: option requires an argument\n",
+                      internal_state->argv0);
+                break;
+            case '?':
+            default:
+                OUT2E("%s: unknown option -%c\n", internal_state->argv0,
+                      optopt);
+                break;
+        }
+    }
 
 #ifdef HAVE_WORKING_HISTORY
     using_history();
@@ -67,12 +90,12 @@ int main(int argc, char **argv)
     while (1)
     {
         expanded_ps1 = ps_expander(internal_state, ps1);
-        stat = read_cmdline(expanded_ps1, &buffer);
+        stat = read_cmdline(internal_state, expanded_ps1, &buffer);
         xfree(expanded_ps1);
         if (stat < 0)
             continue;
         cmd = new_command();
-        stat = filpinfo(buffer, cmd);
+        stat = filpinfo(internal_state, buffer, cmd);
         xfree(buffer);
         if (stat < 0)
         {
@@ -82,6 +105,7 @@ int main(int argc, char **argv)
 
         /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
          * psh_backend_do_run() */
+
         bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {

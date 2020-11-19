@@ -19,14 +19,16 @@
 */
 #ifndef _PSH_INPUT_H
 #define _PSH_INPUT_H
+#include "psh.h"
 
 /** Read command line.
  *
+ * @param state Psh internal state.
  * @param prompt Prompt to print.
  * @param result Pointer to the resulting string, the string needs to be
  * free()d.
  * @return 0 if everything goes well; -1 if the cmd doesn't need to be run; -2
  * if anything went wrong, @p result is untouched.
  */
-int read_cmdline(char *prompt, char **result);
+int read_cmdline(psh_state *state, char *prompt, char **result);
 #endif

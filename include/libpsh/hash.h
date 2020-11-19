@@ -17,6 +17,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#ifndef _LIBPSH_HASH_H
+#define _LIBPSH_HASH_H
 #include <stddef.h>
 
 /** @brief A single key-value pair with @ref next pointer. */
@@ -120,3 +122,4 @@ void psh_hash_free(psh_hash *table);
  * @return The value.
  */
 size_t hasher(const char *s);
+#endif
