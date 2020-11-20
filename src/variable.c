@@ -71,7 +71,7 @@ static inline void free_vf_table(psh_hash *vfa_table)
                     xfree(*array++);
             }
         }
-        else if (!attributes & PSH_VFA_INTEGER)
+        else if (!(attributes & PSH_VFA_INTEGER))
             xfree(((struct _psh_vfa_container *)this->value)->payload.string);
         /* else: integers don't need to be free()d */
     });
