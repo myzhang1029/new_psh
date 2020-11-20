@@ -58,5 +58,6 @@ char *psh_search_path(char *path, int separator, const char *target,
         /* Jump over the substr */
         path += len_substr + 1; /* +1 for separator */
     }
+    xfree(concatenated);
     return NULL;
 }
