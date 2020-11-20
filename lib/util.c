@@ -35,7 +35,7 @@ char *readline(char *);
 #include "libpsh/xmalloc.h"
 
 /* Get a line from file FP with prompt PROMPT.
- * The momory is allocated automatically.
+ * The memory is allocated automatically.
  * Returns the content when an EOF or \n is read,
  * not including the trailing EOF or \n. */
 char *psh_fgets(char *prompt, FILE *fp)
@@ -47,10 +47,10 @@ char *psh_fgets(char *prompt, FILE *fp)
     if (fp == NULL)
         return NULL;
     if (fp == stdin)
-	{
+    {
         printf("%s", prompt);
-		fflush(stdout);
-	}
+        fflush(stdout);
+    }
     {
         size_t charcount = 0, nowhave = 256;
         int ch;

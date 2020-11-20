@@ -29,7 +29,8 @@
  * @param file __FILE__
  * @param line __LINE__
  */
-void code_fault(psh_state *state, char *file, int line) __attribute__((noreturn));
+void code_fault(psh_state *state, char *file, int line)
+    __attribute__((noreturn));
 
 /** Exit after cleaning up.
  *

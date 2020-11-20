@@ -58,7 +58,7 @@ int builtin_builtin(int argc, char **argv, psh_state *state);
 
 /** Find the entrypoint of a builtin by name.
  *
- * @param name Name od the builtin to look for.
+ * @param name Name of the builtin to look for.
  * @return The found entrypoint.
  */
 builtin_function find_builtin(char *name);

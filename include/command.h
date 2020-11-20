@@ -160,7 +160,7 @@ void free_redirect(struct redirect *redir);
 
 /** Allocate a command.
  *
- * @return Poinnter to the allocated struct.
+ * @return Pointer to the allocated struct.
  */
 struct command *new_command();
 

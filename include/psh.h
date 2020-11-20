@@ -35,8 +35,8 @@ typedef struct _psh_state
     /** A list of pending signals. */
     int *signals_pending;
     /* Using two tables here, because both env vars and global vars live
-     * throughout the life of the shell, while local vars can override them without
-     * altering their value. */
+     * throughout the life of the shell, while local vars can override them
+     * without altering their value. */
     /** Environmental and global variables */
     psh_hash *variable_table_eg;
     /** Local variables */
@@ -48,8 +48,8 @@ typedef struct _psh_state
     /** @deprecated $?. */
     int last_command_status; /* #8 TODO: $? */
     /** Verbose flag. */
-    unsigned int verbose:1;
+    unsigned int verbose : 1;
     /** Placeholder. */
-    unsigned int other_flags:3;
+    unsigned int other_flags : 3;
 } psh_state;
 #endif
