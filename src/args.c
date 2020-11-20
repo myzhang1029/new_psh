@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void print_help_info();
 static void print_version_exit();
 
 /* Set variable thats globally avaliable */
@@ -36,12 +37,14 @@ extern char *argv0;
 void parse_shell_args(int argc, char **argv)
 {
 
-    /* Only checks for -- arguments */
+    /* Only checks for -- options */
     int i;
     for (i = 0; i < argc; i++)
     {
         if (strcmp(argv[i], "--version") == 0)
             print_version_exit();
+        if (strcmp(argv[i], "--help") == 0)
+            print_help_info();
         if (strcmp(argv[i], "--verbose") == 0)
         {
             VerbosE = 1;
@@ -75,6 +78,17 @@ void parse_shell_args(int argc, char **argv)
                 break;
         }
     }
+}
+
+static void print_help_info()
+{
+    puts(
+        "-v --verbose enables verbose mode\n"
+        "--help shows this text\n"
+        "--version displays the version"
+        );
+   
+    exit_psh(0);
 }
 
 static void print_version_exit()
