@@ -1,5 +1,5 @@
 /*
-    psh/src/args.c - psh argument control
+    psh/args.c - psh argument parser
     Copyright 2020 Manuel Bertele
 
     This file is part of Psh, P shell.
@@ -23,10 +23,10 @@
 #include "psh.h"
 #include "util.h"
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-void print_version_exit();
+static void print_version_exit();
 
 /* Set variable thats globally avaliable */
 int VerbosE = 0;
@@ -37,21 +37,22 @@ void parse_shell_args(int argc, char **argv)
 {
 
     /* Only checks for -- arguments */
-    short i;
-    for(i = 0; i < argc; i++)
+    int i;
+    for (i = 0; i < argc; i++)
     {
-        if(strcmp(argv[i], "--version") == 0)
+        if (strcmp(argv[i], "--version") == 0)
             print_version_exit();
-        if(strcmp(argv[i], "--verbose") == 0){
+        if (strcmp(argv[i], "--verbose") == 0)
+        {
             VerbosE = 1;
             argv[i][0] = '\0';
         }
-        else if (strstr(argv[i], "--") != NULL){
+        else if (strstr(argv[i], "--") != NULL)
+        {
             OUT2E("%s: unknown option %s\n", argv0, argv[i]);
             argv[i][0] = '\0';
         }
     }
-
 
     int arg;
     const char *optstring = ":v";
@@ -76,10 +77,8 @@ void parse_shell_args(int argc, char **argv)
     }
 }
 
-void print_version_exit()
+static void print_version_exit()
 {
-
-    puts("psh version: "PSH_VERSION);
+    puts("psh version: " PSH_VERSION);
     exit_psh(0);
-
 }
