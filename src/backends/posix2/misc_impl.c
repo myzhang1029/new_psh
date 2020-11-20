@@ -89,3 +89,15 @@ int psh_backend_getopt(int argc, char **argv, const char *optstring)
 {
     return getopt(argc, argv, optstring);
 }
+
+int psh_backend_file_exists(const char *path)
+{
+    if (access(path, F_OK) != -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}

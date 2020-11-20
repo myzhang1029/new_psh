@@ -24,11 +24,15 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "backend.h"
 #include "builtin.h"
 #include "libpsh/hash.h"
+#include "libpsh/path_searcher.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 #include "psh.h"
 
 #define DELETE 0x01
@@ -39,7 +43,7 @@
 int builtin_hash(int argc, char **argv, psh_state *state)
 {
     int flags = 0;
-    int count = 0;
+    int count = 0, return_value = 0;
     char *path;
     /* count always points to the next possible command name */
     while (++count < argc)
@@ -105,6 +109,7 @@ endwhile:
         else
             ITER_TABLE(state->command_table,
                        printf("'%s' '%s'\n", this->key, (char *)this->value););
+        return 0;
     }
     for (; count < argc; ++count)
     {
@@ -115,26 +120,45 @@ endwhile:
         }
         else if (flags & DELETE) /* If -d and -p are both supplied, it is set
                                     but not deleted */
+        {
             if (psh_hash_rm(state->command_table, argv[count]) == 1)
             {
                 OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
                       argv[count]);
-                return 1;
+                return_value = 1;
             }
-            else if (flags & CORRESPOND)
+        }
+        else if (flags & CORRESPOND)
+        {
+            char *path = psh_hash_get(state->command_table, argv[count]);
+            if (path == NULL)
             {
-                char *path = psh_hash_get(state->command_table, argv[count]);
-                if (path == NULL)
-                {
-                    OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
-                          argv[count]);
-                    return 1;
-                }
-                printf("'%s' '%s'\n", argv[count], path);
+                OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
+                      argv[count]);
+                return_value = 1;
             }
             else
-                ;
-        /* refresh hash TODO */
+                printf("'%s' '%s'\n", argv[count], path);
+        }
+        else
+        {
+            char *name = xmalloc(strlen(argv[count]) + 2);
+            char *path;
+            name[0] = '/';
+            psh_strncpy(name + 1, argv[count], strlen(argv[count]));
+            /* #8 TODO: PATH, #12 TODO: path separator */
+            path = psh_search_path(getenv("PATH"), ':', name,
+                                   &psh_backend_file_exists);
+            xfree(name);
+            if (path == NULL)
+            {
+                OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
+                      argv[count]);
+                return_value = 1;
+            }
+            else
+                psh_hash_add(state->command_table, argv[count], path, 1);
+        }
     }
-    return 0;
+    return return_value;
 }

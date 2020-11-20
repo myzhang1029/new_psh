@@ -114,6 +114,13 @@ int psh_backend_chdir(char *);
  */
 int psh_backend_getopt(int argc, char **argv, const char *optstring);
 
+/** Check if file exists.
+ *
+ * @param path Path to the file
+ * @return 1 if exists, 0 if not.
+ */
+int psh_backend_file_exists(const char *path);
+
 /** Run a command.
  *
  * @param command The command struct about command details.
