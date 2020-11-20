@@ -13,6 +13,6 @@ script:
 - 'cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../psh "-DCMAKE_C_FLAGS_INIT=-Wall -Wextra -Wpedantic"'
 - make install
 - make distclean
-- ../configure --prefix=../psh
+- '../configure --prefix=$PWD/../psh'
 - make install
 - make distclean
