@@ -83,6 +83,8 @@ void parse_shell_args(int argc, char **argv)
 static void print_help_info()
 {
     puts(
+        "Psh is a shell licensed under the GPLv3\n\n"
+        "OPTIONS\n"
         "-v --verbose enables verbose mode\n"
         "--help shows this text\n"
         "--version displays the version"
