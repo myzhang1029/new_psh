@@ -41,6 +41,7 @@
 #include "prompts.h"
 #include "psh.h"
 #include "util.h"
+#include "variable.h"
 
 extern int optopt;
 
@@ -59,6 +60,18 @@ int main(int argc, char **argv)
     /* Initiate the internal state */
     internal_state = xmalloc(sizeof(psh_state));
     memset(internal_state, 0, sizeof(psh_state));
+    psh_vfa_new_context(internal_state);
+#ifdef DEBUG
+    {
+        union _psh_vfa_value payload = {1};
+        psh_vf_set(internal_state, "p", PSH_VFA_INTEGER, payload, 0, 0, 0);
+        struct _psh_vfa_container *cnt = psh_vf_get(internal_state, "p", 0);
+        printf("%d = 1\n", cnt->payload);
+        psh_vf_unset(internal_state, "p", 0);
+        cnt = psh_vf_get(internal_state, "p", 0);
+        printf("0x%x = 0x4\n", cnt->attributes);
+    }
+#endif
     internal_state->command_table = psh_hash_create(32);
     /* TODO: Store this as shell arguments */
     internal_state->argv0 = psh_strdup(

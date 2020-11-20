@@ -29,13 +29,14 @@
 #include "libpsh/util.h"
 #include "psh.h"
 #include "util.h"
+#include "variable.h"
 
 /* Some unexpected things happened */
 __attribute__((noreturn)) void code_fault(psh_state *state, char *file,
                                           int line)
 {
     OUT2E("%s: Programming error at %s: %d\n", state->argv0, file, line);
-    OUT2E("Shell version: %s", PSH_VERSION);
+    OUT2E("Shell version: %s\n", PSH_VERSION);
     OUT2E("Please create a GitHub Issue with above info\n");
     exit_psh(state, 1);
 }
@@ -45,6 +46,7 @@ void exit_psh(psh_state *state, int status)
 {
     free(state->argv0);
     free(state->signals_pending);
+    psh_vfa_free(state);
     psh_hash_free(state->command_table);
     free(state);
     exit(status);

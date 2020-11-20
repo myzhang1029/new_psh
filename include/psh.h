@@ -34,13 +34,22 @@ typedef struct _psh_state
 {
     /** A list of pending signals. */
     int *signals_pending;
-    /* Using two tables here, because both env vars and global vars live
-     * throughout the life of the shell, while local vars can override them
-     * without altering their value. */
-    /** Environmental and global variables */
-    psh_hash *variable_table_eg;
-    /** Local variables */
-    psh_hash *variable_table_l;
+    /** Context frames of variables and functions, similar to stack frames in
+     * other languages */
+    struct _psh_vf_context
+    {
+        /** Variables */
+        psh_hash *variable_table;
+        /** Global functions */
+        psh_hash *function_table;
+    } * contexts; /**< An array of context frames. */
+    /** The index of the current context frame. */
+    size_t context_idx;
+    /** The number of available context frames. */
+    size_t context_slots;
+    /* Local functions is a psh extension */
+    /** Aliases hash table */
+    psh_hash *alias_table;
     /** Command hash table */
     psh_hash *command_table;
     /** Shell argv[0]. */
@@ -49,7 +58,5 @@ typedef struct _psh_state
     int last_command_status; /* #8 TODO: $? */
     /** Verbose flag. */
     unsigned int verbose : 1;
-    /** Placeholder. */
-    unsigned int other_flags : 3;
 } psh_state;
 #endif

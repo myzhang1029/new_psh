@@ -280,6 +280,8 @@ void psh_hash_free(psh_hash *table)
     struct _psh_hash_item *this, *tmp;
     size_t count;
 
+    if (table == NULL)
+        return;
     for (using = table->table; using < table->table + table->len; ++using)
     {
         this = using->head;
