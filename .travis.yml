@@ -7,6 +7,7 @@ compiler:
 - clang
 - gcc
 script:
+- autoreconf -fi
 - mkdir build
 - cd build
 - 'cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../psh "-DCMAKE_C_FLAGS_INIT=-Wall -Wextra -Wpedantic"'
