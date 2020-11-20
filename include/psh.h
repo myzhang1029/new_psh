@@ -43,7 +43,7 @@ typedef struct _psh_state
     psh_hash *variable_table_l;
     /** Command hash table */
     psh_hash *command_table;
-    /** @deprecated Shell argv[0]. */
+    /** Shell argv[0]. */
     char *argv0;
     /** @deprecated $?. */
     int last_command_status; /* #8 TODO: $? */

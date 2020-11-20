@@ -21,6 +21,27 @@
 #define _LIBPSH_HASH_H
 #include <stddef.h>
 
+/** Go over elements in a hash table, the item will be called `this` */
+#define ITER_TABLE(table_to_use, code)                                         \
+    do                                                                         \
+    {                                                                          \
+        struct _psh_hash_internal *using;                                      \
+        size_t count;                                                          \
+                                                                               \
+        for (using = (table_to_use)->table;                                    \
+             using < (table_to_use)->table + (table_to_use)->len; ++using)     \
+        {                                                                      \
+            struct _psh_hash_item *this = using->head;                         \
+            for (count = 0; count < using->used; ++count)                      \
+            {                                                                  \
+                {                                                              \
+                    code                                                       \
+                }                                                              \
+                this = this->next;                                             \
+            }                                                                  \
+        }                                                                      \
+    } while (0)
+
 /** @brief A single key-value pair with @ref next pointer. */
 struct _psh_hash_item
 {

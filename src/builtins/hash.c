@@ -24,6 +24,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 
 #include "builtin.h"
 #include "libpsh/hash.h"
@@ -34,6 +35,7 @@
 #define CLEAR 0x02
 #define REUSABLE 0x04
 #define SET 0x08
+#define CORRESPOND 0x10
 int builtin_hash(int argc, char **argv, psh_state *state)
 {
     int flags = 0;
@@ -59,13 +61,19 @@ int builtin_hash(int argc, char **argv, psh_state *state)
                 break;
             case 'p':
                 flags |= SET;
-                path = argv[++count];
+                if (++count == argc)
+                {
+                    OUT2E("%s: %s: -p: option requires an argument\n",
+                          state->argv0, argv[0]);
+                    return 1;
+                }
+                path = argv[count];
                 break;
             case 'r':
                 flags |= CLEAR;
                 break;
             case 't':
-                /* This is the default, different from bash */
+                flags |= CORRESPOND;
                 break;
             default:
                 OUT2E("%s: %s: unrecognized argument -%c\n", state->argv0,
@@ -82,6 +90,51 @@ endwhile:
         state->command_table = psh_hash_create(size);
         return 0;
     }
-    /* TODO: Go over hash table. */
+    if (count == argc) /* Commands not present */
+    {
+        if (flags & CORRESPOND)
+        {
+            OUT2E("%s: %s: -t: option requires an argument\n", state->argv0,
+                  argv[0]);
+            return 1;
+        }
+        if (flags & REUSABLE)
+            ITER_TABLE(state->command_table,
+                       printf("builtin hash -p '%s' '%s'\n",
+                              (char *)this->value, this->key););
+        else
+            ITER_TABLE(state->command_table,
+                       printf("'%s' '%s'\n", this->key, (char *)this->value););
+    }
+    for (; count < argc; ++count)
+    {
+        if (flags & SET)
+        {
+            psh_hash_add_chk(state->command_table, argv[count], strdup(path),
+                             1);
+        }
+        else if (flags & DELETE) /* If -d and -p are both supplied, it is set
+                                    but not deleted */
+            if (psh_hash_rm(state->command_table, argv[count]) == 1)
+            {
+                OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
+                      argv[count]);
+                return 1;
+            }
+            else if (flags & CORRESPOND)
+            {
+                char *path = psh_hash_get(state->command_table, argv[count]);
+                if (path == NULL)
+                {
+                    OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
+                          argv[count]);
+                    return 1;
+                }
+                printf("'%s' '%s'\n", argv[count], path);
+            }
+            else
+                ;
+        /* refresh hash TODO */
+    }
     return 0;
 }
