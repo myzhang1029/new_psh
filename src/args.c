@@ -27,7 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Returns char * with program name and all flags. Needs to be free(d) */
 char *collect_program_arguments(int argc, char **argv);
+
 static void print_help_info();
 static void print_version_exit();
 
@@ -81,8 +83,16 @@ void parse_shell_args(int argc, char **argv)
                 break;
             case 'c':
                 collected_program_arguments = collect_program_arguments(argc, argv);
-                execute_command(collected_program_arguments);
-                free(collected_program_arguments);
+                if(collected_program_arguments)
+                {
+                    execute_command(collected_program_arguments);
+                    free(collected_program_arguments);
+                } else
+                {
+
+                    OUT2E("Error after -c flag. Maybe not enough memory");
+
+                }
                 exit_psh(0);
                 break;
             case ':':
@@ -108,18 +118,22 @@ char *collect_program_arguments(int argc, char **argv)
         {
             int j;
             char *command = calloc(sizeof(optarg), sizeof(char));
+            /* Copy program name */
             strcpy(command, optarg);
             for(j = i + 1; j < argc; j++)
             {
                 if (realloc(command, strlen(command) + strlen(argv[j]) + 1))
                 {
+                    /* Append flags to command */
                     strcat(command, " ");
                     strcat(command, argv[j]);
                 } else
                 {
+                    /* Returns NULL when unable to reallocate memory */
                     return NULL;
                 }
             }
+            /* Return complete command with all flags */
             return command;
         }
     }
