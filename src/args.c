@@ -1,6 +1,7 @@
 /*
     psh/args.c - psh argument parser
     Copyright 2020 Manuel Bertele
+    Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -41,19 +42,25 @@ void parse_shell_args(int argc, char **argv)
     int i;
     for (i = 0; i < argc; i++)
     {
+        if (strcmp(argv[i], "--") == 0)
+            break;
         if (strcmp(argv[i], "--version") == 0)
             print_version_exit();
         if (strcmp(argv[i], "--help") == 0)
+        {
             print_help_info();
+            exit_psh(0);
+        }
         if (strcmp(argv[i], "--verbose") == 0)
         {
             VerbosE = 1;
             argv[i][0] = '\0';
         }
-        else if (strstr(argv[i], "--") != NULL)
+        else if (strstr(argv[i], "--") == argv[i])
         {
+            print_help_info();
             OUT2E("%s: unknown option %s\n", argv0, argv[i]);
-            argv[i][0] = '\0';
+            exit_psh(2);
         }
     }
 
@@ -71,26 +78,29 @@ void parse_shell_args(int argc, char **argv)
                 break;
             case ':':
                 OUT2E("%s: option requires an argument\n", argv0);
-                break;
+                exit_psh(1);
             case '?':
             default:
+                print_help_info();
                 OUT2E("%s: unknown option -%c\n", argv0, optopt);
-                break;
+                exit_psh(2);
         }
     }
 }
 
 static void print_help_info()
 {
-    puts(
-        "Psh is a shell licensed under the GPLv3\n\n"
-        "OPTIONS\n"
-        "-v --verbose enables verbose mode\n"
-        "--help shows this text\n"
-        "--version displays the version"
-        );
-   
-    exit_psh(0);
+    printf("psh, version " PSH_VERSION "\n"
+           "Copyright (C) 2017-2020 Zhang Maiyun, Manuel Bertele\n"
+           "This program comes with ABSOLUTELY NO WARRANTY.\n"
+           "This is free software, and you are welcome to redistribute it\n"
+           "under certain conditions.\n\n"
+           "Usage: %s [options]\n"
+           "Options:\n"
+           "\t-v, --verbose: Enable verbose mode\n"
+           "\t--help: Show this text and exit\n"
+           "\t--version: Print psh version and exit\n",
+           argv0);
 }
 
 static void print_version_exit()

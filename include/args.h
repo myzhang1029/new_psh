@@ -1,6 +1,7 @@
 /** @file psh/include/args.h - @brief psh argument parser */
 /*
     Copyright 2020 Manuel Bertele
+    Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -18,12 +19,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
 #ifndef _PSH_ARGS_H_
 #define _PSH_ARGS_H_
 
 /** Parse shell parameters and set appropriate variables.
- * 
+ *
  * @param argc The first parameter to main()
  * @param argv The second parameter to main()
  */
