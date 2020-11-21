@@ -47,9 +47,7 @@ extern int optopt;
 
 int main(int argc, char **argv)
 {
-    builtin_function bltin;
     int stat;
-    struct command *cmd = NULL;
     char *expanded_ps1, *buffer;
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
