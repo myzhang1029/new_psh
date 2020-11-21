@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *collect_program_arguments(int argc, char **argv);
 static void print_help_info();
 static void print_version_exit();
 
@@ -67,6 +68,7 @@ void parse_shell_args(int argc, char **argv)
 
     int arg;
     const char *optstring = ":vc:";
+    char *collected_program_arguments;
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
@@ -78,7 +80,9 @@ void parse_shell_args(int argc, char **argv)
                 VerbosE = 1;
                 break;
             case 'c':
-                execute_command(optarg);
+                collected_program_arguments = collect_program_arguments(argc, argv);
+                execute_command(collected_program_arguments);
+                free(collected_program_arguments);
                 exit_psh(0);
                 break;
             case ':':
@@ -92,6 +96,37 @@ void parse_shell_args(int argc, char **argv)
         }
     }
 }
+
+
+
+char *collect_program_arguments(int argc, char **argv)
+{
+    int i;
+    for(i = 0; i < argc; i++)
+    {
+        if(strcmp(argv[i], optarg) == 0)
+        {
+            int j;
+            char *command = calloc(sizeof(optarg), sizeof(char));
+            strcpy(command, optarg);
+            for(j = i + 1; j < argc; j++)
+            {
+                if (realloc(command, strlen(command) + strlen(argv[j]) + 1))
+                {
+                    strcat(command, " ");
+                    strcat(command, argv[j]);
+                } else
+                {
+                    return NULL;
+                }
+            }
+            return command;
+        }
+    }
+
+    return NULL;
+}
+
 
 static void print_help_info()
 {
