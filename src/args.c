@@ -118,15 +118,13 @@ char *collect_program_arguments(int argc, char **argv)
         {
             int j;
             char *command = calloc(sizeof(optarg), sizeof(char));
-            /* Copy program name */
-            strcpy(command, optarg);
-            for(j = i + 1; j < argc; j++)
+            for(j = i; j < argc; j++)
             {
                 if (realloc(command, strlen(command) + strlen(argv[j]) + 1))
                 {
                     /* Append flags to command */
-                    strcat(command, " ");
                     strcat(command, argv[j]);
+                    strcat(command, " ");
                 } else
                 {
                     /* Returns NULL when unable to reallocate memory */
