@@ -33,6 +33,7 @@ static void print_version_exit();
 /* Set variable thats globally avaliable */
 int VerbosE = 0;
 extern int optopt;
+extern char *optarg;
 extern char *argv0;
 
 void parse_shell_args(int argc, char **argv)
@@ -77,7 +78,8 @@ void parse_shell_args(int argc, char **argv)
                 VerbosE = 1;
                 break;
             case 'c':
-               
+                execute_command(optarg);
+                exit_psh(0);
                 break;
             case ':':
                 OUT2E("%s: option requires an argument\n", argv0);

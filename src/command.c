@@ -110,9 +110,6 @@ void free_argv(struct command *cmd)
     cmd->argv = NULL;
 }
 
-#include "builtin.h"
-#include "backend.h"
-#include "filpinfo.h"
 
 void execute_command(char *command)
 {
@@ -120,10 +117,10 @@ void execute_command(char *command)
     builtin_function bltin;
     struct command *cmd = NULL;
     int stat;
+    extern int last_command_status;
 
     cmd = new_command();
     stat = filpinfo(command, cmd);
-    xfree(command);
     if (stat < 0)
     {
         free_command(cmd);
@@ -136,7 +133,7 @@ void execute_command(char *command)
     bltin = find_builtin(cmd->argv[0]);
     if (bltin)
     {
-        (*bltin)(get_argc(cmd->argv), cmd->argv);
+        last_command_status = (*bltin)(get_argc(cmd->argv), cmd->argv);
     }
     else
     {

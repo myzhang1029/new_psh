@@ -78,28 +78,7 @@ int main(int argc, char **argv)
             continue;
 
         execute_command(buffer);
-        /*cmd = new_command();
-        stat = filpinfo(buffer, cmd);
-        xfree(buffer);
-        if (stat < 0)
-        {
-            free_command(cmd);
-            continue;
-        }
 
-        * Temporary work-around. #2 #5 #9 TODO, invoke bltin in
-         * psh_backend_do_run() *
-
-        bltin = find_builtin(cmd->argv[0]);
-        if (bltin)
-        {
-            last_command_status = (*bltin)(get_argc(cmd->argv), cmd->argv);
-        }
-        else
-        {
-            psh_backend_do_run(cmd);
-        }
-        free_command(cmd);*/
     }
     return 0;
 }
