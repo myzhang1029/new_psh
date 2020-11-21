@@ -76,7 +76,9 @@ int main(int argc, char **argv)
         xfree(expanded_ps1);
         if (stat < 0)
             continue;
-        cmd = new_command();
+
+        execute_command(buffer);
+        /*cmd = new_command();
         stat = filpinfo(buffer, cmd);
         xfree(buffer);
         if (stat < 0)
@@ -85,8 +87,8 @@ int main(int argc, char **argv)
             continue;
         }
 
-        /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
-         * psh_backend_do_run() */
+        * Temporary work-around. #2 #5 #9 TODO, invoke bltin in
+         * psh_backend_do_run() *
 
         bltin = find_builtin(cmd->argv[0]);
         if (bltin)
@@ -97,7 +99,7 @@ int main(int argc, char **argv)
         {
             psh_backend_do_run(cmd);
         }
-        free_command(cmd);
+        free_command(cmd);*/
     }
     return 0;
 }

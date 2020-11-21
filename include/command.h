@@ -182,4 +182,6 @@ void free_command(struct command *command);
  */
 void free_argv(struct command *command);
 
+void execute_command(char *command);
+
 #endif

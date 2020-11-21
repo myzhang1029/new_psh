@@ -65,7 +65,7 @@ void parse_shell_args(int argc, char **argv)
     }
 
     int arg;
-    const char *optstring = ":v";
+    const char *optstring = ":vc:";
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
@@ -75,6 +75,9 @@ void parse_shell_args(int argc, char **argv)
             /* Verbose flag */
             case 'v':
                 VerbosE = 1;
+                break;
+            case 'c':
+               
                 break;
             case ':':
                 OUT2E("%s: option requires an argument\n", argv0);

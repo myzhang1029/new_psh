@@ -24,7 +24,10 @@
 
 #include <string.h>
 
+#include "backend.h"
+#include "builtin.h"
 #include "command.h"
+#include "filpinfo.h"
 #include "libpsh/xmalloc.h"
 
 void redirect_init(struct redirect *redir)
@@ -105,4 +108,40 @@ void free_argv(struct command *cmd)
     }
     xfree(cmd->argv);
     cmd->argv = NULL;
+}
+
+#include "builtin.h"
+#include "backend.h"
+#include "filpinfo.h"
+
+void execute_command(char *command)
+{
+
+    builtin_function bltin;
+    struct command *cmd = NULL;
+    int stat;
+
+    cmd = new_command();
+    stat = filpinfo(command, cmd);
+    xfree(command);
+    if (stat < 0)
+    {
+        free_command(cmd);
+        return;
+    }
+
+    /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
+     * psh_backend_do_run() */
+
+    bltin = find_builtin(cmd->argv[0]);
+    if (bltin)
+    {
+        (*bltin)(get_argc(cmd->argv), cmd->argv);
+    }
+    else
+    {
+        psh_backend_do_run(cmd);
+    }
+    free_command(cmd);
+
 }
