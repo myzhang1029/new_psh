@@ -72,7 +72,8 @@ size_t bytes;
 
     temp = pointer ? realloc(pointer, bytes) : malloc(bytes);
 #ifdef DEBUG
-    fprintf(stderr, "[xmalloc] %p(realloc)\n", temp);
+    fprintf(stderr, "[xmalloc] %p(realloc_free %d)\n", pointer);
+    fprintf(stderr, "[xmalloc] %p(realloc_malloc %d)\n", temp);
 #endif
 
     if (temp == 0)

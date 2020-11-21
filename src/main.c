@@ -63,7 +63,8 @@ int main(int argc, char **argv)
     {
         union _psh_vfa_value payload = {1};
         psh_vf_set(internal_state, "p", PSH_VFA_INTEGER, payload, 0, 0, 0);
-        struct _psh_vfa_container *cnt = psh_vf_get(internal_state, "p", 0);
+        const struct _psh_vfa_container *cnt =
+            psh_vf_get(internal_state, "p", 0);
         printf("%d = 1\n", cnt->payload);
         psh_vf_unset(internal_state, "p", 0);
         cnt = psh_vf_get(internal_state, "p", 0);
@@ -86,6 +87,7 @@ int main(int argc, char **argv)
     while (1)
     {
         expanded_ps1 = ps_expander(internal_state, ps1);
+        printf("%p\n", expanded_ps1);
         stat = read_cmdline(internal_state, expanded_ps1, &buffer);
         xfree(expanded_ps1);
         if (stat < 0)

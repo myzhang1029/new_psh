@@ -287,7 +287,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     if (cnt_argument_char == 0) /* Previously a blank reached */
                     {
                         cnt_argument_char = cnt_old_parameter;
-                        free(cmd_lastnode->argv[cnt_argument_element]);
+                        xfree(cmd_lastnode->argv[cnt_argument_element]);
                         cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
                     cmd_lastnode->next = new_command();

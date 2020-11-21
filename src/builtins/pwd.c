@@ -29,6 +29,7 @@
 #include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 int builtin_pwd(int argc, char **argv, psh_state *state)
 {
@@ -82,6 +83,6 @@ int builtin_pwd(int argc, char **argv, psh_state *state)
         path = psh_backend_getcwd_dm();
 
     puts(path);
-    free(path);
+    xfree(path);
     return 0;
 }

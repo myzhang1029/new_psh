@@ -27,6 +27,7 @@
 
 #include "libpsh/hash.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 #include "psh.h"
 #include "util.h"
 #include "variable.h"
@@ -44,10 +45,10 @@ __attribute__((noreturn)) void code_fault(psh_state *state, char *file,
 /* Exit psh after cleaning up */
 void exit_psh(psh_state *state, int status)
 {
-    free(state->argv0);
-    free(state->signals_pending);
+    xfree(state->argv0);
+    xfree(state->signals_pending);
     psh_vfa_free(state);
     psh_hash_free(state->command_table);
-    free(state);
+    xfree(state);
     exit(status);
 }
