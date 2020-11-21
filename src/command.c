@@ -1,6 +1,7 @@
 /*
     psh/command.c - psh commands
     Copyright 2020 Zhang Maiyun
+    Copyright 2020 Manuel Bertele
 
     This file is part of Psh, P shell.
 

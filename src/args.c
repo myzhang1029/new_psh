@@ -83,7 +83,7 @@ void parse_shell_args(int argc, char **argv)
                 break;
             case 'c':
                 collected_program_arguments = collect_program_arguments(argc, argv);
-                if(collected_program_arguments)
+                if (collected_program_arguments)
                 {
                     execute_command(collected_program_arguments);
                     free(collected_program_arguments);
@@ -112,13 +112,13 @@ void parse_shell_args(int argc, char **argv)
 char *collect_program_arguments(int argc, char **argv)
 {
     int i;
-    for(i = 0; i < argc; i++)
+    for (i = 0; i < argc; i++)
     {
-        if(strcmp(argv[i], optarg) == 0)
+        if (strcmp(argv[i], optarg) == 0)
         {
             int j;
             char *command = calloc(sizeof(optarg), sizeof(char));
-            for(j = i; j < argc; j++)
+            for (j = i; j < argc; j++)
             {
                 if (realloc(command, strlen(command) + strlen(argv[j]) + 1))
                 {
