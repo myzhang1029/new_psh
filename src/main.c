@@ -30,6 +30,7 @@
 #include <readline/history.h>
 #endif
 
+#include "args.h"
 #include "backend.h"
 #include "builtin.h"
 #include "command.h"
@@ -53,31 +54,12 @@ int main(int argc, char **argv)
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
-    int arg;
-    int verbose = 0;
-
-    /* Parse shell options */
-    while ((arg = psh_backend_getopt(argc, argv, ":v")) != -1)
-    {
-        switch (arg)
-        {
-            /* Verbose flag */
-            case 'v':
-                verbose = 1;
-                break;
-            case ':':
-                OUT2E("%s: option requires an argument\n", argv0);
-                break;
-            case '?':
-            default:
-                OUT2E("%s: unknown option -%c\n", argv0, optopt);
-                break;
-        }
-    }
 
     /* TODO: Store this as shell arguments */
     argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
+
+    parse_shell_args(argc, argv);
 
     add_atexit_free(argv0);
 
@@ -113,7 +95,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            psh_backend_do_run(cmd, verbose);
+            psh_backend_do_run(cmd);
         }
         free_command(cmd);
     }
