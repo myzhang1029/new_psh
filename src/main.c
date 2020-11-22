@@ -47,7 +47,7 @@
 int main(int argc, char **argv)
 {
     builtin_function bltin;
-    psh_state *internal_state;
+    psh_state *state;
     int stat;
     struct _psh_command *cmd = NULL;
     char *expanded_ps1, *buffer;
@@ -56,49 +56,47 @@ int main(int argc, char **argv)
         "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
 
     /* Initiate the internal state */
-    internal_state = xmalloc(sizeof(psh_state));
-    memset(internal_state, 0, sizeof(psh_state));
-    psh_vfa_new_context(internal_state);
+    state = xmalloc(sizeof(psh_state));
+    memset(state, 0, sizeof(psh_state));
+    psh_vfa_new_context(state);
 #ifdef DEBUG
     {
         union _psh_vfa_value payload = {(char *)1};
-        psh_vf_set(internal_state, "p", PSH_VFA_INTEGER, payload, 0, 0, 0);
-        const struct _psh_vfa_container *cnt =
-            psh_vf_get(internal_state, "p", 0);
+        psh_vf_set(state, "p", PSH_VFA_INTEGER, payload, 0, 0, 0);
+        const struct _psh_vfa_container *cnt = psh_vf_get(state, "p", 0);
         printf("%d = 1\n", cnt->payload);
-        psh_vf_unset(internal_state, "p", 0);
-        cnt = psh_vf_get(internal_state, "p", 0);
+        psh_vf_unset(state, "p", 0);
+        cnt = psh_vf_get(state, "p", 0);
         printf("0x%x = 0x4\n", cnt->attributes);
     }
 #endif
-    internal_state->command_table = psh_hash_create(32);
+    state->command_table = psh_hash_create(32);
     /* TODO: Store this as shell arguments */
-    internal_state->argv0 = psh_strdup(
+    state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 
-    parse_shell_args(internal_state, argc, argv);
+    parse_shell_args(state, argc, argv);
 
-    if (psh_backend_prepare() != 0)
-        exit_psh(internal_state, 1);
+    if (psh_backend_prepare(state) != 0)
+        exit_psh(state, 1);
 
 #ifdef HAVE_WORKING_HISTORY
     using_history();
 #endif
     while (1)
     {
-        expanded_ps1 = ps_expander(internal_state, ps1);
-        printf("%p\n", expanded_ps1);
-        stat = read_cmdline(internal_state, expanded_ps1, &buffer);
+        expanded_ps1 = ps_expander(state, ps1);
+        stat = read_cmdline(state, expanded_ps1, &buffer);
         xfree(expanded_ps1);
         if (stat == 1)
         {
             puts("");
-            exit_psh(internal_state, internal_state->last_command_status);
+            exit_psh(state, state->last_command_status);
         }
         if (stat < 0)
             continue;
         cmd = new_command();
-        stat = filpinfo(internal_state, buffer, cmd);
+        stat = filpinfo(state, buffer, cmd);
         xfree(buffer);
         if (stat < 0)
         {
@@ -112,12 +110,12 @@ int main(int argc, char **argv)
         bltin = find_builtin(cmd->argv[0]);
         if (bltin)
         {
-            internal_state->last_command_status =
-                (*bltin)(get_argc(cmd->argv), cmd->argv, internal_state);
+            state->last_command_status =
+                (*bltin)(get_argc(cmd->argv), cmd->argv, state);
         }
         else
         {
-            psh_backend_do_run(cmd);
+            psh_backend_do_run(state, cmd);
         }
         free_command(cmd);
     }

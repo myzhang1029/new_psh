@@ -32,8 +32,6 @@
 /** @brief The internal state of psh. */
 typedef struct _psh_state
 {
-    /** A list of pending signals. */
-    int *signals_pending;
     /** Context frames of variables and functions, similar to stack frames in
      * other languages */
     struct _psh_vf_context
@@ -58,5 +56,7 @@ typedef struct _psh_state
     int last_command_status; /* #8 TODO: $? */
     /** Verbose flag. */
     unsigned int verbose : 1;
+    /** Interactive flag. */
+    unsigned int interactive : 1;
 } psh_state;
 #endif

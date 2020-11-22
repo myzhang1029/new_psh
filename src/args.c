@@ -48,6 +48,11 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
             print_help_info(state);
             exit_psh(state, 0);
         }
+        if (strcmp(argv[i], "--interactive") == 0)
+        {
+            state->interactive = 1;
+            argv[i][0] = '\0';
+        }
         if (strcmp(argv[i], "--verbose") == 0)
         {
             state->verbose = 1;
@@ -62,13 +67,17 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
     }
 
     int arg;
-    const char *optstring = ":v";
+    const char *optstring = ":vi";
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
     {
         switch (arg)
         {
+            /* Interactive flag */
+            case 'i':
+                state->interactive = 1;
+                break;
             /* Verbose flag */
             case 'v':
                 state->verbose = 1;
