@@ -114,8 +114,12 @@ static char *canonicalize_path(psh_state *state, const char *path, int flags)
                 xpath = psh_backend_getcwd_dm();
         }
         if (!xpath)
+        {
             OUT2E("%s: cd: error retrieving current directory: %s\n",
                   state->argv0, strerror(errno));
+            /* bash won't fail in this case, but we do */
+            return NULL;
+        }
         len_cwd = strlen(xpath);
         len_path = strlen(path);
         /* +2 for slash and \0 */

@@ -93,7 +93,7 @@ static inline void free_vf_table(psh_state *state, psh_hash *vfa_table)
  * Initialize variable, function, and alias tables. */
 void psh_vfa_new_context(psh_state *state)
 {
-    if (state->contexts == NULL && state->context_idx == 0)
+    if (state->contexts == NULL)
     {
         /* Initialize the first context frame. */
         state->contexts = xmalloc(sizeof(struct _psh_vf_context) * 4);
