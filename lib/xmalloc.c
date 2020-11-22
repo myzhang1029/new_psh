@@ -2,10 +2,14 @@
 /* Define DEBUG to show all pointers manipulated and show call count which
  * should become 1 when the last xfree is called. */
 
-/* Copyright (C) 1991-2003 Free Software Foundation, Inc.
+/*
+    Copyright (C) 1991-2003 Free Software Foundation, Inc.
+    Copyright (C) 2020 Zhang Maiyun
 
    This file is part of GNU Readline, a library for reading lines
    of text with interactive input and history editing.
+   This file is edited from the original implementation to add memory
+   debug features and the calloc function to be used in psh.
 
    Readline is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -71,7 +75,7 @@ xcalloc(nelem, bytes) size_t nelem, bytes;
 
     temp = calloc(nelem, bytes);
 #ifdef DEBUG
-    fprintf(stderr, "[xmalloc] %p(calloc %d)\n", temp, ++nref);
+    fprintf(stderr, "[xmalloc] %p(malloc_calloc %d)\n", temp, ++nref);
 #endif
     if (temp == 0)
         memory_error_and_abort("xcalloc");
@@ -86,8 +90,8 @@ size_t bytes;
 
     temp = pointer ? realloc(pointer, bytes) : malloc(bytes);
 #ifdef DEBUG
-    fprintf(stderr, "[xmalloc] %p(realloc_free %d)\n", pointer, nref);
-    fprintf(stderr, "[xmalloc] %p(realloc_malloc %d)\n", temp, nref);
+    fprintf(stderr, "[xmalloc] %p(free_realloc %d)\n", pointer, nref);
+    fprintf(stderr, "[xmalloc] %p(malloc_realloc %d)\n", temp, nref);
 #endif
 
     if (temp == 0)

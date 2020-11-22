@@ -36,8 +36,9 @@
 
 /* read command line, shows PROMPT and result goes into *RESULT
  * *RESULT needs to be free()d
- * returns 0 if everything goes well;
- * and -1 if the cmd doesn't need to be run;
+ * returns 0 if everything goes well,
+ * 1 if EOF is reached,
+ * -1 if the cmd doesn't need to be run,
  * and -2 if anything went wrong, RESULT is untouched.
  */
 int read_cmdline(psh_state *state, char *prompt, char **result)
@@ -50,10 +51,7 @@ int read_cmdline(psh_state *state, char *prompt, char **result)
 
     buffer = psh_gets(prompt);
     if (!buffer) /* EOF reached */
-    {
-        puts("");
-        exit_psh(state, state->last_command_status);
-    }
+        return 1;
     if (*buffer == 0)
     {
         xfree(buffer);

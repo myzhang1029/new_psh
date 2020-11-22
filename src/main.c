@@ -90,6 +90,11 @@ int main(int argc, char **argv)
         printf("%p\n", expanded_ps1);
         stat = read_cmdline(internal_state, expanded_ps1, &buffer);
         xfree(expanded_ps1);
+        if (stat == 1)
+        {
+            puts("");
+            exit_psh(internal_state, internal_state->last_command_status);
+        }
         if (stat < 0)
             continue;
         cmd = new_command();
