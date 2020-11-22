@@ -25,12 +25,12 @@
 #include "command.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 
+#define MAXPIDTABLE 1024
 pid_t ChdPid, ChdPid2;
 pid_t BPTable[MAXPIDTABLE] = {0};
 int pipe_fd[2], in_fd, out_fd;
-
-extern char *argv0;
 
 void sigchld_handler(__attribute__((unused)) int sig)
 {
@@ -48,7 +48,7 @@ void sigchld_handler(__attribute__((unused)) int sig)
             else if (pid < 0)
             {
                 if (errno != ECHILD)
-                    OUT2E("%s: waitpid error: %s", argv0, strerror(errno));
+                    OUT2E("%s: waitpid error: %s", "psh", strerror(errno));
             }
             /*else:do nothing.*/
             /*Not background processes has their waitpid() in
@@ -57,137 +57,26 @@ void sigchld_handler(__attribute__((unused)) int sig)
     return;
 }
 
-void sigintabrt_hadler(int sig) { last_command_status = sig; }
+void sigintabrt_hadler(int sig) {}
 
-int psh_backend_prepare(void)
+int psh_backend_prepare(psh_state *state)
 {
     int ret = 0;
     if (signal(SIGCHLD, sigchld_handler) == SIG_ERR)
-        OUT2E("%s: signal error: %s", argv0, strerror(errno)), ret++;
+        OUT2E("%s: signal error: %s", state->argv0, strerror(errno)), ret++;
 
     if (signal(SIGINT, sigintabrt_hadler) == SIG_ERR)
-        OUT2E("%s: signal error: %s", argv0, strerror(errno)), ret++;
+        OUT2E("%s: signal error: %s", state->argv0, strerror(errno)), ret++;
 
     if (signal(SIGQUIT, sigintabrt_hadler) == SIG_ERR)
-        OUT2E("%s: signal error: %s", argv0, strerror(errno)), ret++;
+        OUT2E("%s: signal error: %s", state->argv0, strerror(errno)), ret++;
     return ret;
 }
-
-char *psh_backend_get_homedir(void)
+int psh_backend_do_run(psh_state *state, struct _psh_command *arginfo)
 {
-    struct passwd *pwd = getpwuid(getuid());
-    if (pwd == NULL)
-        return NULL;
-    return pwd->pw_dir;
-}
+    struct _psh_command *info = arginfo;
 
-char *psh_backend_get_homedir_username(char *username)
-{
-    struct passwd *pwd = getpwnam(username);
-    if (pwd == NULL)
-        return NULL;
-    return pwd->pw_dir;
-}
-
-char *psh_backend_get_username(void)
-{
-    struct passwd *pwd = getpwuid(getuid());
-    if (pwd == NULL)
-        return NULL;
-    return pwd->pw_name;
-}
-
-char *psh_backend_getcwd(char *wd, size_t len) { return getcwd(wd, len); }
-
-char *psh_backend_getcwd_dm(void)
-{
-    /* Providing NULL to getcwd isn't mainstream POSIX */
-    char *buf =
-        psh_getstring((void *(*)(char *, size_t)) & psh_backend_getcwd, NULL);
-    return buf;
-}
-
-int psh_backend_gethostname(char *dest, size_t len)
-{
-    return gethostname(dest, len);
-}
-
-char *psh_backend_gethostname_dm(void)
-{
-    char *buf = psh_getstring(
-        (void *(*)(char *, size_t)) & psh_backend_gethostname, NULL);
-    return buf;
-}
-
-int psh_backend_getuid(void) { return geteuid(); }
-
-int psh_backend_chdir(char *dir) { return chdir(dir); }
-
-int psh_backend_setenv(const char *name, const char *value, int overwrite)
-{
-    return setenv(name, value, overwrite);
-}
-
-int psh_backend_getopt(int argc, char **argv, const char *optstring)
-{
-    return getopt(argc, argv, optstring);
-}
-
-static int redir_spawnve(struct redirect *arginfo, char *cmd, char **argv,
-                         char **env)
-{
-    pid_t pid;
-    struct redirect *info = arginfo;
-    if ((pid = fork()) == 0)
-    {
-        while (info)
-        {
-            switch (info->type)
-            {
-                case FD2FD:
-                    dup2(info->in.fd, info->out.fd);
-                    close(info->in.fd);
-                    break;
-                case OUT_REDIR:
-                    dup2(open(info->out.file, O_WRONLY | O_CREAT | O_TRUNC,
-                              0644),
-                         info->in.fd);
-                    break;
-                case OUT_APPN:
-                    dup2(open(info->out.file, O_WRONLY | O_CREAT | O_APPEND,
-                              0644),
-                         info->in.fd);
-                    break;
-                case IN_REDIR:
-                    dup2(open(info->in.file, O_RDONLY | O_CREAT, 0644),
-                         info->out.fd);
-                    break;
-                case CLOSEFD:
-                    close(info->in.fd);
-                    break;
-                case OPENFN:
-                    dup2(open(info->in.file, O_RDWR | O_CREAT, 0644),
-                         info->out.fd);
-                    break;
-                case HEREXX: /* Some magic TODO */
-                    break;
-            }
-            info = info->next;
-        }
-        execve(cmd, argv, env);
-    }
-
-    return pid;
-}
-
-int psh_backend_do_run(struct command *arginfo)
-{
-    struct command *info = arginfo;
-
-    extern int VerbosE;
-
-    /* VerbosE can be 0 or 1, if is only true when verbose == 1 */
-    if (VerbosE)
+    if (state->verbose)
     {
         int i = 0;
         printf("--**--\nstub!\nflags won't be read\n");
@@ -213,7 +102,7 @@ int psh_backend_do_run(struct command *arginfo)
     }
     if ((ChdPid = fork()) != 0) /*shell*/
     {
-        waitpid(ChdPid, &last_command_status, 0); /*wait command1*/
+        waitpid(ChdPid, &state->last_command_status, 0); /*wait command1*/
     }
     else /*command1*/
     {
@@ -221,12 +110,14 @@ int psh_backend_do_run(struct command *arginfo)
         {
             if (errno == ENOENT && !strchr(info->argv[0], '/'))
             {
-                OUT2E("%s: %s: command not found\n", argv0, info->argv[0]);
+                OUT2E("%s: %s: command not found\n", state->argv0,
+                      info->argv[0]);
                 _Exit(127);
             }
             else
             {
-                OUT2E("%s: %s: %s\n", argv0, info->argv[0], strerror(errno));
+                OUT2E("%s: %s: %s\n", state->argv0, info->argv[0],
+                      strerror(errno));
                 /* Exit the failed command child process */
                 _Exit(126);
             }
@@ -241,7 +132,7 @@ int psh_backend_do_run(struct command *arginfo)
 #include "builtin.h"
 
 /* Builtin exec */
-int builtin_exec(int argc, char **argv)
+int builtin_exec(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
         return 0; /* Do nothing */
