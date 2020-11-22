@@ -23,53 +23,59 @@
 
 #include <stdint.h>
 
+/** @brief Attributes of variables, functions, and aliases. */
+enum _psh_vfa_attributes
+{
+    /** No update */
+    PSH_VFA_NO_UPDATE = 0x0,
+    /** Indexed arrays. */
+    PSH_VFA_INDEX_ARRAY = 0x001,
+    /** Associative arrays. */
+    PSH_VFA_ASSOC_ARRAY = 0x002,
+    /** Integer. */
+    PSH_VFA_INTEGER = 0x004,
+    /** Reference to the variable by its value. */
+    PSH_VFA_REFERENCE = 0x008,
+    /** Readonly. */
+    PSH_VFA_READONLY = 0x010,
+    /** Trace. */
+    PSH_VFA_TRACE = 0x020,
+    /** Exported. */
+    PSH_VFA_EXPORT = 0x040,
+    /** Uppercase on assignment. */
+    PSH_VFA_UPPER = 0x080,
+    /** Lowercase on assignment. */
+    PSH_VFA_LOWER = 0x100,
+    /** First-letter-capitalized on assignment. */
+    PSH_VFA_CAPI = 0x200,
+    /** Resolved to code piece. */
+    PSH_VFA_PARSED = 0x400,
+    /** Together with a local scope, this marks a variable as
+     * locally-unset, and stops psh from travelling up to find a value. */
+    PSH_VFA_UNSET = 0x800,
+    /** String */
+    PSH_VFA_STRING = 0x1000
+};
 /** @brief Container of variables, functions, and aliases. */
 struct _psh_vfa_container
 {
-    /** @brief Attributes of variables, functions, and aliases. */
-    enum _psh_vfa_attributes
-    {
-        /** No update */
-        PSH_VFA_NO_UPDATE = 0x0,
-        /** Indexed arrays. */
-        PSH_VFA_INDEX_ARRAY = 0x001,
-        /** Associative arrays. */
-        PSH_VFA_ASSOC_ARRAY = 0x002,
-        /** Integer. */
-        PSH_VFA_INTEGER = 0x004,
-        /** Reference to the variable by its value. */
-        PSH_VFA_REFERENCE = 0x008,
-        /** Readonly. */
-        PSH_VFA_READONLY = 0x010,
-        /** Trace. */
-        PSH_VFA_TRACE = 0x020,
-        /** Exported. */
-        PSH_VFA_EXPORT = 0x040,
-        /** Uppercase on assignment. */
-        PSH_VFA_UPPER = 0x080,
-        /** Lowercase on assignment. */
-        PSH_VFA_LOWER = 0x100,
-        /** First-letter-capitalized on assignment. */
-        PSH_VFA_CAPI = 0x200,
-        /** Resolved to code piece. */
-        PSH_VFA_PARSED = 0x400,
-        /** Together with a local scope, this marks a variable as
-         * locally-unset, and stops psh from travelling up to find a value. */
-        PSH_VFA_UNSET = 0x800,
-        /** String */
-        PSH_VFA_STRING = 0x1000
-    } attributes; /**< The attributes for this variable. */
-    /** Resolved code or string value of the variable */
+    /** The attributes for this variable. */
+    int attributes;
+    /** Value of a variable. */
     union _psh_vfa_value
     {
-        /** String value */
+        /** String value. */
         char *string;
+        /** Parsed code. */
         struct _psh_command *code;
+        /** Integer array. */
         intmax_t *int_array;
+        /** String array. */
         char **string_array;
+        /** Integer. */
         intmax_t integer;
     } payload;
-    /** Size of the array if it is one */
+    /** Size of the array if it is one. */
     size_t array_size;
 };
 

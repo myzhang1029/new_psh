@@ -31,6 +31,7 @@
 #include "backend.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "psh.h"
 #include "variable.h"
 
 extern char **environ;
