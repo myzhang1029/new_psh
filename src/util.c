@@ -46,7 +46,6 @@ __attribute__((noreturn)) void code_fault(psh_state *state, char *file,
 void exit_psh(psh_state *state, int status)
 {
     xfree(state->argv0);
-    xfree(state->signals_pending);
     psh_vfa_free(state);
     psh_hash_free(state->command_table);
     xfree(state);

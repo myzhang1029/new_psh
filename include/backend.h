@@ -24,12 +24,14 @@
 #include <stdio.h>
 
 #include "command.h" /* For struct _psh_command */
+#include "psh.h"
 
 /** Platform dependent shell initialization.
  *
+ * @param state Psh internal state.
  * @return A non-zero return value aborts shell startup.
  */
-int psh_backend_prepare(void);
+int psh_backend_prepare(psh_state *state);
 
 /** Get the home directory of current user.
  *
@@ -118,9 +120,10 @@ int psh_backend_file_exists(const char *path);
 
 /** Run a command.
  *
+ * @param state Psh internal state.
  * @param command The command struct about command details.
  * @return Zero if succeeded.
  */
-int psh_backend_do_run(struct _psh_command *command);
+int psh_backend_do_run(psh_state *state, struct _psh_command *command);
 
 #endif /* _PSH_BACKEND_H*/
