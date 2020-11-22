@@ -22,6 +22,7 @@
 #include "config.h"
 #endif
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -116,7 +117,7 @@ static int builtin_unsupported(int argc, char **argv, psh_state *state)
 
 static int builtin_getstat_handler(int argc, char **argv, psh_state *state)
 {
-    printf("%d\n", psh_vf_getint(state, "?"));
+    printf("%" PRIdMAX "\n", psh_vf_getint(state, "?"));
     return 0;
 }
 
