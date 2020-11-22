@@ -44,6 +44,15 @@
  */
 PTR_T xmalloc(size_t bytes);
 
+/** Allocate and zero-initialize a block of free()able memory. If that failed,
+ * print an error message and abort.
+ *
+ * @param nelem Number of elements.
+ * @param bytes Number of bytes to allocate for each element.
+ * @return Pointer to the allocated memory block.
+ */
+PTR_T xcalloc(size_t nelem, size_t bytes);
+
 /** Resize a block of malloc()ed memory. If that failed, print an error
  * message and abort.
  *

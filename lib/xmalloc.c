@@ -65,6 +65,20 @@ xmalloc(bytes) size_t bytes;
 }
 
 PTR_T
+xcalloc(nelem, bytes) size_t nelem, bytes;
+{
+    PTR_T temp;
+
+    temp = calloc(nelem, bytes);
+#ifdef DEBUG
+    fprintf(stderr, "[xmalloc] %p(calloc %d)\n", temp, ++nref);
+#endif
+    if (temp == 0)
+        memory_error_and_abort("xcalloc");
+    return (temp);
+}
+
+PTR_T
 xrealloc(pointer, bytes) PTR_T pointer;
 size_t bytes;
 {
@@ -72,8 +86,8 @@ size_t bytes;
 
     temp = pointer ? realloc(pointer, bytes) : malloc(bytes);
 #ifdef DEBUG
-    fprintf(stderr, "[xmalloc] %p(realloc_free %d)\n", pointer);
-    fprintf(stderr, "[xmalloc] %p(realloc_malloc %d)\n", temp);
+    fprintf(stderr, "[xmalloc] %p(realloc_free %d)\n", pointer, nref);
+    fprintf(stderr, "[xmalloc] %p(realloc_malloc %d)\n", temp, nref);
 #endif
 
     if (temp == 0)

@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     builtin_function bltin;
     psh_state *internal_state;
     int stat;
-    struct command *cmd = NULL;
+    struct _psh_command *cmd = NULL;
     char *expanded_ps1, *buffer;
     char *ps1 =
         "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     psh_vfa_new_context(internal_state);
 #ifdef DEBUG
     {
-        union _psh_vfa_value payload = {1};
+        union _psh_vfa_value payload = {(char *)1};
         psh_vf_set(internal_state, "p", PSH_VFA_INTEGER, payload, 0, 0, 0);
         const struct _psh_vfa_container *cnt =
             psh_vf_get(internal_state, "p", 0);

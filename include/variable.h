@@ -60,7 +60,7 @@ struct _psh_vfa_container
     {
         /** String value */
         char *string;
-        struct command *code;
+        struct _psh_command *code;
         intmax_t *int_array;
         char **string_array;
         intmax_t integer;

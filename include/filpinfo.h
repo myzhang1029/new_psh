@@ -1,4 +1,5 @@
-/** @file psh/filpinfo.h - @brief Function to fill parse info (struct command)
+/** @file psh/filpinfo.h - @brief Function to fill parse info (struct
+ * _psh_command)
  * @details merges original preprocesser, splitbuf, parser.
  */
 /*
@@ -23,11 +24,11 @@
 #define _PSH_FILPINFO_H
 #include "psh.h"
 
-/** Fill struct command with an input string.
+/** Fill struct _psh_command with an input string.
  *
  * @param state Psh internal state.
  * @param buffer Input string.
- * @param command The struct command to fill.
+ * @param command The struct _psh_command to fill.
  * @return The number of characters processed. */
-int filpinfo(psh_state *state, char *buffer, struct command *command);
+int filpinfo(psh_state *state, char *buffer, struct _psh_command *command);
 #endif

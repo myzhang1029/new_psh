@@ -23,16 +23,11 @@
 
 #include <stdio.h>
 
-#include "command.h" /* For struct command */
+#include "command.h" /* For struct _psh_command */
 
-/** The exit status of the previous command, $? */
-extern int last_command_status;
-/** @deprecated Maximum number of background jobs. */
-#define MAXPIDTABLE 1024
-
-/** Platform dependent shell initializaion.
+/** Platform dependent shell initialization.
  *
- * @return A non-zero return value aborts shell shartup.
+ * @return A non-zero return value aborts shell startup.
  */
 int psh_backend_prepare(void);
 
@@ -126,6 +121,6 @@ int psh_backend_file_exists(const char *path);
  * @param command The command struct about command details.
  * @return Zero if succeeded.
  */
-int psh_backend_do_run(struct command *command);
+int psh_backend_do_run(struct _psh_command *command);
 
 #endif /* _PSH_BACKEND_H*/

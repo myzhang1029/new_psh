@@ -50,9 +50,9 @@ static int ignore_IFSs(char *buffer, int count)
 
 /* Malloc and fill a command with a buffer,  returns the number of characters
  * processed */
-int filpinfo(psh_state *state, char *buffer, struct command *info)
+int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
 {
-/* Report a syntax error bashly */
+/* Report a syntax error */
 #define synerr(token)                                                          \
     OUT2E("%s: syntax error near unexpected token `%s'\n", state->argv0,       \
           (token))
@@ -78,7 +78,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
     } while (0)
 
 /* malloc() and zero-initialize an element in argv[][] */
-#define malloc_one(n) (cmd_lastnode->argv[n]) = calloc(MAXEACHARG, P_CS)
+#define malloc_one(n) (cmd_lastnode->argv[n]) = xcalloc(MAXEACHARG, P_CS)
 
 /* Write the current char in buffer to current command, increase cnt_return
  * only if current is neither blank nor 0 */
@@ -92,7 +92,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
         {                                                                      \
             if (redir_lastnode == NULL)                                        \
             {                                                                  \
-                redir_lastnode = malloc(sizeof(struct redirect));              \
+                redir_lastnode = xmalloc(sizeof(struct _psh_redirect));        \
                 redirect_init(redir_lastnode);                                 \
             }                                                                  \
             if (!isdigit(buffer[cnt_buffer]))                                  \
@@ -124,8 +124,9 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
         ignore: determine whether a meta character should be ignored(not
        for a dollar sign)
     */
-    struct command *cmd_lastnode = info /* The last node of the command list */;
-    struct redirect *redir_lastnode = info ? info->rlist : NULL;
+    struct _psh_command *cmd_lastnode =
+        info /* The last node of the command list */;
+    struct _psh_redirect *redir_lastnode = info ? info->rlist : NULL;
     int stat_in_squote = 0, stat_in_dquote = 0, stat_parsing_redirect = 0;
     int cnt_buffer = 0, cnt_argument_char = 0, cnt_argument_element = 0,
         cnt_return = 0, cnt_old_parameter = 0, cnt_first_nonIFS = 0;
@@ -225,8 +226,8 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     {
                         /* done */
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = BACKGROUND; /* cmd & \0
-                                                              */
+                            cmd_lastnode->flag = PSH_CMD_BACKGROUND; /* cmd & \0
+                                                                      */
                         else
                         {
                             synerr("&");
@@ -238,7 +239,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     {
                         cmd_lastnode->next = new_command();
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = RUN_AND;
+                            cmd_lastnode->flag = PSH_CMD_RUN_AND;
                         else
                         {
                             synerr("&&");
@@ -265,7 +266,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     {
                         cmd_lastnode->next = new_command();
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = BACKGROUND;
+                            cmd_lastnode->flag = PSH_CMD_BACKGROUND;
                         else
                         {
                             synerr("&");
@@ -294,7 +295,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     if (buffer[cnt_buffer + 1] == '|')
                     {
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = RUN_OR;
+                            cmd_lastnode->flag = PSH_CMD_RUN_OR;
                         else
                         {
                             synerr("||");
@@ -320,7 +321,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     else
                     {
                         if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PIPED;
+                            cmd_lastnode->flag = PSH_CMD_PIPED;
                         else
                         {
                             synerr("|");
@@ -458,7 +459,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     if (redir_lastnode->type != 0)
                         code_fault(state, __FILE__, __LINE__);
                     else if (buffer[cnt_buffer + 1] == '&')
-                        redir_lastnode->type = FD2FD;
+                        redir_lastnode->type = PSH_REDIR_FD2FD;
                     else if (buffer[cnt_buffer + 1] == 0)
                     {
                         synerr("newline");
@@ -466,7 +467,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                         goto done;
                     }
                     else
-                        redir_lastnode->type = OUT_REDIR;
+                        redir_lastnode->type = PSH_REDIR_OUT_REDIR;
                 }
                 if (cnt_buffer == cnt_first_nonIFS)
                     redir_lastnode->in.fd = 1 /* stdout */;
@@ -534,7 +535,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     case '>': /* Out append */
                         if (redir_lastnode->type != 0)
                             code_fault(state, __FILE__, __LINE__);
-                        redir_lastnode->type = OUT_APPN;
+                        redir_lastnode->type = PSH_REDIR_OUT_APPN;
                         ++cnt_buffer;
                         switch (buffer[cnt_buffer + 1])
                         {
@@ -622,7 +623,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                 write_char(0);
                 return cnt_return;
             case ';':
-                /* TODO: Write muiltiple command process code here */
+                /* TODO: Write multiple command process code here */
                 if (ignore)
                     write_current();
                 else
@@ -635,7 +636,7 @@ int filpinfo(psh_state *state, char *buffer, struct command *info)
                     }
                     cmd_lastnode->next = new_command();
                     if (cmd_lastnode->flag == 0)
-                        cmd_lastnode->flag = MULTICMD;
+                        cmd_lastnode->flag = PSH_CMD_MULTICMD;
                     else
                     {
                         synerr(";");
