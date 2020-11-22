@@ -116,7 +116,6 @@ int main(int argc, char **argv)
             continue;
         cmd = new_command();
         stat = filpinfo(state, buffer, cmd);
-        xfree(buffer);
         if (stat < 0)
         {
             free_command(cmd);

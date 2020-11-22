@@ -1,7 +1,7 @@
 /*
     psh/filpinfo.c - function to fill parse info(merges original preprocesser,
     splitbuf, parser) and some other functions for command managing.
-    Copyright 2017-2018 Zhang Maiyun.
+    Copyright 2017-2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
 
@@ -48,8 +48,8 @@ static int ignore_IFSs(char *buffer, int count)
     return -6; /* Reaching here impossible */
 }
 
-/* Malloc and fill a command with a buffer,  returns the number of characters
- * processed */
+/* Fill a command with a buffer, free() the buffer, and return the number of
+ * characters processed */
 int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
 {
 /* Report a syntax error */
@@ -620,8 +620,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     cmd_lastnode->argv[cnt_argument_element] = NULL;
                     cnt_argument_element--;
                 }
-                write_char(0);
-                return cnt_return;
+                goto done;
             case ';':
                 /* TODO: Write multiple command process code here */
                 if (ignore)
@@ -676,5 +675,6 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
 done:
     if (cnt_return > 0)
         write_char(0);
+    xfree(buffer);
     return cnt_return;
 }
