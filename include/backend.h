@@ -91,6 +91,12 @@ char *psh_backend_gethostname_dm(void);
  */
 int psh_backend_setenv(const char *name, const char *value, int overwrite);
 
+/** Get all environ.
+ *
+ * @param state Psh internal state.
+ */
+void psh_backend_get_all_env(psh_state *state);
+
 /** Get the user id of the current user.
  *
  * @return UID.

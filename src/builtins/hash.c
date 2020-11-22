@@ -34,6 +34,7 @@
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"
+#include "variable.h"
 
 #define DELETE 0x01
 #define CLEAR 0x02
@@ -146,8 +147,8 @@ endwhile:
             char *path;
             name[0] = '/';
             psh_strncpy(name + 1, argv[count], strlen(argv[count]));
-            /* #8 TODO: PATH, #12 TODO: path separator */
-            path = psh_search_path(getenv("PATH"), ':', name,
+            /* #12 TODO: path separator */
+            path = psh_search_path(psh_vf_getstr(state, "PATH"), ':', name,
                                    &psh_backend_file_exists);
             xfree(name);
             if (path == NULL)

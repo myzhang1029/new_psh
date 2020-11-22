@@ -29,6 +29,8 @@ struct _psh_vfa_container
     /** @brief Attributes of variables, functions, and aliases. */
     enum _psh_vfa_attributes
     {
+        /** No update */
+        PSH_VFA_NO_UPDATE = 0x0,
         /** Indexed arrays. */
         PSH_VFA_INDEX_ARRAY = 0x001,
         /** Associative arrays. */
@@ -53,7 +55,9 @@ struct _psh_vfa_container
         PSH_VFA_PARSED = 0x400,
         /** Together with a local scope, this marks a variable as
          * locally-unset, and stops psh from travelling up to find a value. */
-        PSH_VFA_UNSET = 0x800
+        PSH_VFA_UNSET = 0x800,
+        /** String */
+        PSH_VFA_STRING = 0x1000
     } attributes; /**< The attributes for this variable. */
     /** Resolved code or string value of the variable */
     union _psh_vfa_value
@@ -122,4 +126,29 @@ int psh_vf_unset(psh_state *state, const char *varname, int is_func);
  * @param state Psh internal state.
  */
 void psh_vfa_free(psh_state *state);
+
+/** Get a string value
+ *
+ * @param state Psh internal state.
+ * @param name Name of the variable.
+ * @return value if found, shouldn't be free()d, NULL if not.
+ */
+static inline const char *psh_vf_getstr(psh_state *state, char *name)
+{
+    const struct _psh_vfa_container *container = psh_vf_get((state), (name), 0);
+    return container ? psh_vf_get((state), (name), 0)->payload.string : NULL;
+}
+
+/** Get a string value
+ *
+ * @param state Psh internal state.
+ * @param name Name of the variable.
+ * @return value if found, 0 if not (dangerous!).
+ */
+static inline intmax_t psh_vf_getint(psh_state *state, char *name)
+{
+    const struct _psh_vfa_container *container = psh_vf_get((state), (name), 0);
+    return container ? psh_vf_get((state), (name), 0)->payload.integer : 0;
+}
+
 #endif

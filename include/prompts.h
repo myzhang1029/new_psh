@@ -27,5 +27,5 @@
  * @param prompt The $PSn string to be expanded.
  * @return Expanded prompt.
  */
-char *ps_expander(psh_state *state, char *prompt);
+char *ps_expander(psh_state *state, const char *prompt);
 #endif

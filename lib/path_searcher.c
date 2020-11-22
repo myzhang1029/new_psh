@@ -27,7 +27,7 @@
  * separated by SEPARATOR.
  * Returns the first concatenated string for which CHK_FUNC returns non-zero;
  * or NULL if none succeeded. Result should be free()d */
-char *psh_search_path(char *path, int separator, const char *target,
+char *psh_search_path(const char *path, int separator, const char *target,
                       int (*chk_func)(const char *))
 {
     /* +1 for '\0' */

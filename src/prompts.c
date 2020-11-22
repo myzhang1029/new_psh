@@ -132,7 +132,7 @@ static char *get_strftime_string(const char *fmt)
 }
 
 /* Expands $PS1-4, result needs to be free()d */
-char *ps_expander(psh_state *state, char *prompt)
+char *ps_expander(psh_state *state, const char *prompt)
 {
 /* cur: current char in process
  * start: start of current piece of string

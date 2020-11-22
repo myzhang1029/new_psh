@@ -68,6 +68,7 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"
+#include "variable.h"
 
 #define LFLAG 0x1
 #define PFLAG 0x2
@@ -108,7 +109,7 @@ static char *canonicalize_path(psh_state *state, const char *path, int flags)
             xpath = psh_backend_getcwd_dm();
         else
         {
-            xpath = psh_strdup(getenv("PWD")); /* #8 TODO */
+            xpath = psh_strdup(psh_vf_getstr(state, "PWD"));
             if (!xpath)
                 xpath = psh_backend_getcwd_dm();
         }
@@ -211,6 +212,9 @@ int builtin_cd(int argc, char **argv, psh_state *state)
         if (argv[current_arg][0] == '-')
         {
             int current_char, length = strlen(argv[current_arg]);
+            if (length == 1)
+                /* '-' */
+                path = argv[current_arg];
             /* skip '-' */
             for (current_char = 1; current_char < length; ++current_char)
             {
@@ -251,14 +255,14 @@ int builtin_cd(int argc, char **argv, psh_state *state)
     }
     /* cd without args, then path == $HOME. */
     if (!path)
-        path = getenv("HOME"); /* #8 TODO */
+        path = (char *)psh_vf_getstr(state, "HOME");
     if (!path)
     {
         OUT2E("%s: %s: HOME not set\n", state->argv0, argv[0]);
         return 1;
     }
     if (strcmp(path, "-") == 0)
-        path = getenv("OLDPWD"); /* #8 TODO */
+        path = (char *)psh_vf_getstr(state, "OLDPWD");
     if (!path)
     {
         OUT2E("%s: %s: OLDPWD not set\n", state->argv0, argv[0]);
@@ -269,12 +273,21 @@ int builtin_cd(int argc, char **argv, psh_state *state)
     if (!destination)
         return 1;
     if (psh_backend_chdir(destination) != 0)
+    {
         OUT2E("%s: %s: %s: %s\n", state->argv0, argv[0], path, strerror(errno));
+        xfree(destination);
+        return 1;
+    }
     else
     {
-        psh_backend_setenv("OLDPWD", getenv("PWD"), 1); /* #8 TODO */
-        psh_backend_setenv("PWD", destination, 1);      /* #8 TODO */
+        union _psh_vfa_value payload = {
+            psh_strdup(psh_vf_getstr(state, "PWD"))};
+        psh_vf_set(state, "OLDPWD", PSH_VFA_STRING,
+                   (const union _psh_vfa_value)payload, 0, 0, 0);
+        payload.string = destination;
+        psh_vf_set(state, "PWD", 0, (const union _psh_vfa_value)payload, 0, 0,
+                   0);
+        /* Destination not free()d */
+        return 0;
     }
-    xfree(destination);
-    return 0;
 }

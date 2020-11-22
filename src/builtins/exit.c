@@ -27,12 +27,13 @@
 #include "builtin.h"
 #include "psh.h"
 #include "util.h"
+#include "variable.h"
 
 int builtin_exit(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
     {
-        exit_psh(state, state->last_command_status);
+        exit_psh(state, psh_vf_getint(state, "?"));
     }
     else
     {

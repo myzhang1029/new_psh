@@ -25,7 +25,7 @@
 #define __attribute__(x)
 #endif
 /** Version of psh. */
-#define PSH_VERSION "0.18.0"
+#define PSH_VERSION "0.19.0"
 
 #include "libpsh/hash.h"
 
@@ -52,8 +52,6 @@ typedef struct _psh_state
     psh_hash *command_table;
     /** Shell argv[0]. */
     char *argv0;
-    /** @deprecated $?. */
-    int last_command_status; /* #8 TODO: $? */
     /** Verbose flag. */
     unsigned int verbose : 1;
     /** Interactive flag. */

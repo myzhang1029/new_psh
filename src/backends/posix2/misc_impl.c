@@ -25,11 +25,15 @@
 
 #include <pwd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "backend.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
+#include "variable.h"
 
+extern char **environ;
 char *psh_backend_get_homedir(void)
 {
     struct passwd *pwd = getpwuid(getuid());
@@ -82,7 +86,10 @@ int psh_backend_chdir(char *dir) { return chdir(dir); }
 
 int psh_backend_setenv(const char *name, const char *value, int overwrite)
 {
-    return setenv(name, value, overwrite);
+    if (value)
+        return setenv(name, value, overwrite);
+    else
+        return unsetenv(name);
 }
 
 int psh_backend_getopt(int argc, char **argv, const char *optstring)
@@ -99,5 +106,21 @@ int psh_backend_file_exists(const char *path)
     else
     {
         return 0;
+    }
+}
+
+void psh_backend_get_all_env(psh_state *state)
+{
+    size_t count;
+    for (count = 0; environ[count]; ++count)
+    {
+        char *env = psh_strdup(environ[count]);
+        char *equal = strrchr(env, '=');
+        char *value = psh_strdup(equal + 1);
+        union _psh_vfa_value payload = {value};
+        *equal = 0;
+        psh_vf_set(state, env, PSH_VFA_EXPORT | PSH_VFA_STRING, payload, 0, 0,
+                   0);
+        xfree(env);
     }
 }
