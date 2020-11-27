@@ -32,9 +32,7 @@
 int builtin_exit(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
-    {
         exit_psh(state, psh_vf_getint(state, "?"));
-    }
     else
     {
         int i = atoi(argv[1]);

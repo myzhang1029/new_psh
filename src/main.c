@@ -81,11 +81,11 @@ int main(int argc, char **argv)
         union _psh_vfa_value payload = {(char *)1};
         psh_vf_set(state, "p", PSH_VFA_INTEGER | PSH_VFA_EXPORT, payload, 0, 0,
                    0);
-        const struct _psh_vfa_container *cnt = psh_vf_get(state, "p", 0);
+        const struct _psh_vfa_container *cnt = psh_vf_get(state, "p", 0, 0);
         printf("%d = 1\n", cnt->payload);
         printf("%s = 1\n", getenv("p"));
         psh_vf_unset(state, "p", 0);
-        cnt = psh_vf_get(state, "p", 0);
+        cnt = psh_vf_get(state, "p", 0, 0);
         printf("0x%x = 0x0\n", cnt);
     }
 #endif

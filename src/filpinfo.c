@@ -593,11 +593,18 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                 break;
             case '`':
                 /* TODO: Write command substitute code here */
+                if (stat_in_squote || escape)
+                    write_current();
 
             case '$':
-            /* TODO: Write variable, variable cut,
-             * ANSI-C style escape, command substitute,
-             * arithmetic expansion code here */
+                /* TODO: Write variable, variable cut,
+                 * ANSI-C style escape, command substitute,
+                 * arithmetic expansion code here */
+                if (stat_in_squote || escape)
+                    write_current();
+                switch (buffer[cnt_buffer + 1])
+                {
+                }
             case '(':
             case ')':
             /* TODO: Write command sequence code here */

@@ -1,12 +1,18 @@
 {
     "cSpell.words": [
+        "APPN",
         "Bertele",
         "CDPATH",
         "HEREXX",
+        "IFSs",
         "builtins",
+        "cmdor",
+        "dquote",
         "esac",
         "filpinfo",
         "libpsh",
+        "squote",
+        "tlide",
         "xcalloc",
         "xfree",
         "xmalloc",
