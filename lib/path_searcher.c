@@ -33,9 +33,9 @@ char *psh_search_path(const char *path, int separator, const char *target,
     /* +1 for '\0' */
     size_t len_substr, len_target = strlen(target) + 1,
                        size_allocated = 2 * len_target;
-    char *concatenated = xmalloc(size_allocated), *occur;
+    char *concatenated = xmalloc(size_allocated), *occur = (char *)1;
 
-    while (*path)
+    while (occur)
     {
         occur = strchr(path, separator);
         len_substr = occur ? (size_t)(occur - path) : strlen(path);
