@@ -35,6 +35,8 @@
 #include "variable.h"
 
 extern char **environ;
+int psh_backend_path_separator = ':';
+
 char *psh_backend_get_homedir(void)
 {
     struct passwd *pwd = getpwuid(getuid());

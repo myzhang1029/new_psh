@@ -136,7 +136,7 @@ struct _psh_command
          * @sa section 2.9.3
          */
         PSH_CMD_MULTICMD
-    } flag; /**< The type of this command. */
+    } type; /**< The type of this command. */
 
     /** Redirection sequence. */
     struct _psh_redirect *rlist;

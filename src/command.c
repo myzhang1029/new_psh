@@ -69,7 +69,7 @@ struct _psh_command *new_command()
 
 void command_init(struct _psh_command *cmd)
 {
-    cmd->flag = 0;
+    cmd->type = 0;
     cmd->rlist = NULL;
     cmd->argv = NULL;
     cmd->next = NULL;

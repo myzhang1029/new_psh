@@ -225,8 +225,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         -5) /* EOL */
                     {
                         /* done */
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_BACKGROUND; /* cmd & \0
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_BACKGROUND; /* cmd & \0
                                                                       */
                         else
                         {
@@ -238,8 +238,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     else if (buffer[cnt_buffer + 1] == '&')
                     {
                         cmd_lastnode->next = new_command();
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_RUN_AND;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_RUN_AND;
                         else
                         {
                             synerr("&&");
@@ -265,8 +265,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     else
                     {
                         cmd_lastnode->next = new_command();
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_BACKGROUND;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_BACKGROUND;
                         else
                         {
                             synerr("&");
@@ -294,8 +294,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     cmd_lastnode->next = new_command();
                     if (buffer[cnt_buffer + 1] == '|')
                     {
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_RUN_OR;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_RUN_OR;
                         else
                         {
                             synerr("||");
@@ -320,8 +320,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     }
                     else
                     {
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_PIPED;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_PIPED;
                         else
                         {
                             synerr("|");
@@ -641,8 +641,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
                     cmd_lastnode->next = new_command();
-                    if (cmd_lastnode->flag == 0)
-                        cmd_lastnode->flag = PSH_CMD_MULTICMD;
+                    if (cmd_lastnode->type == 0)
+                        cmd_lastnode->type = PSH_CMD_MULTICMD;
                     else
                     {
                         synerr(";");

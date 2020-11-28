@@ -26,6 +26,9 @@
 #include "command.h" /* For struct _psh_command */
 #include "psh.h"
 
+/** The separator between $PATH entries. */
+extern int psh_backend_path_separator;
+
 /** Platform dependent shell initialization.
  *
  * @param state Psh internal state.

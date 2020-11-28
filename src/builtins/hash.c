@@ -147,8 +147,8 @@ endwhile:
             char *path;
             name[0] = '/';
             psh_strncpy(name + 1, argv[count], strlen(argv[count]));
-            /* #12 TODO: path separator */
-            path = psh_search_path(psh_vf_getstr(state, "PATH"), ':', name,
+            path = psh_search_path(psh_vf_getstr(state, "PATH"),
+                                   psh_backend_path_separator, name,
                                    &psh_backend_file_exists);
             xfree(name);
             if (path == NULL)

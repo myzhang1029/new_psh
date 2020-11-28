@@ -59,17 +59,18 @@ int builtin_pwd(int argc, char **argv, psh_state *state)
     }
     if (!flag) /* No -P */
     {
-        char *p = (char *)psh_vf_getstr(state, "PWD");
+        char *path = (char *)psh_vf_getstr(state, "PWD"), *p;
 
-        if (!p || p[0] != '/')
+        if (!path || path[0] != '/')
             goto use_p;
+        p = path;
         while ((p = strstr(p, "/.")))
         {
             if (!p[2] || p[2] == '/' || (p[2] == '.' && (!p[3] || p[3] == '/')))
                 goto use_p;
             ++p;
         }
-        puts(p);
+        puts(path);
         return 0;
     }
 use_p:
