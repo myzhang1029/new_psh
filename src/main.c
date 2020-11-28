@@ -121,21 +121,7 @@ int main(int argc, char **argv)
             free_command(cmd);
             continue;
         }
-
-        /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
-         * psh_backend_do_run() */
-
-        bltin = find_builtin(cmd->argv[0]);
-        if (bltin)
-        {
-            union _psh_vfa_value payload;
-            payload.integer = (*bltin)(get_argc(cmd->argv), cmd->argv, state);
-            psh_vf_set(state, "?", 0, payload, 0, 0, 0);
-        }
-        else
-        {
-            psh_backend_do_run(state, cmd);
-        }
+        psh_backend_do_run(state, cmd);
         free_command(cmd);
     }
     return 0;
