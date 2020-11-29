@@ -56,7 +56,7 @@ char *check_for_alias(char *alias)
     int i;
     for (i = 0; i < alias_amount; i++)
     {
-        if (!strcmp(alias, aliases[i][0]))
+        if (strcmp(alias, aliases[i][0]) == 0)
         {
             return aliases[i][1];
         }
@@ -102,13 +102,18 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
     }
 
-    if (!strcmp(alias, check_for_alias(alias)))
+    free(argstr);
+
+    if (strcmp(alias, check_for_alias(alias)) == 0)
     {
         add_alias(alias, value);
     } else
     {
         OUT2E("Alias %s already exists with %s\n", alias, check_for_alias(alias));
     }
+
+    free(alias);
+    free(value);
 
     return 0;
 

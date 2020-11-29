@@ -312,7 +312,6 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
 #endif
         /* First try to find a builtin command TODO: functions */
 
-        //HERE ALIAS MANAGEMENT
 
         builtin = find_builtin(cmd->argv[0]);
         if (builtin && cmd->type != PSH_CMD_PIPED &&
@@ -321,6 +320,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
             /* Execute without forking if async execution is not needed */
             fd_backup backed_up;
             /* Builtin commands can be redirected too */
+
             if (set_up_redirection(state, cmd->rlist, 1, &backed_up))
             {
                 /* Even if set_up_redirection failed, this must still be free()d
