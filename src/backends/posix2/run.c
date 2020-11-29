@@ -380,7 +380,6 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
             case PSH_CMD_RUN_OR:
             case PSH_CMD_SINGLE:
             case PSH_CMD_MULTICMD:
-                printf("%d\n", pid);
                 waitpid(pid, &status, 0);
         }
         psh_vf_get(state, "?", 0, 0)->payload.integer = status;
