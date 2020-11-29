@@ -41,8 +41,6 @@
 #include "psh.h"
 #include "variable.h"
 
-#define DEBUG
-
 /* Error handling INSIDE child process */
 #define DO_THIS_OR_FAIL(cmd, why)                                              \
     do                                                                         \
@@ -381,8 +379,8 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
             case PSH_CMD_SINGLE:
             case PSH_CMD_MULTICMD:
                 waitpid(pid, &status, 0);
+                psh_vf_get(state, "?", 0, 0)->payload.integer = status;
         }
-        psh_vf_get(state, "?", 0, 0)->payload.integer = status;
     cont:
         cmd = cmd->next;
     }

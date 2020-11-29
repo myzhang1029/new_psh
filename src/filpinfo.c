@@ -153,6 +153,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
      * programming error */
     if (info == NULL)
         code_fault(state, __FILE__, __LINE__);
+    if (state->verbose)
+        OUT2E("%s\n", buffer);
     ignIFS(); /* Ignore starting spaces */
     cnt_first_nonIFS = ++cnt_buffer;
     do

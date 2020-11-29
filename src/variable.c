@@ -214,10 +214,10 @@ int psh_vf_add_raw(psh_state *state, const char *varname, int attrib,
 struct _psh_vfa_container *psh_vf_get(psh_state *state, const char *varname,
                                       int force_local, int is_func)
 {
-    struct _psh_vfa_container *container = NULL;
+    struct _psh_vfa_container *container;
     size_t ctx_idx_searching = state->context_idx + 1;
     if (force_local)
-        container = psh_hash_get(
+        return psh_hash_get(
             (is_func ? state->contexts[state->context_idx].function_table
                      : state->contexts[state->context_idx].variable_table),
             varname);
@@ -228,9 +228,9 @@ struct _psh_vfa_container *psh_vf_get(psh_state *state, const char *varname,
                  (is_func ? state->contexts[ctx_idx_searching].function_table
                           : state->contexts[ctx_idx_searching].variable_table),
                  varname)))
-            break;
+            return container;
     } while (ctx_idx_searching);
-    return container;
+    return NULL;
 }
 
 /* Clear all variables and functions local to this scope. */
