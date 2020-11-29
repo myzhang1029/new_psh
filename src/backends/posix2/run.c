@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -163,7 +164,20 @@ static int restore_fds(psh_state *state, fd_backup restore_spec)
     return 0;
 }
 
-/** Execute one command. */
+/** Execute one command.
+ *
+ * @param state Psh internal state.
+ * @param cmd Command.
+ * @param pipe_in Pipe for stdin.
+ * @param pipe_out Pipe for stdout.
+ * @param pipe_close1 The other end of the pipe to be closed.
+ * @param pipe_close2 The other end of the pipe to be closed.
+ * @param builtin A builtin function if this command is a builtin.
+ * @param cmd_realpath Full path to the command.
+ * @note If both @ref builtin and @ref cmd_realpath are NULL, nothing will be
+ * executed, but a process will still be created.
+ * @return The PID of the forked process.
+ */
 static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
                                 int pipe_in, int pipe_out, int pipe_close1,
                                 int pipe_close2, builtin_function builtin,
@@ -219,13 +233,16 @@ static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
         if (builtin)
             /* Run a builtin */
             _Exit((*builtin)(get_argc(cmd->argv), cmd->argv, state));
-        else
+        else if (cmd_realpath)
             /* An on-disk command */
             if (execv(cmd_realpath, cmd->argv))
-        {
-            OUT2E("%s: %s: %s\n", state->argv0, cmd_realpath, strerror(errno));
-            _Exit(127);
-        }
+            {
+                OUT2E("%s: %s: %s\n", state->argv0, cmd_realpath,
+                      strerror(errno));
+                _Exit(127);
+            }
+            else
+                _Exit(127);
     }
 }
 
@@ -234,6 +251,12 @@ static char *get_cmd_realpath(psh_state *state, char *cmd)
     if (strchr(cmd, '/'))
         /* A command with a path */
         return cmd;
+    else if (*cmd == '\0')
+    {
+        /* This is an empty command, don't search path for it */
+        OUT2E("%s: : command not found\n", state->argv0);
+        return NULL;
+    }
     else
     {
         /* Search PATH and run command */
@@ -271,6 +294,8 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
     int last_pipe_fd[2] = {0};
     int status;
     builtin_function builtin;
+    int error_level = 0;
+
 #ifdef DEBUG
     printf("command position: %p\n", cmd);
 #endif
@@ -294,25 +319,22 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
         {
             /* Execute without forking if async execution is not needed */
             fd_backup backed_up;
-            int return_val;
             /* Builtin commands can be redirected too */
             if (set_up_redirection(state, cmd->rlist, 1, &backed_up))
             {
                 /* Even if set_up_redirection failed, this must still be free()d
                  */
                 xfree(backed_up);
-                return 1;
+                ++error_level;
+                goto cont;
             }
             /* Run the builtin */
             psh_vf_get(state, "?", 0, 0)->payload.integer =
                 (*builtin)(get_argc(cmd->argv), cmd->argv, state);
             /* Restore file descriptors as we are returning to shell */
-            return_val = restore_fds(state, backed_up);
+            restore_fds(state, backed_up);
             xfree(backed_up);
-            if (return_val)
-                return 1;
-            cmd = cmd->next;
-            continue;
+            goto cont;
         }
         if (cmd->type == PSH_CMD_PIPED)
         {
@@ -320,13 +342,12 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
             if (pipe(pipe_fd) != 0)
             {
                 OUT2E("%s: pipe: %s\n", state->argv0, strerror(errno));
-                return 1;
+                goto cont;
             }
 #ifdef DEBUG
             printf("pipe(%d, %d)\n", pipe_fd[1], pipe_fd[0]);
 #endif
         }
-        /* Receive pipe from the previous command */
         if (builtin)
             pid =
                 execute_single_cmd(state, cmd, last_pipe_fd[0], pipe_fd[1],
@@ -334,12 +355,17 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
         else
         {
             char *cmd_realpath = get_cmd_realpath(state, cmd->argv[0]);
-            if (!cmd_realpath)
-                return 1;
             pid = execute_single_cmd(state, cmd, last_pipe_fd[0], pipe_fd[1],
                                      pipe_fd[0], last_pipe_fd[1], builtin,
                                      cmd_realpath);
         }
+        /* Make sure the used fds of the pipe are closed in the main process. */
+        if (last_pipe_fd[0])
+            close(last_pipe_fd[0]);
+        if (pipe_fd[1])
+            close(pipe_fd[1]);
+        /* Backup the pipe created for this process and possibly the next
+         * process */
         last_pipe_fd[0] = pipe_fd[0];
         last_pipe_fd[1] = pipe_fd[1];
         if (pid < 0)
@@ -358,6 +384,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
                 waitpid(pid, &status, 0);
         }
         psh_vf_get(state, "?", 0, 0)->payload.integer = status;
+    cont:
         cmd = cmd->next;
     }
     return 0;
