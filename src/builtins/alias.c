@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
 
@@ -77,6 +78,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     argstr = malloc(strlen(argv[1]));
     strcpy(argstr, argv[1]);
 
+    /* Combine all argv pointers to one pointer */
     for (i = 2; i < argc; i++)
     {
         if (realloc(argstr, strlen(argstr) + strlen(argv[i]) + 1))
@@ -89,6 +91,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
         }
     }
 
+    /* Split the string at '=' */
     for (i = 0; i < strlen(argstr); i++)
     {
         if (argstr[i] == '=')
@@ -116,5 +119,11 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     free(value);
 
     return 0;
+
+}
+
+int replace_with_alias(struct _psh_command *cmd)
+{
+
 
 }
