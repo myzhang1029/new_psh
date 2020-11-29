@@ -25,27 +25,47 @@
 #include <stdlib.h>
 #include <string.h>
 
-char ***aliases;
+char ***aliases = NULL;
 
 static int alias_amount = 0;
 
 int add_alias(char *alias, char *value)
 {
 
-    aliases = malloc(sizeof(char *));
+    if (aliases == NULL)
+        aliases = malloc(sizeof(char *));
+    else
+    {
+        realloc(aliases, (alias_amount + 1) * sizeof(char *));
+    }
+
     aliases[alias_amount] = calloc(2, sizeof(char *));
     aliases[alias_amount][0] = malloc(strlen(alias));
     aliases[alias_amount][1] = malloc(strlen(value));
     strcpy(aliases[alias_amount][0], alias);
     strcpy(aliases[alias_amount][1], value);
 
-    puts(aliases[alias_amount][0]);
-    puts(aliases[alias_amount][1]);
-
     alias_amount++;
 
     return 0;
 }
+
+char *check_for_alias(char *alias)
+{
+    int i;
+    for (i = 0; i < alias_amount; i++)
+    {
+        if (!strcmp(alias, aliases[i][0]))
+        {
+            return aliases[i][1];
+        }
+    }
+
+    return alias;
+
+}
+
+
 
 int builtin_alias(int argc, char **argv, psh_state *state)
 {
@@ -56,7 +76,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     argstr = malloc(strlen(argv[1]));
     strcpy(argstr, argv[1]);
 
-    for(i = 2; i < argc; i++)
+    for (i = 2; i < argc; i++)
     {
         if (realloc(argstr, strlen(argstr) + strlen(argv[i]) + 1))
         {
@@ -68,7 +88,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
         }
     }
 
-    for(i = 0; i < strlen(argstr); i++)
+    for (i = 0; i < strlen(argstr); i++)
     {
         if (argstr[i] == '=')
         {
@@ -81,8 +101,14 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
     }
 
-    puts(alias);
-    puts(value);
-    exit(0);
+    if (!strcmp(alias, check_for_alias(alias)))
+    {
+        add_alias(alias, value);
+    } else
+    {
+        OUT2E("Alias %s already exists with %s\n", alias, check_for_alias(alias));
+    }
+
+    return 0;
 
 }
