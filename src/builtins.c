@@ -39,7 +39,7 @@ static int builtin_getstat_handler(int argc, char **argv, psh_state *state);
 /* List of all builtins, sorted by name */
 const struct builtin builtins[] = {{".", &builtin_unsupported},
                                    {":", &builtin_true},
-                                   {"alias", &builtin_unsupported},
+                                   {"alias", &builtin_alias},
                                    {"bg", &builtin_unsupported},
                                    {"bind", &builtin_unsupported},
                                    {"break", &builtin_unsupported},

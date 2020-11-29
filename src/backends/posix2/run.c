@@ -311,6 +311,9 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
         printf("flag: %d\n", cmd->type);
 #endif
         /* First try to find a builtin command TODO: functions */
+
+        //HERE ALIAS MANAGEMENT
+
         builtin = find_builtin(cmd->argv[0]);
         if (builtin && cmd->type != PSH_CMD_PIPED &&
             cmd->type != PSH_CMD_BACKGROUND)
