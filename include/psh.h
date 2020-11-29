@@ -29,6 +29,9 @@
 
 #include "libpsh/hash.h"
 
+/* jobs.h depends on our psh_state, so this forward decl is used instead */
+struct _psh_jobs;
+
 /** @brief The internal state of psh. */
 typedef struct _psh_state
 {
@@ -45,6 +48,8 @@ typedef struct _psh_state
     size_t context_idx;
     /** The number of available context frames. */
     size_t context_slots;
+    /** Background jobs. */
+    struct _psh_jobs *jobs;
     /* Local functions is a psh extension */
     /** Aliases hash table */
     psh_hash *alias_table;

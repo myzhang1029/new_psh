@@ -120,6 +120,13 @@ int psh_backend_chdir(char *);
  */
 int psh_backend_getopt(int argc, char **argv, const char *optstring);
 
+/** Send SIGHUP or similar to a child process.
+ *
+ * @param pid Child pid.
+ * @return 0 if succeed, -1 otherwise.
+ */
+int psh_backend_hup(int pid);
+
 /** Check if file exists.
  *
  * @param path Path to the file

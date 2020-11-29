@@ -72,8 +72,7 @@ int main(int argc, char **argv)
     char *expanded_ps1, *buffer;
 
     /* Initiate the internal state */
-    state = xmalloc(sizeof(psh_state));
-    memset(state, 0, sizeof(psh_state));
+    state = xcalloc(1, sizeof(psh_state));
     psh_vfa_new_context(state);
     load_shell_vars(state);
 #ifdef DEBUG

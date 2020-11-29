@@ -24,9 +24,11 @@
 #endif
 
 #include <pwd.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include "backend.h"
 #include "libpsh/util.h"
@@ -111,6 +113,8 @@ int psh_backend_file_exists(const char *path)
         return 0;
     }
 }
+
+int psh_backend_hup(int pid) { return kill((pid_t)pid, SIGHUP); }
 
 void psh_backend_get_all_env(psh_state *state)
 {

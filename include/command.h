@@ -106,38 +106,39 @@ struct _psh_redirect
     struct _psh_redirect *next;
 };
 
+/** @brief The type of the command. */
+enum _psh_cmd_type
+{
+    /** Simple command. \n
+     * @sa section 2.9.1
+     */
+    PSH_CMD_SINGLE = 0,
+    /** Asynchronous list. \n
+     * @sa section 2.9.3
+     */
+    PSH_CMD_BACKGROUND,
+    /** Pipeline. \n
+     * @sa section 2.9.2
+     */
+    PSH_CMD_PIPED,
+    /** AND list. \n
+     * @sa section 2.9.3
+     */
+    PSH_CMD_RUN_AND,
+    /** OR list. \n
+     * @sa section 2.9.3
+     */
+    PSH_CMD_RUN_OR,
+    /** Sequential list. \n
+     * @sa section 2.9.3
+     */
+    PSH_CMD_MULTICMD
+};
 /** @brief Everything about a command. */
 struct _psh_command
 {
-    /** @brief The type of the command. */
-    enum _psh_cmd_type
-    {
-        /** Simple command. \n
-         * @sa section 2.9.1
-         */
-        PSH_CMD_SINGLE = 0,
-        /** Asynchronous list. \n
-         * @sa section 2.9.3
-         */
-        PSH_CMD_BACKGROUND,
-        /** Pipeline. \n
-         * @sa section 2.9.2
-         */
-        PSH_CMD_PIPED,
-        /** AND list. \n
-         * @sa section 2.9.3
-         */
-        PSH_CMD_RUN_AND,
-        /** OR list. \n
-         * @sa section 2.9.3
-         */
-        PSH_CMD_RUN_OR,
-        /** Sequential list. \n
-         * @sa section 2.9.3
-         */
-        PSH_CMD_MULTICMD
-    } type; /**< The type of this command. */
-
+    /** The type of this command. */
+    enum _psh_cmd_type type;
     /** Redirection sequence. */
     struct _psh_redirect *rlist;
     /** List of arguments */
