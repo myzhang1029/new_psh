@@ -4,11 +4,11 @@
 
 ## Description
 Psh is a shell implementation. It tries to mimic most of bash's
-and dash's behaviours.  
+and dash's behaviors.  
 
 Psh started out as a vvy/wshell fork, but now all original contents
-are to-be-removed, and I expect to implement the shell completely
-by myself.  
+have been removed and re-implemented without referencing the original code,
+and the shell is being worked on completely by me and other nice contributors.  
 
 Psh aims to be able to compile on as many C99 systems as possible,
 providing a highly emulated POSIX environment.
@@ -19,11 +19,18 @@ _backends_.
 Psh is now my UWC FP _free summer_ project.
 
 ## Usage
-Psh is equipped with CMake build system, autotools support is in progress.
+Psh is equipped with CMake build system as well as GNU autotools support.
 ```
 mkdir build
 cd build
 cmake ..
+make
+```
+
+or
+```
+autoreconf -fi
+./configure
 make
 ```
 
@@ -37,3 +44,8 @@ Have a look at the GitHub projects
 [Roadmap](https://github.com/myzhang1029/psh/projects/2) kanban!
 
 
+## Contributing
+Issues and pull requests are always welcomed! However, please do take a note on
+[licensing](https://www.gnu.org/licenses/#GPL) and this readme. For the code
+style, following the existing code should work, it will be even better if the
+style defined with the `.clang-format` file is used.
