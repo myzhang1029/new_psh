@@ -75,7 +75,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     int i;
     char *alias, *value, *argstr;
 
-    argstr = malloc(strlen(argv[1]));
+    argstr = malloc(strlen(argv[1]) + 1);
     strcpy(argstr, argv[1]);
 
     /* Combine all argv pointers to one pointer */
