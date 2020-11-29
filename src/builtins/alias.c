@@ -36,7 +36,8 @@ int add_alias(char *alias, char *value)
         aliases = malloc(sizeof(char *));
     else
     {
-        realloc(aliases, (alias_amount + 1) * sizeof(char *));
+        if (!realloc(aliases, (alias_amount + 1) * sizeof(char *)))
+            OUT2E("Not enough memory");
     }
 
     aliases[alias_amount] = calloc(2, sizeof(char *));
