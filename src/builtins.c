@@ -22,6 +22,7 @@
 #include "config.h"
 #endif
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +31,7 @@
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"
+#include "variable.h"
 
 static int builtin_unsupported(int argc, char **argv, psh_state *state);
 static int builtin_getstat_handler(int argc, char **argv, psh_state *state);
@@ -115,7 +117,7 @@ static int builtin_unsupported(int argc, char **argv, psh_state *state)
 
 static int builtin_getstat_handler(int argc, char **argv, psh_state *state)
 {
-    printf("%d\n", state->last_command_status);
+    printf("%" PRIdMAX "\n", psh_vf_getint(state, "?"));
     return 0;
 }
 

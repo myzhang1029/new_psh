@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "jobs.h"
 #include "libpsh/hash.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
@@ -48,6 +49,7 @@ void exit_psh(psh_state *state, int status)
     xfree(state->argv0);
     psh_vfa_free(state);
     psh_hash_free(state->command_table);
+    psh_jobs_free(state, 1);
     xfree(state);
     exit(status);
 }

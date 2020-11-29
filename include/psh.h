@@ -25,9 +25,12 @@
 #define __attribute__(x)
 #endif
 /** Version of psh. */
-#define PSH_VERSION "0.18.0"
+#define PSH_VERSION "0.19.0"
 
 #include "libpsh/hash.h"
+
+/* jobs.h depends on our psh_state, so this forward decl is used instead */
+struct _psh_jobs;
 
 /** @brief The internal state of psh. */
 typedef struct _psh_state
@@ -45,6 +48,8 @@ typedef struct _psh_state
     size_t context_idx;
     /** The number of available context frames. */
     size_t context_slots;
+    /** Background jobs. */
+    struct _psh_jobs *jobs;
     /* Local functions is a psh extension */
     /** Aliases hash table */
     psh_hash *alias_table;
@@ -52,8 +57,6 @@ typedef struct _psh_state
     psh_hash *command_table;
     /** Shell argv[0]. */
     char *argv0;
-    /** @deprecated $?. */
-    int last_command_status; /* #8 TODO: $? */
     /** Verbose flag. */
     unsigned int verbose : 1;
     /** Interactive flag. */

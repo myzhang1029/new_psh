@@ -44,6 +44,25 @@
 #include "util.h"
 #include "variable.h"
 
+#include <stdlib.h>
+
+static void load_shell_vars(psh_state *state)
+{
+    union _psh_vfa_value payload = {psh_backend_getcwd_dm()};
+    psh_vf_set(state, "PWD", PSH_VFA_STRING, payload, 0, 0, 0);
+    psh_vf_unset(state, "OLDPWD", 0);
+    payload.integer = 0;
+    psh_vf_set(state, "?", PSH_VFA_INTEGER, payload, 0, 0, 0);
+    payload.string = psh_strdup(
+        "\\[\\e[01;32m\\]\\u \\D{} "
+        "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ");
+    psh_vf_set(state, "PS1", PSH_VFA_STRING, payload, 0, 0, 0);
+    /* #5 #12 #14 TODO: Retrieve all env vars,
+     * for generic, only try to read those important to shell, such as HOME,
+     * PATH, etc. */
+    psh_backend_get_all_env(state);
+}
+
 int main(int argc, char **argv)
 {
     builtin_function bltin;
@@ -51,23 +70,22 @@ int main(int argc, char **argv)
     int stat;
     struct _psh_command *cmd = NULL;
     char *expanded_ps1, *buffer;
-    char *ps1 =
-        "\\[\\e[01;32m\\]\\u \\D{} " /* #8 TODO: $PS1 */
-        "\\[\\e[01;34m\\]\\w\\[\\e[01;35m\\]\\012\\s-\\V\\[\\e[0m\\]\\$ ";
 
     /* Initiate the internal state */
-    state = xmalloc(sizeof(psh_state));
-    memset(state, 0, sizeof(psh_state));
+    state = xcalloc(1, sizeof(psh_state));
     psh_vfa_new_context(state);
+    load_shell_vars(state);
 #ifdef DEBUG
     {
         union _psh_vfa_value payload = {(char *)1};
-        psh_vf_set(state, "p", PSH_VFA_INTEGER, payload, 0, 0, 0);
-        const struct _psh_vfa_container *cnt = psh_vf_get(state, "p", 0);
+        psh_vf_set(state, "p", PSH_VFA_INTEGER | PSH_VFA_EXPORT, payload, 0, 0,
+                   0);
+        const struct _psh_vfa_container *cnt = psh_vf_get(state, "p", 0, 0);
         printf("%d = 1\n", cnt->payload);
+        printf("%s = 1\n", getenv("p"));
         psh_vf_unset(state, "p", 0);
-        cnt = psh_vf_get(state, "p", 0);
-        printf("0x%x = 0x4\n", cnt->attributes);
+        cnt = psh_vf_get(state, "p", 0, 0);
+        printf("0x%x = 0x0\n", cnt);
     }
 #endif
     state->command_table = psh_hash_create(32);
@@ -85,38 +103,24 @@ int main(int argc, char **argv)
 #endif
     while (1)
     {
-        expanded_ps1 = ps_expander(state, ps1);
+        expanded_ps1 = ps_expander(state, psh_vf_getstr(state, "PS1"));
         stat = read_cmdline(state, expanded_ps1, &buffer);
         xfree(expanded_ps1);
         if (stat == 1)
         {
             puts("");
-            exit_psh(state, state->last_command_status);
+            exit_psh(state, psh_vf_getint(state, "?"));
         }
         if (stat < 0)
             continue;
         cmd = new_command();
         stat = filpinfo(state, buffer, cmd);
-        xfree(buffer);
         if (stat < 0)
         {
             free_command(cmd);
             continue;
         }
-
-        /* Temporary work-around. #2 #5 #9 TODO, invoke bltin in
-         * psh_backend_do_run() */
-
-        bltin = find_builtin(cmd->argv[0]);
-        if (bltin)
-        {
-            state->last_command_status =
-                (*bltin)(get_argc(cmd->argv), cmd->argv, state);
-        }
-        else
-        {
-            psh_backend_do_run(state, cmd);
-        }
+        psh_backend_do_run(state, cmd);
         free_command(cmd);
     }
     return 0;

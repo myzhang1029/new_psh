@@ -30,6 +30,7 @@
 #include "builtin.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "variable.h"
 
 int builtin_pwd(int argc, char **argv, psh_state *state)
 {
@@ -58,30 +59,22 @@ int builtin_pwd(int argc, char **argv, psh_state *state)
     }
     if (!flag) /* No -P */
     {
-        char *wd = getenv("PWD");
-        char *p;
-        int use_logical = 1;
+        char *path = (char *)psh_vf_getstr(state, "PWD"), *p;
 
-        if (!wd || wd[0] != '/')
-            use_logical = 0;
-        p = wd;
+        if (!path || path[0] != '/')
+            goto use_p;
+        p = path;
         while ((p = strstr(p, "/.")))
         {
             if (!p[2] || p[2] == '/' || (p[2] == '.' && (!p[3] || p[3] == '/')))
-                use_logical = 0;
-            p++;
+                goto use_p;
+            ++p;
         }
-        if (use_logical)
-        {
-            puts(wd);
-            return 0;
-        }
-        else
-            path = psh_backend_getcwd_dm();
+        puts(path);
+        return 0;
     }
-    else /* flag */
-        path = psh_backend_getcwd_dm();
-
+use_p:
+    path = psh_backend_getcwd_dm();
     puts(path);
     xfree(path);
     return 0;

@@ -69,7 +69,7 @@ struct _psh_command *new_command()
 
 void command_init(struct _psh_command *cmd)
 {
-    cmd->flag = 0;
+    cmd->type = 0;
     cmd->rlist = NULL;
     cmd->argv = NULL;
     cmd->next = NULL;
@@ -95,13 +95,10 @@ void free_argv(struct _psh_command *cmd)
     int count;
     for (count = 0; count < MAXARG; ++count)
     {
-        if (cmd->argv[count] != NULL)
-        {
-            xfree(cmd->argv[count]);
-            cmd->argv[count] = NULL;
-        }
-        else
+        if (cmd->argv[count] == NULL)
             break; /* All args should be freed after here */
+        xfree(cmd->argv[count]);
+        cmd->argv[count] = NULL;
     }
     xfree(cmd->argv);
     cmd->argv = NULL;

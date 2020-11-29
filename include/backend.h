@@ -26,6 +26,9 @@
 #include "command.h" /* For struct _psh_command */
 #include "psh.h"
 
+/** The separator between $PATH entries. */
+extern int psh_backend_path_separator;
+
 /** Platform dependent shell initialization.
  *
  * @param state Psh internal state.
@@ -91,6 +94,12 @@ char *psh_backend_gethostname_dm(void);
  */
 int psh_backend_setenv(const char *name, const char *value, int overwrite);
 
+/** Get all environ.
+ *
+ * @param state Psh internal state.
+ */
+void psh_backend_get_all_env(psh_state *state);
+
 /** Get the user id of the current user.
  *
  * @return UID.
@@ -110,6 +119,13 @@ int psh_backend_chdir(char *);
  * @param optstring Options specification.
  */
 int psh_backend_getopt(int argc, char **argv, const char *optstring);
+
+/** Send SIGHUP or similar to a child process.
+ *
+ * @param pid Child pid.
+ * @return 0 if succeed, -1 otherwise.
+ */
+int psh_backend_hup(int pid);
 
 /** Check if file exists.
  *

@@ -35,6 +35,6 @@
  * @return The first concatenated string for which @p chk_func returns non-zero;
  * or NULL if none succeeded, should be free()d.
  */
-char *psh_search_path(char *path, int separator, const char *target,
+char *psh_search_path(const char *path, int separator, const char *target,
                       int (*chk_func)(const char *));
 #endif

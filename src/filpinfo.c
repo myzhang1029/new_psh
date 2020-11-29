@@ -1,7 +1,7 @@
 /*
     psh/filpinfo.c - function to fill parse info(merges original preprocesser,
     splitbuf, parser) and some other functions for command managing.
-    Copyright 2017-2018 Zhang Maiyun.
+    Copyright 2017-2020 Zhang Maiyun.
 
     This file is part of Psh, P shell.
 
@@ -48,8 +48,8 @@ static int ignore_IFSs(char *buffer, int count)
     return -6; /* Reaching here impossible */
 }
 
-/* Malloc and fill a command with a buffer,  returns the number of characters
- * processed */
+/* Fill a command with a buffer, free() the buffer, and return the number of
+ * characters processed */
 int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
 {
 /* Report a syntax error */
@@ -225,8 +225,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         -5) /* EOL */
                     {
                         /* done */
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_BACKGROUND; /* cmd & \0
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_BACKGROUND; /* cmd & \0
                                                                       */
                         else
                         {
@@ -238,8 +238,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     else if (buffer[cnt_buffer + 1] == '&')
                     {
                         cmd_lastnode->next = new_command();
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_RUN_AND;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_RUN_AND;
                         else
                         {
                             synerr("&&");
@@ -265,8 +265,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     else
                     {
                         cmd_lastnode->next = new_command();
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_BACKGROUND;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_BACKGROUND;
                         else
                         {
                             synerr("&");
@@ -294,8 +294,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     cmd_lastnode->next = new_command();
                     if (buffer[cnt_buffer + 1] == '|')
                     {
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_RUN_OR;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_RUN_OR;
                         else
                         {
                             synerr("||");
@@ -320,8 +320,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     }
                     else
                     {
-                        if (cmd_lastnode->flag == 0)
-                            cmd_lastnode->flag = PSH_CMD_PIPED;
+                        if (cmd_lastnode->type == 0)
+                            cmd_lastnode->type = PSH_CMD_PIPED;
                         else
                         {
                             synerr("|");
@@ -593,11 +593,18 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                 break;
             case '`':
                 /* TODO: Write command substitute code here */
+                if (stat_in_squote || escape)
+                    write_current();
 
             case '$':
-            /* TODO: Write variable, variable cut,
-             * ANSI-C style escape, command substitute,
-             * arithmetic expansion code here */
+                /* TODO: Write variable, variable cut,
+                 * ANSI-C style escape, command substitute,
+                 * arithmetic expansion code here */
+                if (stat_in_squote || escape)
+                    write_current();
+                switch (buffer[cnt_buffer + 1])
+                {
+                }
             case '(':
             case ')':
             /* TODO: Write command sequence code here */
@@ -620,8 +627,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     cmd_lastnode->argv[cnt_argument_element] = NULL;
                     cnt_argument_element--;
                 }
-                write_char(0);
-                return cnt_return;
+                goto done;
             case ';':
                 /* TODO: Write multiple command process code here */
                 if (ignore)
@@ -635,8 +641,8 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         cmd_lastnode->argv[cnt_argument_element] = NULL;
                     }
                     cmd_lastnode->next = new_command();
-                    if (cmd_lastnode->flag == 0)
-                        cmd_lastnode->flag = PSH_CMD_MULTICMD;
+                    if (cmd_lastnode->type == 0)
+                        cmd_lastnode->type = PSH_CMD_MULTICMD;
                     else
                     {
                         synerr(";");
@@ -676,5 +682,6 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
 done:
     if (cnt_return > 0)
         write_char(0);
+    xfree(buffer);
     return cnt_return;
 }

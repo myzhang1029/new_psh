@@ -24,11 +24,20 @@
 #endif
 
 #include <pwd.h>
+#include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include "backend.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
+#include "psh.h"
+#include "variable.h"
+
+extern char **environ;
+int psh_backend_path_separator = ':';
 
 char *psh_backend_get_homedir(void)
 {
@@ -82,7 +91,10 @@ int psh_backend_chdir(char *dir) { return chdir(dir); }
 
 int psh_backend_setenv(const char *name, const char *value, int overwrite)
 {
-    return setenv(name, value, overwrite);
+    if (value)
+        return setenv(name, value, overwrite);
+    else
+        return unsetenv(name);
 }
 
 int psh_backend_getopt(int argc, char **argv, const char *optstring)
@@ -99,5 +111,23 @@ int psh_backend_file_exists(const char *path)
     else
     {
         return 0;
+    }
+}
+
+int psh_backend_hup(int pid) { return kill((pid_t)pid, SIGHUP); }
+
+void psh_backend_get_all_env(psh_state *state)
+{
+    size_t count;
+    for (count = 0; environ[count]; ++count)
+    {
+        char *env = psh_strdup(environ[count]);
+        char *equal = strrchr(env, '=');
+        char *value = psh_strdup(equal + 1);
+        union _psh_vfa_value payload = {value};
+        *equal = 0;
+        psh_vf_set(state, env, PSH_VFA_EXPORT | PSH_VFA_STRING, payload, 0, 0,
+                   0);
+        xfree(env);
     }
 }
