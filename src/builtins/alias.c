@@ -19,6 +19,7 @@
 */
 
 #include "builtin.h"
+#include "libpsh/util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,22 +51,38 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 {
 
     int i;
-    char *alias, *value;
+    char *alias, *value, *argstr;
 
-    for (i = 1; i < argc; i++)
+    argstr = malloc(strlen(argv[1]));
+    strcpy(argstr, argv[1]);
+
+    for(i = 2; i < argc; i++)
     {
-        int j;
-        for (j = 0; j < strlen(argv[i]); j++)
+        if (realloc(argstr, strlen(argstr) + strlen(argv[i]) + 1))
         {
-            if (argv[i][j] == '=')
-            {
-                alias = calloc(j, sizeof(char));
-                memcpy(alias, argv[i], j);
-            }
+            strcat(argstr, argv[i]);
+            strcat(argstr, " ");
+        } else
+        {
+            OUT2E("Not enough memory");
         }
     }
 
+    for(i = 0; i < strlen(argstr); i++)
+    {
+        if (argstr[i] == '=')
+        {
+            alias = calloc(i, sizeof(char));
+            memcpy(alias, argstr, i);
+            value = calloc(strlen(argstr) - i, sizeof(char));
+            strcpy(value, argstr + i + 1);
+            break;
+        }
+
+    }
+
     puts(alias);
+    puts(value);
     exit(0);
 
 }
