@@ -93,7 +93,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 int builtin_unalias(int argc, char **argv, psh_state *state)
 {
 
-    puts("hallo");
+    puts("Work in progress");
 }
 
 
