@@ -312,7 +312,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
         printf("flag: %d\n", cmd->type);
 #endif
         /* Replace command with alias */
-        replace_with_alias(cmd);
+        expand_alias(cmd);
         /* First try to find a builtin command TODO: functions */
         builtin = find_builtin(cmd->argv[0]);
         if (builtin && cmd->type != PSH_CMD_PIPED &&

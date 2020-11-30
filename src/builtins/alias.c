@@ -21,6 +21,7 @@
 #include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,16 +35,15 @@ int add_alias(char *alias, char *value)
 {
 
     if (aliases == NULL)
-        aliases = malloc(sizeof(char *));
+        aliases = xmalloc(sizeof(char *));
     else
     {
-        if (!realloc(aliases, (alias_amount + 1) * sizeof(char *)))
-            OUT2E("Not enough memory");
+        xrealloc(aliases, (alias_amount + 1) * sizeof(char *));
     }
 
     aliases[alias_amount] = calloc(2, sizeof(char *));
-    aliases[alias_amount][0] = malloc(strlen(alias));
-    aliases[alias_amount][1] = malloc(strlen(value));
+    aliases[alias_amount][0] = xmalloc(strlen(alias));
+    aliases[alias_amount][1] = xmalloc(strlen(value));
     strcpy(aliases[alias_amount][0], alias);
     strcpy(aliases[alias_amount][1], value);
 
@@ -75,20 +75,15 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     int i;
     char *alias, *value, *argstr;
 
-    argstr = malloc(strlen(argv[1]) + 1);
+    argstr = xmalloc(strlen(argv[1]) + 1);
     strcpy(argstr, argv[1]);
 
     /* Combine all argv pointers to one pointer */
     for (i = 2; i < argc; i++)
     {
-        if (realloc(argstr, strlen(argstr) + strlen(argv[i]) + 1))
-        {
-            strcat(argstr, argv[i]);
-            strcat(argstr, " ");
-        } else
-        {
-            OUT2E("Not enough memory");
-        }
+        xrealloc(argstr, strlen(argstr) + strlen(argv[i]) + 1);
+        strcat(argstr, argv[i]);
+        strcat(argstr, " ");
     }
 
     /* Split the string at '=' */
@@ -96,9 +91,9 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     {
         if (argstr[i] == '=')
         {
-            alias = calloc(i, sizeof(char));
+            alias = xcalloc(i, sizeof(char));
             memcpy(alias, argstr, i);
-            value = calloc(strlen(argstr) - i, sizeof(char));
+            value = xcalloc(strlen(argstr) - i, sizeof(char));
             strcpy(value, argstr + i + 1);
             break;
         }
@@ -122,7 +117,15 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
 }
 
-int replace_with_alias(struct _psh_command *cmd)
+
+int builtin_unalias(int argc, char **argv, psh_state *state)
+{
+
+    puts("hallo");
+}
+
+
+int expand_alias(struct _psh_command *cmd)
 {
 
 
