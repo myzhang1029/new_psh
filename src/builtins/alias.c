@@ -29,13 +29,15 @@
 
 static int add_alias(psh_hash *table, char *alias, char *value)
 {
-   
+
+    psh_hash_add_chk(table, alias, value, 1);
+
     return 0;
 }
 
 static char *check_for_alias(psh_hash *table, char *alias)
 {
-
+    return psh_hash_get(table, alias);
 
 }
 
@@ -72,13 +74,13 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
     xfree(argstr);
 
-    //if (strcmp(alias, check_for_alias(alias)) == 0)
-    //{
-    //    add_alias(alias, value);
-    //} else
-    //{
-    //    OUT2E("Alias %s already exists with %s\n", alias, check_for_alias(alias));
-    //}
+    if (check_for_alias(state->alias_table, alias) == NULL)
+    {
+        add_alias(state->alias_table, alias, value);
+    } else
+    {
+        OUT2E("Alias %s already exists with %s\n", alias, check_for_alias(state->alias_table, alias));
+    }
 
     xfree(alias);
     xfree(value);
