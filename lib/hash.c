@@ -89,11 +89,9 @@ psh_hash *psh_hash_create(size_t len)
     table->len = len;
     table->used = 0;
     /* zero length gets handled too */
-    table->table = xmalloc(sizeof(struct _psh_hash_internal) * len);
-
     /* NUL-init the internal table, because USED needs to be zero for
      * psh_hash_add to function */
-    memset(table->table, 0, sizeof(struct _psh_hash_internal) * len);
+    table->table = xcalloc(len, sizeof(struct _psh_hash_internal));
 
     return table;
 }
@@ -210,10 +208,9 @@ psh_hash *psh_hash_realloc(psh_hash *table, size_t newlen)
 
     newlen = ceil_pow2(newlen);
     table->len = newlen;
-    table->table = xmalloc(sizeof(struct _psh_hash_internal) * newlen);
     /* NUL-init the internal table, because USED needs to be zero for
      * psh_hash_add to function */
-    memset(table->table, 0, sizeof(struct _psh_hash_internal) * newlen);
+    table->table = xcalloc(newlen, sizeof(struct _psh_hash_internal));
     table->used = 0;
     /* Go through the old table and settle the items into the new table */
     for (using = oldtable; using < oldtable + oldlen; ++using)

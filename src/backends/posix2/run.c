@@ -39,6 +39,7 @@
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"
+#include "util.h"
 #include "variable.h"
 
 /* Error handling INSIDE child process */
@@ -65,7 +66,11 @@
 
 /** Type of a file-descriptor backup. */
 typedef int **fd_backup;
+
 /** Set up redirections and optionally backup file descriptors.
+ *
+ * For the backup, originally closed fds are saved as -1, which is what dup
+ * returns on EBADF, so we don't need to explicitly backup closed fds.
  *
  * @param state Psh internal state
  * @param redirect Redirections
@@ -90,6 +95,9 @@ static int set_up_redirection(psh_state *state, struct _psh_redirect *redirect,
             break;                                                             \
         (*backup)[used_size][0] = (fd);                                        \
         (*backup)[used_size][1] = dup((fd));                                   \
+        if ((*backup)[used_size][1] < 0 && errno != EBADF)                     \
+            /* Backup failed */                                                \
+            return 2;                                                          \
         if (++used_size >= have_size)                                          \
             *backup = xrealloc(*backup, sizeof(int) * 2 * (have_size *= 2));   \
     } while (0)
@@ -98,22 +106,26 @@ static int set_up_redirection(psh_state *state, struct _psh_redirect *redirect,
     {
         switch (redirect->type)
         {
+            case PSH_REDIR_NONE:
+                /* This case currently exists, but should not. #4 TODO */
+                break;
             case PSH_REDIR_OUT_REDIR:
             {
                 int file_fd;
 #ifdef DEBUG
-                printf("output(%d, %s)\n", redirect->in.fd, redirect->out.file);
+                printf("output(%d, %s)\n", redirect->lhs.fd,
+                       redirect->rhs.file);
 #endif
                 /* if piping and redirecting output, bash actually respects
                  * the redirect instead of the pipe, but I dislike that.
                  * However, here the pipe's fd is actually overriden. */
                 /* Open output file */
-                file_fd = open(redirect->out.file, O_WRONLY | O_CREAT | O_TRUNC,
+                file_fd = open(redirect->rhs.file, O_WRONLY | O_CREAT | O_TRUNC,
                                0644);
                 DO_THIS_OR_FAIL_MAIN((file_fd < 0), "open", 1);
-                BACKUP_FD(redirect->in.fd);
-                close(redirect->in.fd);
-                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->in.fd) < 0),
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->lhs.fd) < 0),
                                      "dup2", 1);
                 close(file_fd);
                 break;
@@ -122,20 +134,83 @@ static int set_up_redirection(psh_state *state, struct _psh_redirect *redirect,
             {
                 int file_fd;
 #ifdef DEBUG
-                printf("append(%d, %s)\n",
-
-                       redirect->in.fd, redirect->out.file);
+                printf("append(%d, %s)\n", redirect->lhs.fd,
+                       redirect->rhs.file);
 #endif
-                file_fd = open(redirect->out.file,
+                file_fd = open(redirect->rhs.file,
                                O_WRONLY | O_CREAT | O_APPEND, 0644);
                 DO_THIS_OR_FAIL_MAIN((file_fd < 0), "open", 1);
-                BACKUP_FD(redirect->in.fd);
-                close(redirect->in.fd);
-                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->in.fd) < 0),
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->lhs.fd) < 0),
                                      "dup2", 1);
                 close(file_fd);
                 break;
             }
+            case PSH_REDIR_IN_REDIR:
+            {
+                int file_fd;
+#ifdef DEBUG
+                printf("input(%d, %s)\n", redirect->lhs.fd, redirect->rhs.file);
+#endif
+                file_fd = open(redirect->rhs.file, O_RDONLY, 0644);
+                DO_THIS_OR_FAIL_MAIN((file_fd < 0), "open", 1);
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->lhs.fd) < 0),
+                                     "dup2", 1);
+                close(file_fd);
+                break;
+            }
+            case PSH_REDIR_FD2FD:
+#ifdef DEBUG
+                printf("fd_dup(%d, %d)\n", redirect->lhs.fd, redirect->rhs.fd);
+#endif
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                DO_THIS_OR_FAIL_MAIN(
+                    (dup2(redirect->rhs.fd, redirect->lhs.fd) < 0), "dup2", 1);
+                break;
+            case PSH_REDIR_CLOSEFD:
+#ifdef DEBUG
+                printf("close(%d, %d)\n", redirect->lhs.fd, redirect->rhs.fd);
+#endif
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                break;
+            case PSH_REDIR_OPENFN:
+            {
+                int file_fd;
+#ifdef DEBUG
+                printf("open(%d, %s)\n", redirect->lhs.fd, redirect->rhs.file);
+#endif
+                file_fd = open(redirect->rhs.file, O_RDWR | O_CREAT, 0644);
+                DO_THIS_OR_FAIL_MAIN((file_fd < 0), "open", 1);
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->lhs.fd) < 0),
+                                     "dup2", 1);
+                close(file_fd);
+                break;
+            }
+            case PSH_REDIR_HEREXX:
+            {
+                int file_fd;
+#ifdef DEBUG
+                printf("herexx(%d, %p)\n", redirect->lhs.fd,
+                       redirect->rhs.herexx);
+#endif
+                file_fd = open(redirect->rhs.file, O_RDONLY, 0644);
+                DO_THIS_OR_FAIL_MAIN((file_fd < 0), "open", 1);
+                BACKUP_FD(redirect->lhs.fd);
+                close(redirect->lhs.fd);
+                DO_THIS_OR_FAIL_MAIN((dup2(file_fd, redirect->lhs.fd) < 0),
+                                     "dup2", 1);
+                close(file_fd);
+                break;
+            }
+            default:
+                code_fault(state, __FILE__, __LINE__);
         }
         redirect = redirect->next;
     }
@@ -151,11 +226,15 @@ static int restore_fds(psh_state *state, fd_backup restore_spec)
     {
         /* Close the original, restore_spec[0][0] */
         close(**restore_spec);
-        /* Replace the original with the restored */
-        DO_THIS_OR_FAIL_MAIN((dup2((*restore_spec)[1], **restore_spec) < 0),
-                             "dup2", 1);
-        /* Close the restored */
-        close((*restore_spec)[1]);
+        /* -1 indicates that the fd was originally closed. */
+        if ((*restore_spec)[1] >= 0)
+        {
+            /* Replace the original with the restored */
+            DO_THIS_OR_FAIL_MAIN((dup2((*restore_spec)[1], **restore_spec) < 0),
+                                 "dup2", 1);
+            /* Close the restored */
+            close((*restore_spec)[1]);
+        }
         /* Get the next one */
         ++restore_spec;
     }
@@ -330,7 +409,8 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
             psh_vf_get(state, "?", 0, 0)->payload.integer =
                 (*builtin)(get_argc(cmd->argv), cmd->argv, state);
             /* Restore file descriptors as we are returning to shell */
-            restore_fds(state, backed_up);
+            if (builtin != builtin_exec)
+                restore_fds(state, backed_up);
             xfree(backed_up);
             goto cont;
         }

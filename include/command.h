@@ -38,54 +38,55 @@ struct _psh_redirect
     /** @brief The type of this redirection. */
     enum _psh_redir_type
     {
+        PSH_REDIR_NONE = 0,
         /** Duplicate a file discripter. \n
-         * @ref redirect::in::fd -> @ref redirect::out::fd \n
+         * @ref redirect::lhs::fd -> @ref redirect::rhs::fd \n
          * forms: [n] > &n or [n] < &n
          * @sa section 2.7.5, 2.7.6
          */
         PSH_REDIR_FD2FD = 1,
         /** Redirecting output. \n
-         * @ref redirect::in::fd -> @ref redirect::out::file \n
+         * @ref redirect::lhs::fd -> @ref redirect::rhs::file \n
          * forms: [n] > filename or [n] >| filename
          * @sa section 2.7.2
          */
         PSH_REDIR_OUT_REDIR,
         /** Appending redirected output. \n
-         * @ref redirect::in::fd -> @ref redirect::out::file \n
+         * @ref redirect::lhs::fd -> @ref redirect::rhs::file \n
          * forms: [n] >> filename
          * @sa section 2.7.3
          */
         PSH_REDIR_OUT_APPN,
         /** Redirecting input. \n
-         * @ref redirect::in::file -> @ref redirect::out::fd \n
+         * @ref redirect::rhs::file -> @ref redirect::lhs::fd \n
          * forms: [n] < filename
          * @sa section 2.7.1
          */
         PSH_REDIR_IN_REDIR,
         /** Close a file descripter. \n
-         * @ref redirect::in::fd = -1 -> @ref redirect::out::fd \n
+         * @ref redirect::rhs::fd = -1 -> @ref redirect::lhs::fd \n
          * forms: [n] < &- \n
-         * @ref redirect::in::fd -> @ref redirect::out::fd = -1 \n
+         * @ref redirect::lhs::fd -> @ref redirect::rhs::fd = -1 \n
          * forms: [n] > &-
          * @sa section 2.7.5, 2.7.6
          */
         PSH_REDIR_CLOSEFD,
         /** Open file for reading and writing. \n
-         * @ref redirect::in::file -> @ref redirect::out::fd \n
+         * @ref redirect::rhs::file -> @ref redirect::lhs::fd \n
          * forms: [n] <> filename
          * @sa section 2.7.7
          */
         PSH_REDIR_OPENFN,
         /** Here document and here strings. \n
-         * @ref redirect::in::herexx -> @ref redirect::out::fd \n
+         * @ref redirect::rhs::herexx -> @ref redirect::lhs::fd \n
          * forms: [n] << delimiter \n
          * [n] <<< string
          * @sa section 2.7.4
          */
         PSH_REDIR_HEREXX
     } type; /**< The type of this redirection. */
-    /** @brief Input of this redirection no matter what type it is. */
-    union _psh_redir_in
+    /** @brief Right-hand side of this redirection no matter what type it is. */
+    union _psh_redir_rhs
     {
         /** File descripter. */
         int fd;
@@ -93,15 +94,16 @@ struct _psh_redirect
         char *file;
         /** Temporary file created to store here document and here strings. */
         FILE *herexx;
-    } in; /**< The input of this redirection. */
-    /** @brief Output of this redirection no matter what type it is. */
-    union _psh_redir_out
+    } rhs; /**< The right operand of this redirection. */
+    /** @brief Left-hand side of this redirection no matter what type it is.
+     * This side is always the side that needs backing up. */
+    union _psh_redir_lhs
     {
         /** File descripter. */
         int fd;
         /** File path. */
         char *file;
-    } out; /**< The output of his redirection. */
+    } lhs; /**< The left operand of his redirection. */
     /** Next redirection in the chain. */
     struct _psh_redirect *next;
 };
@@ -149,6 +151,8 @@ struct _psh_command
 
 /** Initialize a redirect struct.
  *
+ * @deprecated This function has been removed. Use xcalloc to allocate struct
+ * _psh_redirect instead.
  * @param redir Pointer to the redirect struct.
  */
 void redirect_init(struct _psh_redirect *redir);
@@ -167,6 +171,8 @@ struct _psh_command *new_command();
 
 /** Initialize a command.
  *
+ * @deprecated This function has been removed. Use xcalloc to allocate struct
+ * _psh_command instead.
  * @param command Pointer to the redirect struct.
  */
 void command_init(struct _psh_command *command);

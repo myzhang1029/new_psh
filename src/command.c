@@ -27,16 +27,6 @@
 #include "command.h"
 #include "libpsh/xmalloc.h"
 
-void redirect_init(struct _psh_redirect *redir)
-{
-    redir->in.fd = 0;
-    redir->in.file = NULL;
-    redir->out.fd = 0;
-    redir->out.file = NULL;
-    redir->type = 0;
-    redir->next = NULL;
-}
-
 void free_redirect(struct _psh_redirect *redir)
 {
     struct _psh_redirect *temp;
@@ -53,26 +43,15 @@ void free_redirect(struct _psh_redirect *redir)
  * a struct _psh_redirect */
 struct _psh_command *new_command()
 {
-    /* XXX: Remove MAXARG, MAXEACHARG */
+    /* TODO: Remove MAXARG, MAXEACHARG */
     struct _psh_command *cmd;
-    cmd = xmalloc(sizeof(struct _psh_command));
-    command_init(cmd);
-    cmd->argv = xmalloc(sizeof(char *) * MAXARG);
-    memset(cmd->argv, 0, MAXARG); /* This will be used to detect
+    cmd = xcalloc(1, sizeof(struct _psh_command));
+    /* Setting to '\0' will be used to detect
                            whether an element is used */
-    cmd->argv[0] = xmalloc(P_CS * MAXEACHARG);
-    memset(cmd->argv[0], 0, MAXEACHARG);
-    cmd->rlist = xmalloc(sizeof(struct _psh_redirect));
-    redirect_init(cmd->rlist);
+    cmd->argv = xcalloc(MAXARG, P_CS);
+    cmd->argv[0] = xcalloc(MAXEACHARG, P_CS);
+    cmd->rlist = xcalloc(1, sizeof(struct _psh_redirect));
     return cmd;
-}
-
-void command_init(struct _psh_command *cmd)
-{
-    cmd->type = 0;
-    cmd->rlist = NULL;
-    cmd->argv = NULL;
-    cmd->next = NULL;
 }
 
 /* Free a command and its nexts */

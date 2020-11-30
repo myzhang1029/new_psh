@@ -5,6 +5,7 @@
         "CDPATH",
         "HEREXX",
         "IFSs",
+        "OPENFN",
         "builtins",
         "cmdor",
         "dquote",
