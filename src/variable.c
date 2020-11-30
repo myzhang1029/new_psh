@@ -276,8 +276,10 @@ int psh_vf_unset(psh_state *state, const char *varname, int is_func)
                          : state->contexts[ctx_idx_searching].variable_table),
                     varname);
             }
+            return 0;
         }
     } while (ctx_idx_searching);
+    return 1;
 }
 
 /* Called upon shell exit, destroy the whole variable database */
