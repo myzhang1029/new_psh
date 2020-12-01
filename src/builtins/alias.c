@@ -27,10 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int add_alias(psh_hash *table, char *alias, char *value)
+void add_alias(psh_hash *table, char *alias, char *value)
 {
-    psh_hash_add_chk(table, alias, value, 1);
-    return 0;
+    psh_hash_add_chk(table, alias, value, 0);
 }
 
 static char *check_for_alias(psh_hash *table, char *alias)
@@ -44,10 +43,11 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 {
 
     int i;
-    char *alias;
-    char *value;
     for (i = 1; i < argc; i++)
     {
+        char *alias;
+        char *value;
+
         alias = argv[i];
         int j;
         for (j = 0; j < strlen(argv[i]); j++)
@@ -61,11 +61,18 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
         }
 
+
         if (check_for_alias(state->alias_table, alias) == NULL)
         {
             add_alias(state->alias_table, alias, value);
+            puts(check_for_alias(state->alias_table, alias));
 
+        } else
+        {
+            puts(check_for_alias(state->alias_table, alias));
+            OUT2E("The alias: %s already exists with %s\n", alias, check_for_alias(state->alias_table, alias));
         }
+
     }
 
 
