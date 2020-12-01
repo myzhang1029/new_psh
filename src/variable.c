@@ -202,10 +202,9 @@ int psh_vf_add_raw(psh_state *state, const char *varname, unsigned int attrib,
             (is_func ? state->contexts[state->context_idx].function_table
                      : state->contexts[state->context_idx].variable_table),
             varname, container, 1);
-    else
-        return psh_hash_add((is_func ? state->contexts[0].function_table
-                                     : state->contexts[0].variable_table),
-                            varname, container, 1);
+    return psh_hash_add((is_func ? state->contexts[0].function_table
+                                 : state->contexts[0].variable_table),
+                        varname, container, 1);
 }
 
 /* Get the reference to a variable or a function. Returned value should never be

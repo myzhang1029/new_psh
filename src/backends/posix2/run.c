@@ -313,16 +313,14 @@ static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
         if (cmd_realpath)
         {
             /* An on-disk command */
-            if (execv(cmd_realpath, cmd->argv))
-            {
-                OUT2E("%s: %s: %s\n", state->argv0, cmd_realpath,
-                      strerror(errno));
-                _Exit(127);
-            }
-        }
-        else
+            execv(cmd_realpath, cmd->argv);
+            OUT2E("%s: %s: %s\n", state->argv0, cmd_realpath, strerror(errno));
             _Exit(127);
+        }
+        _Exit(127);
     }
+    /* Control shouldn't reach here */
+    code_fault(state, __FILE__, __LINE__);
 }
 
 static char *get_cmd_realpath(psh_state *state, char *cmd)
