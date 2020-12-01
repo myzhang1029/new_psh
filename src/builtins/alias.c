@@ -29,19 +29,44 @@
 
 static int add_alias(psh_hash *table, char *alias, char *value)
 {
-
+    psh_hash_add_chk(table, alias, value, 1);
     return 0;
 }
 
 static char *check_for_alias(psh_hash *table, char *alias)
 {
-
+    return psh_hash_get(table, alias);
 }
 
 
 
 int builtin_alias(int argc, char **argv, psh_state *state)
 {
+
+    int i;
+    char *alias;
+    char *value;
+    for (i = 1; i < argc; i++)
+    {
+        alias = argv[i];
+        int j;
+        for (j = 0; j < strlen(argv[i]); j++)
+        {
+            if (argv[i][j] == '=')
+            {
+                argv[i][j] = '\0';
+                value = &argv[i][j] + 1;
+                break;
+            }
+
+        }
+
+        if (check_for_alias(state->alias_table, alias) == NULL)
+        {
+            add_alias(state->alias_table, alias, value);
+
+        }
+    }
 
 
     return 0;
