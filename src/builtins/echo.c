@@ -40,10 +40,6 @@ int builtin_echo(int argc, char **argv, psh_state *state)
     {
         switch (argv[1][1])
         {
-            case 0:
-                /* Another blank line */
-                puts("");
-                return 0;
             case 'n':
                 cnt = 2;
                 if (argv[2] == NULL)
