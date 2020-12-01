@@ -30,14 +30,11 @@
 static int add_alias(psh_hash *table, char *alias, char *value)
 {
 
-    psh_hash_add_chk(table, alias, value, 1);
-
     return 0;
 }
 
 static char *check_for_alias(psh_hash *table, char *alias)
 {
-    return psh_hash_get(table, alias);
 
 }
 
@@ -46,44 +43,6 @@ static char *check_for_alias(psh_hash *table, char *alias)
 int builtin_alias(int argc, char **argv, psh_state *state)
 {
 
-    int i;
-    char *alias, *value, *argstr;
-
-    argstr = strdup(argv[1]);
-
-    /* Combine all argv pointers to one pointer */
-    for (i = 2; i < argc; i++)
-    {
-        xrealloc(argstr, strlen(argstr) + strlen(argv[i]) + 1);
-        strcat(argstr, argv[i]);
-        strcat(argstr, " ");
-    }
-
-    /* Split the string at '=' */
-    for (i = 0; i < strlen(argstr); i++)
-    {
-        if (argstr[i] == '=')
-        {
-            alias = xcalloc(i, sizeof(char));
-            memcpy(alias, argstr, i);
-            value = strdup(argstr + i + 1);
-            break;
-        }
-
-    }
-
-    xfree(argstr);
-
-    if (check_for_alias(state->alias_table, alias) == NULL)
-    {
-        add_alias(state->alias_table, alias, value);
-    } else
-    {
-        OUT2E("Alias %s already exists with %s\n", alias, check_for_alias(state->alias_table, alias));
-    }
-
-    xfree(alias);
-    xfree(value);
 
     return 0;
 
