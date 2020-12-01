@@ -58,7 +58,8 @@ int builtin_history(int argc, char **argv, psh_state *state)
 #else
     if (argv[1] != NULL)
     {
-        int count, ch, flags = 0, n;
+        int count, ch, n;
+        unsigned int flags = 0;
         char *filename = xmalloc(P_CS * MAXEACHARG);
         struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                     {NULL, 0, NULL, 0}};

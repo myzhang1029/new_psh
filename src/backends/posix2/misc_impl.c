@@ -27,8 +27,8 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "backend.h"
 #include "libpsh/util.h"
@@ -91,10 +91,9 @@ int psh_backend_chdir(char *dir) { return chdir(dir); }
 
 int psh_backend_setenv(const char *name, const char *value, int overwrite)
 {
-    if (value)
-        return setenv(name, value, overwrite);
-    else
+    if (!value)
         return unsetenv(name);
+    return setenv(name, value, overwrite);
 }
 
 int psh_backend_getopt(int argc, char **argv, const char *optstring)
@@ -105,13 +104,8 @@ int psh_backend_getopt(int argc, char **argv, const char *optstring)
 int psh_backend_file_exists(const char *path)
 {
     if (access(path, F_OK) != -1)
-    {
         return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 int psh_backend_hup(int pid) { return kill((pid_t)pid, SIGHUP); }

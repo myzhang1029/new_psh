@@ -27,9 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "backend.h"
 #include "builtin.h"
@@ -270,7 +270,7 @@ static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
 #endif
         return pid;
     }
-    else if (pid == 0)
+    if (pid == 0)
     {
         /* Child process */
         struct _psh_redirect *redirect = cmd->rlist;
@@ -310,7 +310,8 @@ static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
         if (builtin)
             /* Run a builtin */
             _Exit((*builtin)(get_argc(cmd->argv), cmd->argv, state));
-        else if (cmd_realpath)
+        if (cmd_realpath)
+        {
             /* An on-disk command */
             if (execv(cmd_realpath, cmd->argv))
             {
@@ -318,8 +319,9 @@ static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
                       strerror(errno));
                 _Exit(127);
             }
-            else
-                _Exit(127);
+        }
+        else
+            _Exit(127);
     }
 }
 
@@ -328,41 +330,37 @@ static char *get_cmd_realpath(psh_state *state, char *cmd)
     if (strchr(cmd, '/'))
         /* A command with a path */
         return cmd;
-    else if (*cmd == '\0')
+    if (*cmd == '\0')
     {
         /* This is an empty command, don't search path for it */
         OUT2E("%s: : command not found\n", state->argv0);
         return NULL;
     }
-    else
+    /* Search PATH and run command */
+    char *exec_path;
+    /* Try to find a cached command path. */
+    exec_path = psh_hash_get(state->command_table, cmd);
+    if (exec_path == NULL)
     {
-        /* Search PATH and run command */
-        char *exec_path;
-        /* Try to find a cached command path. */
-        exec_path = psh_hash_get(state->command_table, cmd);
+        /* No cached commands, search PATH for it */
+        char *name = xmalloc(strlen(cmd) + 2);
+        name[0] = '/';
+        psh_strncpy(name + 1, cmd, strlen(cmd));
+        exec_path = psh_search_path(psh_vf_getstr(state, "PATH"),
+                                    psh_backend_path_separator, name,
+                                    &psh_backend_file_exists);
+        xfree(name);
         if (exec_path == NULL)
         {
-            /* No cached commands, search PATH for it */
-            char *name = xmalloc(strlen(cmd) + 2);
-            name[0] = '/';
-            psh_strncpy(name + 1, cmd, strlen(cmd));
-            exec_path = psh_search_path(psh_vf_getstr(state, "PATH"),
-                                        psh_backend_path_separator, name,
-                                        &psh_backend_file_exists);
-            xfree(name);
-            if (exec_path == NULL)
-            {
-                OUT2E("%s: %s: command not found\n", state->argv0, cmd);
-                return NULL;
-            }
-            else
-                psh_hash_add(state->command_table, cmd, exec_path, 1);
+            OUT2E("%s: %s: command not found\n", state->argv0, cmd);
+            return NULL;
         }
-#ifdef DEBUG
-        printf("Cached Path: %s\n", exec_path);
-#endif
-        return exec_path;
+        psh_hash_add(state->command_table, cmd, exec_path, 1);
     }
+#ifdef DEBUG
+    printf("Cached Path: %s\n", exec_path);
+#endif
+    return exec_path;
 }
 
 int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
@@ -372,6 +370,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
     int status;
     builtin_function builtin;
     int error_level = 0;
+    int should_be_run = 1;
 
 #ifdef DEBUG
     printf("command position: %p\n", cmd);
@@ -455,6 +454,9 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
                 psh_jobs_add(state, cmd->argv[0], pid, cmd->type);
                 break;
             case PSH_CMD_RUN_AND:
+                waitpid(pid, &status, 0);
+                psh_vf_get(state, "?", 0, 0)->payload.integer = status;
+                should_be_run = pid == 0 ? 0 : 0;
             case PSH_CMD_RUN_OR:
             case PSH_CMD_SINGLE:
             case PSH_CMD_MULTICMD:

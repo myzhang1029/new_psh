@@ -135,7 +135,7 @@ int builtin_help(int argc, char **argv, psh_state *state)
         if (argv[count][1] == '\0')
             /* Treat '-' as an argument. */
             break;
-        else if (argv[count][1] == 'm')
+        if (argv[count][1] == 'm')
             type = MAN;
         else if (argv[count][1] == 's')
             type = SHORT;

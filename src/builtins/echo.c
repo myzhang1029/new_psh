@@ -29,13 +29,14 @@
 
 int builtin_echo(int argc, char **argv, psh_state *state)
 {
+    int cnt;
     if (argv[1] == NULL)
     {
         /* A blank line */
         puts("");
         return 0;
     }
-    else if (argv[1][0] == '-')
+    if (argv[1][0] == '-')
     {
         switch (argv[1][1])
         {
@@ -44,22 +45,18 @@ int builtin_echo(int argc, char **argv, psh_state *state)
                 puts("");
                 return 0;
             case 'n':
+                cnt = 2;
                 if (argv[2] == NULL)
                     /* No more blank line */
                     return 0;
-                else
+                printf("%s", argv[cnt]);
+                while (argv[++cnt] != NULL)
                 {
-                    int cnt = 2;
-                    printf("%s", argv[cnt]);
-                    while (argv[++cnt] != NULL)
-                    {
-                        printf(" %s", argv[cnt]);
-                    }
-                    return 0;
+                    printf(" %s", argv[cnt]);
                 }
+                return 0;
             default:
-            {
-                int cnt = 1;
+                cnt = 1;
                 printf("%s", argv[cnt]);
                 while (argv[++cnt] != NULL)
                 {
@@ -68,19 +65,15 @@ int builtin_echo(int argc, char **argv, psh_state *state)
                 }
                 puts("");
                 return 0;
-            }
         } /* switch-case */
     }
-    else
+    cnt = 1;
+    printf("%s", argv[cnt]);
+    while (argv[++cnt] != NULL)
     {
-        int cnt = 1;
-        printf("%s", argv[cnt]);
-        while (argv[++cnt] != NULL)
-        {
-            printf(" %s", argv[cnt]);
-            cnt++;
-        }
-        puts("");
-        return 0;
+        printf(" %s", argv[cnt]);
+        cnt++;
     }
+    puts("");
+    return 0;
 }

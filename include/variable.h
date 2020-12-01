@@ -74,7 +74,7 @@ union _psh_vfa_value
 struct _psh_vfa_container
 {
     /** The attributes for this variable. */
-    int attributes;
+    unsigned int attributes;
     /** The value of this variable. */
     union _psh_vfa_value payload;
     /** Size of the array if it is one. */
@@ -99,7 +99,7 @@ void psh_vfa_new_context(psh_state *state);
  * @param is_func Whether this is a function.
  * @return 0 if succeed, 1 if not.
  */
-int psh_vf_set(psh_state *state, const char *varname, int attrib,
+int psh_vf_set(psh_state *state, const char *varname, unsigned int attrib,
                const union _psh_vfa_value payload, size_t array_size,
                int is_local, int is_func);
 
@@ -115,7 +115,7 @@ int psh_vf_set(psh_state *state, const char *varname, int attrib,
  * @param is_func Whether this is a function.
  * @return 0 if succeed, 1 if not.
  */
-int psh_vf_add_raw(psh_state *state, const char *varname, int attrib,
+int psh_vf_add_raw(psh_state *state, const char *varname, unsigned int attrib,
                    const union _psh_vfa_value payload, size_t array_size,
                    int is_local, int is_func);
 
