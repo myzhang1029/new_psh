@@ -43,33 +43,40 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 {
 
     int i;
+    /* Iterate over every argument */
     for (i = 1; i < argc; i++)
     {
         char *alias;
         char *value;
 
+        /* Set alias pointer to beginning of argument */
         alias = argv[i];
+
         int j;
+        /* Iterate over every char of argument */
         for (j = 0; j < strlen(argv[i]); j++)
         {
+            /* Replace char = with \0 */
             if (argv[i][j] == '=')
             {
+                /* Replace = with \0 to end alias pointer */
                 argv[i][j] = '\0';
+                /* Set value to char after \0 */
                 value = &argv[i][j] + 1;
+                /* values null terminator is the end of the argument */
                 break;
             }
 
         }
 
 
+        /* If  alias is already set print error otherwise add it */
         if (check_for_alias(state->alias_table, alias) == NULL)
         {
             add_alias(state->alias_table, alias, value);
-            puts(check_for_alias(state->alias_table, alias));
 
         } else
         {
-            puts(check_for_alias(state->alias_table, alias));
             OUT2E("The alias: %s already exists with %s\n", alias, check_for_alias(state->alias_table, alias));
         }
 
