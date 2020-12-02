@@ -130,4 +130,10 @@ void psh_jobs_free(psh_state *state, int hup)
         xfree(cur);
         cur = tmp;
     }
+    if (state->fg_job)
+    {
+        if (hup)
+            psh_backend_hup(state->fg_job->commands);
+        free_command(state->fg_job->commands);
+    }
 }
