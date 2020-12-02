@@ -108,7 +108,14 @@ int psh_backend_file_exists(const char *path)
     return 0;
 }
 
-int psh_backend_hup(int pid) { return kill((pid_t)pid, SIGHUP); }
+void psh_backend_hup(struct _psh_command *command)
+{
+    while (command)
+    {
+        kill((pid_t)command->pid, SIGHUP);
+        command = command->next;
+    }
+}
 
 void psh_backend_get_all_env(psh_state *state)
 {

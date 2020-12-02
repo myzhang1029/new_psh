@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "jobs.h"
+#include "command.h"
 #include "libpsh/hash.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
@@ -37,9 +37,10 @@
 __attribute__((noreturn)) void code_fault(psh_state *state, char *file,
                                           int line)
 {
-    OUT2E("%s: Programming error at %s: %d\n", state->argv0, file, line);
+    OUT2E("%s: Programming error at %s:%d\n", state->argv0, file, line);
     OUT2E("Shell version: %s\n", PSH_VERSION);
-    OUT2E("Please create a GitHub Issue with above info\n");
+    OUT2E("Please create a GitHub Issue at "
+          "https://github.com/myzhang1029/psh/issues with above info\n");
     exit_psh(state, 1);
 }
 

@@ -120,12 +120,12 @@ int psh_backend_chdir(char *);
  */
 int psh_backend_getopt(int argc, char **argv, const char *optstring);
 
-/** Send SIGHUP or similar to a child process.
+/** Send SIGHUP or similar to commands.
  *
  * @param pid Child pid.
  * @return 0 if succeed, -1 otherwise.
  */
-int psh_backend_hup(int pid);
+void psh_backend_hup(struct _psh_command *command);
 
 /** Check if file exists.
  *
@@ -137,9 +137,9 @@ int psh_backend_file_exists(const char *path);
 /** Run a command.
  *
  * @param state Psh internal state.
- * @param command The command struct about command details.
+ * @param jobs The parsed jobs.
  * @return Zero if succeeded.
  */
-int psh_backend_do_run(psh_state *state, struct _psh_command *command);
+int psh_backend_do_run(psh_state *state, struct _psh_job *jobs);
 
 #endif /* _PSH_BACKEND_H*/

@@ -33,7 +33,6 @@
 
 #include "backend.h"
 #include "builtin.h"
-#include "jobs.h"
 #include "libpsh/hash.h"
 #include "libpsh/path_searcher.h"
 #include "libpsh/util.h"
@@ -361,22 +360,41 @@ static char *get_cmd_realpath(psh_state *state, char *cmd)
     return exec_path;
 }
 
-int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
+/** Execute a single job.
+ *
+ * @param state Psh internal state.
+ * @param job The job structure.
+ * @return 0 on success.
+ */
+static int execute_one_job(psh_state *state, struct _psh_job *job)
 {
+    int error_level = 0;
     int i = 0;
     int last_pipe_fd[2] = {0};
-    int status;
-    builtin_function builtin;
-    int error_level = 0;
     int should_be_run = 1;
+    struct _psh_command *cmd = job->commands;
 
-#ifdef DEBUG
-    printf("command position: %p\n", cmd);
-#endif
+    job->status = PSH_JOB_RUNNING;
+    if (job->type == PSH_CMD_BACKGROUND)
+    {
+        /* Fork a subshell */
+        pid_t pid = fork();
+        DO_THIS_OR_FAIL_MAIN((pid < 0), "fork", -1);
+        if (pid > 0)
+        {
+            job->controller = pid;
+            return 0;
+        }
+        /* Leaving the child process executing the rest. */
+    }
+
+    /* Go over each command and execute them. */
     while (++i, cmd)
     {
         int pipe_fd[2] = {0};
         pid_t pid;
+        int status;
+        builtin_function builtin;
 #ifdef DEBUG
         printf("part %d:\n"
                "command: %s\n",
@@ -388,8 +406,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
 #endif
         /* First try to find a builtin command TODO: functions */
         builtin = find_builtin(cmd->argv[0]);
-        if (builtin && cmd->type != PSH_CMD_PIPED &&
-            cmd->type != PSH_CMD_BACKGROUND)
+        if (builtin && cmd->type != PSH_CMD_PIPED)
         {
             /* Execute without forking if async execution is not needed */
             fd_backup backed_up;
@@ -434,7 +451,8 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
                                      pipe_fd[0], last_pipe_fd[1], builtin,
                                      cmd_realpath);
         }
-        /* Make sure the used fds of the pipe are closed in the main process. */
+        /* Make sure the used fds of the pipe are closed in the parent process.
+         */
         if (last_pipe_fd[0])
             close(last_pipe_fd[0]);
         if (pipe_fd[1])
@@ -445,24 +463,66 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
         last_pipe_fd[1] = pipe_fd[1];
         if (pid < 0)
             return 1;
+        /* Store the pid. */
+        cmd->pid = pid;
         switch (cmd->type)
         {
-            case PSH_CMD_BACKGROUND:
             case PSH_CMD_PIPED:
-                psh_jobs_add(state, cmd->argv[0], pid, cmd->type);
                 break;
             case PSH_CMD_RUN_AND:
                 waitpid(pid, &status, 0);
+                cmd->wait_stat = status;
                 psh_vf_get(state, "?", 0, 0)->payload.integer = status;
-                should_be_run = pid == 0 ? 0 : 0;
+                should_be_run = pid == 0 ? 1 : 0;
+                break;
             case PSH_CMD_RUN_OR:
-            case PSH_CMD_SINGLE:
-            case PSH_CMD_MULTICMD:
                 waitpid(pid, &status, 0);
+                cmd->wait_stat = status;
                 psh_vf_get(state, "?", 0, 0)->payload.integer = status;
+                should_be_run = pid == 0 ? 0 : 1;
+                break;
+            case PSH_CMD_SINGLE:
+                waitpid(pid, &status, 0);
+                cmd->wait_stat = status;
+                psh_vf_get(state, "?", 0, 0)->payload.integer = status;
+                should_be_run = 1;
+                break;
+            default:
+                /* commands shouldn't have other types */
+                code_fault(state, __FILE__, __LINE__);
         }
     cont:
         cmd = cmd->next;
+    }
+    return 0;
+}
+
+int psh_backend_do_run(psh_state *state, struct _psh_job *jobs)
+{
+    int i;
+    while (jobs)
+    {
+        if (jobs->type == PSH_CMD_BACKGROUND)
+            psh_job_add_bg(state, jobs);
+        else
+        {
+            if (state->fg_job)
+                /* To be clear, this field must be cleared. */
+                code_fault(state, __FILE__, __LINE__);
+            state->fg_job = jobs;
+        }
+        if (execute_one_job(state, jobs))
+        {
+            OUT2E("%s: job execution failed, further execution skipped.\n",
+                  state->argv0);
+            return 1;
+        }
+        if (jobs->type == PSH_CMD_FOREGROUND)
+        {
+            free_command(state->fg_job->commands);
+            state->fg_job->commands = NULL;
+        }
+        jobs = jobs->next;
     }
     return 0;
 }

@@ -1,4 +1,4 @@
-/** @file psh/command.h - @brief Psh commands */
+/** @file psh/command.h - @brief Psh commands and jobs */
 /*
     Copyright 2020 Zhang Maiyun
 
@@ -17,11 +17,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+/*
+Command definition:
+a command: the minimal unit of execution, can have its own redirections, and can
+be of type SIMPLE, RUN_OR, RUN_AND, or PIPED. a job or a queue: one or more
+commands connected by ||, &&, or |, a job is terminated with a semicolon to
+indicate foreground, or with an ampersand to indicate background execution. a
+job is the smallest scheduling unit, and are assigned job ids. `if`, `case`,
+`for`, `while`, and `until` are all commands, but are parsed with special care.
+*/
 
 #ifndef _PSH_COMMAND_H
 #define _PSH_COMMAND_H
 
 #include <stdio.h> /* For FILE */
+
+#include "psh.h"
 
 /** @deprecated Maximum characters in a line */
 #define MAXLINE 262144
@@ -108,17 +119,13 @@ struct _psh_redirect
     struct _psh_redirect *next;
 };
 
-/** @brief The type of the command. */
+/** @brief The type of commands and jobs. */
 enum _psh_cmd_type
 {
     /** Simple command. \n
      * @sa section 2.9.1
      */
     PSH_CMD_SINGLE = 0,
-    /** Asynchronous list. \n
-     * @sa section 2.9.3
-     */
-    PSH_CMD_BACKGROUND,
     /** Pipeline. \n
      * @sa section 2.9.2
      */
@@ -131,11 +138,18 @@ enum _psh_cmd_type
      * @sa section 2.9.3
      */
     PSH_CMD_RUN_OR,
-    /** Sequential list. \n
+    /** Asynchronous list. \n
+     * @note Only used when parsing and executing, not useful in scheduling.
      * @sa section 2.9.3
      */
-    PSH_CMD_MULTICMD
+    PSH_CMD_BACKGROUND,
+    /** Sequential list. \n
+     * @note Only used when parsing and executing, not useful in scheduling.
+     * @sa section 2.9.3
+     */
+    PSH_CMD_FOREGROUND
 };
+
 /** @brief Everything about a command. */
 struct _psh_command
 {
@@ -145,17 +159,51 @@ struct _psh_command
     struct _psh_redirect *rlist;
     /** List of arguments */
     char **argv;
+    /** Pid of the command. */
+    int pid;
+    /** Status returned by wait(). */
+    int wait_stat;
+    /** Signal received. */
+    int sig;
     /** The next command in the list. */
     struct _psh_command *next;
 };
 
-/** Initialize a redirect struct.
+/** @brief Job statuses. */
+enum _psh_job_status
+{
+    PSH_JOB_BORN = 0,
+    PSH_JOB_RUNNING,
+    PSH_JOB_SIGNALED,
+    PSH_JOB_STOPPED,
+    PSH_JOB_DONE
+};
+
+/** @brief Everything about a job. */
+struct _psh_job
+{
+    /** The type of this job. */
+    enum _psh_cmd_type type;
+    /** Commands in this job. */
+    struct _psh_command *commands;
+    /** Job status. */
+    enum _psh_job_status status;
+    /** Whether the status of this job has been notified. */
+    int notified;
+    /** Pid of the controller subshell if background. */
+    int controller;
+    /** Job ID. */
+    int id;
+    /** Following jobs */
+    struct _psh_job *next;
+};
+
+/** Add a job to the background.
  *
- * @deprecated This function has been removed. Use xcalloc to allocate struct
- * _psh_redirect instead.
- * @param redir Pointer to the redirect struct.
+ * @param state Psh internal state.
+ * @param job The job to add.
  */
-void redirect_init(struct _psh_redirect *redir);
+void psh_job_add_bg(psh_state *state, struct _psh_job *job);
 
 /** Deallocate a redirect struct.
  *
@@ -169,23 +217,16 @@ void free_redirect(struct _psh_redirect *redir);
  */
 struct _psh_command *new_command();
 
-/** Initialize a command.
- *
- * @deprecated This function has been removed. Use xcalloc to allocate struct
- * _psh_command instead.
- * @param command Pointer to the redirect struct.
- */
-void command_init(struct _psh_command *command);
-
 /** Deallocate a command.
  *
  * @param command Pointer to the redirect struct.
  */
 void free_command(struct _psh_command *command);
 
-/** Free the argv field of a command struct.
+/** Free the jobs table and all linked jobs
  *
- * @param command Pointer to the redirect struct.
+ * @param state Psh internal state.
+ * @param hup Whether to send hangup signals.
  */
-void free_argv(struct _psh_command *command);
+void psh_jobs_free(psh_state *state, int hup);
 #endif
