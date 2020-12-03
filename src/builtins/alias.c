@@ -39,7 +39,7 @@ void add_alias(psh_hash *table, char *alias, char *value)
         list_of_aliases = malloc(sizeof(char *));
     }else
     {
-        list_of_aliases = realloc(list_of_aliases, amount_of_aliases * sizeof(char *));
+        list_of_aliases = realloc(list_of_aliases, (amount_of_aliases + 1) * sizeof(char *));
     }
     list_of_aliases[amount_of_aliases] = strdup(alias);
     amount_of_aliases++;
