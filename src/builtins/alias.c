@@ -27,9 +27,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+char **list_of_aliases = NULL;
+unsigned int amount_of_aliases = 0;
+
 void add_alias(psh_hash *table, char *alias, char *value)
 {
     psh_hash_add_chk(table, alias, value, 0);
+
+    if (list_of_aliases == NULL)
+    {
+        list_of_aliases = malloc(sizeof(char *));
+    }else
+    {
+        list_of_aliases = realloc(list_of_aliases, amount_of_aliases * sizeof(char *));
+    }
+    list_of_aliases[amount_of_aliases] = strdup(alias);
+    amount_of_aliases++;
+
 }
 
 char *check_for_alias(psh_hash *table, char *alias)
@@ -41,11 +55,26 @@ char *check_for_alias(psh_hash *table, char *alias)
 
 int builtin_alias(int argc, char **argv, psh_state *state)
 {
-
     int i;
+
+    if (argc < 2)
+    {
+        for (i = 0; i < amount_of_aliases; i++)
+        {
+            printf("%s='%s'\n", list_of_aliases[i], check_for_alias(state->alias_table, list_of_aliases[i]));
+        }
+
+    }
+
     /* Iterate over every argument */
     for (i = 1; i < argc; i++)
     {
+        if (strstr(argv[i], "=") == NULL)
+        {
+            OUT2E("Alias missing a value\n");
+            return -1;
+        }
+
         char *alias;
         char *value;
 
