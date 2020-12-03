@@ -1,5 +1,5 @@
 /*
-    psh/backends/posix2/run.c - process-related posix backend
+    psh/builtins/alias.c - process-related posix backend
     Copyright 2020 Manuel Bertele
 
     This file is part of Psh, P shell.
@@ -32,7 +32,7 @@ void add_alias(psh_hash *table, char *alias, char *value)
     psh_hash_add_chk(table, alias, value, 0);
 }
 
-static char *check_for_alias(psh_hash *table, char *alias)
+char *check_for_alias(psh_hash *table, char *alias)
 {
     return psh_hash_get(table, alias);
 }
@@ -69,15 +69,18 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
         }
 
+        char *key = strdup(alias);
+        char *val = strdup(value);
+
 
         /* If  alias is already set print error otherwise add it */
         if (check_for_alias(state->alias_table, alias) == NULL)
         {
-            add_alias(state->alias_table, alias, value);
+            add_alias(state->alias_table, key, val);
 
         } else
         {
-            OUT2E("The alias: %s already exists with %s\n", alias, check_for_alias(state->alias_table, alias));
+            OUT2E("The alias: %s already exists with %s\n", key, check_for_alias(state->alias_table, key));
         }
 
     }
