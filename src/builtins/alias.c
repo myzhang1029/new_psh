@@ -125,7 +125,7 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
     {
-        OUT2E("Not enough arguments");
+        OUT2E("Not enough arguments\n");
         return -1;
     }
 
