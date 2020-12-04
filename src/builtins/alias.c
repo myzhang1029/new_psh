@@ -20,6 +20,7 @@
 
 #include "backend.h"
 #include "builtin.h"
+#include "command.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
 
@@ -156,8 +157,32 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
 }
 
 
-int expand_alias(struct _psh_command *cmd)
+int expand_alias(psh_hash *table, char *buffer)
 {
 
+    char *after_argv0 = NULL;
+    char *bufferv0 = NULL;
+
+    int i;
+    for (i = 0; i < strlen(buffer); i++)
+    {
+        if(buffer[i] == ' ')
+        {
+            buffer[i] = '\0';
+            after_argv0 = strdup(&buffer[i + 1]);
+            bufferv0 = strdup(buffer);
+            break;
+        }
+
+    }
+
+    free(buffer);
+
+    char *alias = check_for_alias(table, bufferv0);
+
+    buffer = malloc(strlen(alias) + strlen(after_argv0) + 2);
+    sprintf(buffer, "%s %s", alias, after_argv0);
+
+    return 0;
 
 }

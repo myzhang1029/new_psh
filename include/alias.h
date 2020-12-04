@@ -3,6 +3,6 @@
 #ifndef ALIAS_H_
 #define ALIAS_H_
 
-int expand_alias(struct _psh_command *cmd);
+int expand_alias(psh_hash *table, char *buffer);
 
 #endif

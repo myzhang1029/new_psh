@@ -30,6 +30,7 @@
 #include <readline/history.h>
 #endif
 
+#include "alias.h"
 #include "args.h"
 #include "backend.h"
 #include "builtin.h"
@@ -121,6 +122,7 @@ int main(int argc, char **argv)
             free_command(cmd);
             continue;
         }
+        expand_alias(state->alias_table, buffer);
         psh_backend_do_run(state, cmd);
         free_command(cmd);
     }
