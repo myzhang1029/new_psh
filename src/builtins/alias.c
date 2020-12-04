@@ -162,11 +162,11 @@ char *expand_alias(psh_hash *table, char *buffer)
 
     char *after_argv0 = "";
     char *bufferv0;
+    int i;
 
     if (strstr(buffer, " "))
     {
 
-        int i;
         for (i = 0; i < strlen(buffer); i++)
         {
             if(buffer[i] == ' ')
@@ -191,6 +191,12 @@ char *expand_alias(psh_hash *table, char *buffer)
 
     char *ret = xmalloc(strlen(alias) + strlen(after_argv0) + 2);
     sprintf(ret, "%s %s", alias, after_argv0);
+
+    for (i = 0; i < strlen(alias); i++)
+    {
+        if (alias[i] == ' ')
+            alias[i] = '\0';
+    }
 
     /* Recusion if alias value is an alias */
     if (check_for_alias(table, alias) != NULL)
