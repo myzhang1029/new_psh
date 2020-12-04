@@ -61,7 +61,8 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     {
         for (i = 0; i < amount_of_aliases; i++)
         {
-            printf("%s='%s'\n", list_of_aliases[i], check_for_alias(state->alias_table, list_of_aliases[i]));
+            if (list_of_aliases[i] != NULL)
+                printf("%s='%s'\n", list_of_aliases[i], check_for_alias(state->alias_table, list_of_aliases[i]));
         }
 
     }
@@ -122,8 +123,36 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
 int builtin_unalias(int argc, char **argv, psh_state *state)
 {
+    if (argc < 2)
+    {
+        OUT2E("Not enough arguments");
+        return -1;
+    }
 
-    puts("Work in progress");
+    int i;
+    for (i = 1; i < argc; i++)
+    {
+        /* Remove alias from hash table */
+        psh_hash_rm(state->alias_table, argv[i]);
+
+        int j;
+        for (j = 0; j < amount_of_aliases; j++)
+        {
+            if (list_of_aliases[j] != NULL)
+            {
+
+                if (!strcmp(argv[i], list_of_aliases[j]))
+                {
+                    /* Remove alias from list_of_aliases */
+                    free(list_of_aliases[j]);
+                    list_of_aliases[j] = NULL;
+                    break;
+                }
+            }
+        }
+    }
+   
+    return 0;
 }
 
 

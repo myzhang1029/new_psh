@@ -31,7 +31,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include "alias.h"
 #include "backend.h"
 #include "builtin.h"
 #include "jobs.h"
@@ -311,8 +310,6 @@ int psh_backend_do_run(psh_state *state, struct _psh_command *cmd)
             printf("argv[%d] = %s\n", j, cmd->argv[j]);
         printf("flag: %d\n", cmd->type);
 #endif
-        /* Replace command with alias */
-        expand_alias(cmd);
         /* First try to find a builtin command TODO: functions */
         builtin = find_builtin(cmd->argv[0]);
         if (builtin && cmd->type != PSH_CMD_PIPED &&
