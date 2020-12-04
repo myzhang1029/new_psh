@@ -145,7 +145,7 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
                 if (!strcmp(argv[i], list_of_aliases[j]))
                 {
                     /* Remove alias from list_of_aliases */
-                    free(list_of_aliases[j]);
+                    xfree(list_of_aliases[j]);
                     list_of_aliases[j] = NULL;
                     break;
                 }
@@ -157,32 +157,50 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
 }
 
 
-int expand_alias(psh_hash *table, char *buffer)
+char *expand_alias(psh_hash *table, char *buffer)
 {
 
-    char *after_argv0 = NULL;
-    char *bufferv0 = NULL;
+    char *after_argv0 = "";
+    char *bufferv0;
 
-    int i;
-    for (i = 0; i < strlen(buffer); i++)
+    if (strstr(buffer, " "))
     {
-        if(buffer[i] == ' ')
-        {
-            buffer[i] = '\0';
-            after_argv0 = strdup(&buffer[i + 1]);
-            bufferv0 = strdup(buffer);
-            break;
-        }
 
+        int i;
+        for (i = 0; i < strlen(buffer); i++)
+        {
+            if(buffer[i] == ' ')
+            {
+                buffer[i] = '\0';
+                after_argv0 = strdup(&buffer[i + 1]);
+                bufferv0 = strdup(buffer);
+                break;
+            }
+
+        }
+    } else
+    {
+        bufferv0 = strdup(buffer);
     }
 
-    free(buffer);
 
     char *alias = check_for_alias(table, bufferv0);
 
-    buffer = malloc(strlen(alias) + strlen(after_argv0) + 2);
-    sprintf(buffer, "%s %s", alias, after_argv0);
+    if (alias == NULL)
+        alias = bufferv0;
 
-    return 0;
+    char *ret = xmalloc(strlen(alias) + strlen(after_argv0) + 2);
+    sprintf(ret, "%s %s", alias, after_argv0);
+
+    /* Recusion if alias value is an alias */
+    if (check_for_alias(table, alias) != NULL)
+    {
+        return expand_alias(table, ret);
+    }else
+    {
+        return ret;
+
+    }
+
 
 }

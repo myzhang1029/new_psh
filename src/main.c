@@ -116,13 +116,13 @@ int main(int argc, char **argv)
         if (stat < 0)
             continue;
         cmd = new_command();
+        buffer = expand_alias(state->alias_table, buffer);
         stat = filpinfo(state, buffer, cmd);
         if (stat < 0)
         {
             free_command(cmd);
             continue;
         }
-        expand_alias(state->alias_table, buffer);
         psh_backend_do_run(state, cmd);
         free_command(cmd);
     }
