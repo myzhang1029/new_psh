@@ -32,11 +32,11 @@
 int builtin_exit(int argc, char **argv, psh_state *state)
 {
     if (argc < 2)
-        exit_psh(state, psh_vf_getint(state, "?"));
+        psh_exit(state, psh_vf_getint(state, "?"));
     else
     {
         int i = (int)strtol(argv[1], NULL, 10);
-        exit_psh(state, i);
+        psh_exit(state, i);
     }
     return 1; /* Noreturn */
 }

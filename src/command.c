@@ -91,10 +91,8 @@ struct _psh_command *new_command()
 static void free_argv(struct _psh_command *cmd)
 {
     int count;
-    for (count = 0; count < MAXARG; ++count)
+    for (count = 0; cmd->argv[count]; ++count)
     {
-        if (cmd->argv[count] == NULL)
-            break; /* All args should be freed after here */
         xfree(cmd->argv[count]);
         cmd->argv[count] = NULL;
     }

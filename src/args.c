@@ -46,7 +46,7 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
         if (strcmp(argv[i], "--help") == 0)
         {
             print_help_info(state);
-            exit_psh(state, 0);
+            psh_exit(state, 0);
         }
         if (strcmp(argv[i], "--interactive") == 0)
         {
@@ -62,7 +62,7 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
         {
             print_help_info(state);
             OUT2E("%s: unknown option %s\n", state->argv0, argv[i]);
-            exit_psh(state, 2);
+            psh_exit(state, 2);
         }
     }
 
@@ -84,12 +84,12 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
                 break;
             case ':':
                 OUT2E("%s: option requires an argument\n", state->argv0);
-                exit_psh(state, 1);
+                psh_exit(state, 1);
             case '?':
             default:
                 print_help_info(state);
                 OUT2E("%s: unknown option -%c\n", state->argv0, optopt);
-                exit_psh(state, 2);
+                psh_exit(state, 2);
         }
     }
 }
@@ -112,5 +112,5 @@ static void print_help_info(psh_state *state)
 static void print_version_exit(psh_state *state)
 {
     puts("psh version: " PSH_VERSION);
-    exit_psh(state, 0);
+    psh_exit(state, 0);
 }

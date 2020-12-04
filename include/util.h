@@ -23,13 +23,21 @@
 
 #include "psh.h" /* For psh_state and __attribute__ */
 
+/** Search a command in the command hash table for its path on disk.
+ *  If not found, search against $PATH and add the result to the hash table.
+ *
+ * @param cmd Name of the command to be searched.
+ * @return The path, do not free().
+ */
+char *psh_get_cmd_realpath(psh_state *state, char *cmd);
+
 /** Report a fault in programming.
  *
  * @param state Internal state.
  * @param file __FILE__
  * @param line __LINE__
  */
-void code_fault(psh_state *state, char *file, int line)
+void psh_code_fault(psh_state *state, char *file, int line)
     __attribute__((noreturn));
 
 /** Exit after cleaning up.
@@ -37,5 +45,5 @@ void code_fault(psh_state *state, char *file, int line)
  * @param state Internal state.
  * @param status Exit status.
  */
-void exit_psh(psh_state *state, int status) __attribute__((noreturn));
+void psh_exit(psh_state *state, int status) __attribute__((noreturn));
 #endif

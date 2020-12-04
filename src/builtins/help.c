@@ -68,7 +68,9 @@ const builtin_help_t builtin_helps[63] = {
     {"esac", "", "", ""},
     {"eval", "", "", ""},
     {"exec", "", "", ""},
-    {"exit", "", "", ""},
+    {"exit", "exit [n]", "Exit the shell.",
+     "Exits the shell with a status of N.  If N is omitted, the exit status is "
+     "that of the last command executed."},
     {"export", "", "", ""},
     {"false", "", "", ""},
     {"fc", "", "", ""},

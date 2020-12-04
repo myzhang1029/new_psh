@@ -209,7 +209,7 @@ static int set_up_redirection(psh_state *state, struct _psh_redirect *redirect,
                 break;
             }
             default:
-                code_fault(state, __FILE__, __LINE__);
+                psh_code_fault(state, __FILE__, __LINE__);
         }
         redirect = redirect->next;
     }
@@ -319,45 +319,7 @@ static pid_t execute_single_cmd(psh_state *state, struct _psh_command *cmd,
         _Exit(127);
     }
     /* Control shouldn't reach here */
-    code_fault(state, __FILE__, __LINE__);
-}
-
-static char *get_cmd_realpath(psh_state *state, char *cmd)
-{
-    if (strchr(cmd, '/'))
-        /* A command with a path */
-        return cmd;
-    if (*cmd == '\0')
-    {
-        /* This is an empty command, don't search path for it */
-        OUT2E("%s: : command not found\n", state->argv0);
-        return NULL;
-    }
-    /* Search PATH and run command */
-    char *exec_path;
-    /* Try to find a cached command path. */
-    exec_path = psh_hash_get(state->command_table, cmd);
-    if (exec_path == NULL)
-    {
-        /* No cached commands, search PATH for it */
-        char *name = xmalloc(strlen(cmd) + 2);
-        name[0] = '/';
-        psh_strncpy(name + 1, cmd, strlen(cmd));
-        exec_path = psh_search_path(psh_vf_getstr(state, "PATH"),
-                                    psh_backend_path_separator, name,
-                                    &psh_backend_file_exists);
-        xfree(name);
-        if (exec_path == NULL)
-        {
-            OUT2E("%s: %s: command not found\n", state->argv0, cmd);
-            return NULL;
-        }
-        psh_hash_add(state->command_table, cmd, exec_path, 1);
-    }
-#ifdef DEBUG
-    printf("Cached Path: %s\n", exec_path);
-#endif
-    return exec_path;
+    psh_code_fault(state, __FILE__, __LINE__);
 }
 
 /** Execute a single job.
@@ -446,7 +408,7 @@ static int execute_one_job(psh_state *state, struct _psh_job *job)
                                    pipe_fd[0], last_pipe_fd[1], builtin, NULL);
         else
         {
-            char *cmd_realpath = get_cmd_realpath(state, cmd->argv[0]);
+            char *cmd_realpath = psh_get_cmd_realpath(state, cmd->argv[0]);
             pid = execute_single_cmd(state, cmd, last_pipe_fd[0], pipe_fd[1],
                                      pipe_fd[0], last_pipe_fd[1], builtin,
                                      cmd_realpath);
@@ -489,7 +451,7 @@ static int execute_one_job(psh_state *state, struct _psh_job *job)
                 break;
             default:
                 /* commands shouldn't have other types */
-                code_fault(state, __FILE__, __LINE__);
+                psh_code_fault(state, __FILE__, __LINE__);
         }
     cont:
         cmd = cmd->next;
@@ -508,7 +470,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_job *jobs)
         {
             if (state->fg_job)
                 /* To be clear, this field must be cleared. */
-                code_fault(state, __FILE__, __LINE__);
+                psh_code_fault(state, __FILE__, __LINE__);
             state->fg_job = jobs;
         }
         if (execute_one_job(state, jobs))

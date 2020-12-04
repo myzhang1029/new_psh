@@ -1,7 +1,7 @@
-/** @file token.h - @brief Parser tokens */
+/** @file parser.h - @brief Parser */
 /*
 
-   Copyright 2018 Zhang Maiyun.
+   Copyright 2018-2020 Zhang Maiyun.
 
    This file is part of Psh, P shell.
 
@@ -20,7 +20,7 @@
 */
 
 /** Valid psh tokens. */
-enum psh_tokens
+enum _psh_tokens
 {
     IF,                  /* if */
     THEN,                /* then */
@@ -41,7 +41,7 @@ enum psh_tokens
     BANG,                /* ! */
     TIME,                /* time */
     WORD,                /* whatever */
-    ASSIGNMENT,          /* = */
+    ASSIGNMENT,          /* x=y */
     NUMBER,              /* 1234567890 */
     ARITH_CMD,           /*  */
     ARITH_FOR_EXPRS,     /*  */
@@ -64,10 +64,25 @@ enum psh_tokens
 };
 
 /** Token stream. */
-typedef struct psh_token_stream
+typedef struct _psh_token_and_data
 {
     /** Type of this token */
-    enum psh_tokens the_token;
+    enum _psh_tokens the_token;
     /** Additional arguments */
     char *arg;
-} psh_tokenstream;
+} psh_token;
+
+/** State of the tokenizer. */
+struct _psh_tokenize_state
+{
+    /** Index of the next word to write. */
+    size_t idx;
+    /** Allocated size. */
+    size_t have_size;
+    /** Allocated array. */
+    char **result;
+    /** Whether more input is required. */
+    int need_input;
+    /** If requiring more input, the incomplete token. */
+    char *incomplete_token;
+};

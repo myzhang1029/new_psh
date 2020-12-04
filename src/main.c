@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     parse_shell_args(state, argc, argv);
 
     if (psh_backend_prepare(state) != 0)
-        exit_psh(state, 1);
+        psh_exit(state, 1);
 
 #ifdef HAVE_WORKING_HISTORY
     using_history();
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
         if (stat == 1)
         {
             puts("");
-            exit_psh(state, psh_vf_getint(state, "?"));
+            psh_exit(state, psh_vf_getint(state, "?"));
         }
         if (stat < 0)
             continue;

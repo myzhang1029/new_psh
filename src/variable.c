@@ -80,7 +80,7 @@ static inline void clear_single_var(psh_state *state,
     {
         if (!(attributes & PSH_VFA_STRING))
             /* No more types exist, this is a mistake */
-            code_fault(state, __FILE__, __LINE__);
+            psh_code_fault(state, __FILE__, __LINE__);
         xfree(var->payload.string);
     }
     /* else: integers don't need to be free()d */
@@ -196,7 +196,7 @@ int psh_vf_add_raw(psh_state *state, const char *varname, unsigned int attrib,
     container->array_size = array_size;
     if (!attrib)
         /* New variables must have attrib */
-        code_fault(state, __FILE__, __LINE__);
+        psh_code_fault(state, __FILE__, __LINE__);
     if (is_local && !(attrib & PSH_VFA_EXPORT))
         return psh_hash_add(
             (is_func ? state->contexts[state->context_idx].function_table
@@ -237,7 +237,7 @@ void psh_vf_exit_local(psh_state *state)
 {
     if (state->context_idx == 0)
         /* Exiting the root context is not expected to happen. */
-        code_fault(state, __FILE__, __LINE__);
+        psh_code_fault(state, __FILE__, __LINE__);
     free_vf_table(state, state->contexts[state->context_idx].variable_table);
     free_vf_table(state, state->contexts[state->context_idx--].function_table);
 }
@@ -291,3 +291,6 @@ void psh_vfa_free(psh_state *state)
     xfree(state->contexts);
     psh_hash_free(state->alias_table);
 }
+
+/* Convert variables of various types to a string, need to be free()d. */
+char *psh_vf_stringify(const struct _psh_vfa_container *variable) {}

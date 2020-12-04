@@ -25,6 +25,22 @@
 #include <stddef.h>
 
 #include "backend.h"
-#include "token.h"
+#include "libpsh/xmalloc.h"
+#include "parser.h"
+#include "psh.h"
 
-psh_tokenstream *parse(char *input) { return NULL; }
+psh_token *parse(char *token) { return NULL; }
+char **expand_and_tokenize(psh_state *state, const char *buffer,
+                           struct _psh_tokenize_state **ptokenize_state)
+{
+    struct _psh_tokenize_state *tokenize_state;
+    if (!*ptokenize_state)
+    {
+        tokenize_state = *ptokenize_state =
+            xmalloc(sizeof(struct _psh_tokenize_state));
+        tokenize_state->result;
+        /* TODO: init result */
+    }
+    /* TODO: tokenize, if not quoted to double-quoted, expand parameter, if not
+     * quoted, re-split words. */
+}

@@ -4,7 +4,7 @@ psh_SOURCES = builtins.c command.c filpinfo.c input.c main.c parser.c \
 		      args.c prompts.c util.c variable.c builtins/builtin.c \
 			  builtins/cd.c builtins/echo.c builtins/exec.c builtins/exit.c \
 			  builtins/history.c builtins/pwd.c builtins/true.c \
-			  builtins/hash.c builtins/help.c
+			  builtins/hash.c builtins/help.c expansion.c
 psh_CFLAGS = -I$(top_srcdir)/include
 noinst_HEADERS = $(top_srcdir)/include/backend.h $(top_srcdir)/include/builtin.h \
 				 $(top_srcdir)/include/command.h $(top_srcdir)/include/filpinfo.h \

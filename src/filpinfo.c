@@ -149,7 +149,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
     /* The input command should be initialized in main.c, otherwise report a
      * programming error */
     if (info == NULL)
-        code_fault(state, __FILE__, __LINE__);
+        psh_code_fault(state, __FILE__, __LINE__);
     if (state->verbose)
         OUT2E("%s\n", buffer);
     ignIFS(); /* Ignore starting spaces */
@@ -456,7 +456,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                 if (buffer[cnt_buffer + 1] != '>')
                 {
                     if (redir_lastnode->type != 0)
-                        code_fault(state, __FILE__, __LINE__);
+                        psh_code_fault(state, __FILE__, __LINE__);
                     else if (buffer[cnt_buffer + 1] == '&')
                         redir_lastnode->type = PSH_REDIR_FD2FD;
                     else if (buffer[cnt_buffer + 1] == 0)
@@ -533,7 +533,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         break;
                     case '>': /* Out append */
                         if (redir_lastnode->type != 0)
-                            code_fault(state, __FILE__, __LINE__);
+                            psh_code_fault(state, __FILE__, __LINE__);
                         redir_lastnode->type = PSH_REDIR_OUT_APPN;
                         ++cnt_buffer;
                         switch (buffer[cnt_buffer + 1])
