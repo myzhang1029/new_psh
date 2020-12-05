@@ -121,6 +121,31 @@ int builtin_alias(int argc, char **argv, psh_state *state)
 
 }
 
+int remove_alias(psh_state *state, char *alias)
+{
+
+        /* Remove alias from hash table */
+        psh_hash_rm(state->alias_table, alias);
+
+        int j;
+        for (j = 0; j < amount_of_aliases; j++)
+        {
+            if (list_of_aliases[j] != NULL)
+            {
+
+                if (!strcmp(alias, list_of_aliases[j]))
+                {
+                    /* Remove alias from list_of_aliases */
+                    xfree(list_of_aliases[j]);
+                    list_of_aliases[j] = NULL;
+                    break;
+                }
+            }
+        }
+
+        return 0;
+}
+
 
 int builtin_unalias(int argc, char **argv, psh_state *state)
 {
@@ -131,26 +156,22 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
     }
 
     int i;
+
+    if (!strcmp(argv[1], "-a"))
+    {
+
+        for (i = 0; i < amount_of_aliases; i++)
+        {
+            remove_alias(state, list_of_aliases[i]);
+        }
+       
+        return 0;
+    }
+
+
     for (i = 1; i < argc; i++)
     {
-        /* Remove alias from hash table */
-        psh_hash_rm(state->alias_table, argv[i]);
-
-        int j;
-        for (j = 0; j < amount_of_aliases; j++)
-        {
-            if (list_of_aliases[j] != NULL)
-            {
-
-                if (!strcmp(argv[i], list_of_aliases[j]))
-                {
-                    /* Remove alias from list_of_aliases */
-                    xfree(list_of_aliases[j]);
-                    list_of_aliases[j] = NULL;
-                    break;
-                }
-            }
-        }
+        remove_alias(state, argv[i]);
     }
    
     return 0;
