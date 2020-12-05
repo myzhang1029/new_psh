@@ -204,6 +204,7 @@ char *expand_alias(psh_hash *table, char *buffer)
         return expand_alias(table, ret);
     }else
     {
+        free(bufferv0);
         return ret;
 
     }
