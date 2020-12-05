@@ -641,7 +641,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                     }
                     cmd_lastnode->next = new_command();
                     if (cmd_lastnode->type == 0)
-                        cmd_lastnode->type = PSH_CMD_MULTICMD;
+                        cmd_lastnode->type = PSH_CMD_FOREGROUND;
                     else
                     {
                         synerr(";");
