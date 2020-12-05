@@ -43,7 +43,7 @@
 #define CORRESPOND 0x10
 int builtin_hash(int argc, char **argv, psh_state *state)
 {
-    int flags = 0;
+    unsigned int flags = 0;
     int count = 0, return_value = 0;
     char *path;
     /* count always points to the next possible command name */

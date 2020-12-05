@@ -91,10 +91,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
         if (stat_parsing_redirect == 1) /* for an fd */                        \
         {                                                                      \
             if (redir_lastnode == NULL)                                        \
-            {                                                                  \
-                redir_lastnode = xmalloc(sizeof(struct _psh_redirect));        \
-                redirect_init(redir_lastnode);                                 \
-            }                                                                  \
+                redir_lastnode = xcalloc(1, sizeof(struct _psh_redirect));     \
             if (!isdigit(buffer[cnt_buffer]))                                  \
             {                                                                  \
                 OUT2E("%s: %c: Digit input required\n", state->argv0,          \
@@ -472,7 +469,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         redir_lastnode->type = PSH_REDIR_OUT_REDIR;
                 }
                 if (cnt_buffer == cnt_first_nonIFS)
-                    redir_lastnode->in.fd = 1 /* stdout */;
+                    redir_lastnode->lhs.fd = 1 /* stdout */;
                 else
                 {
                     if (cnt_argument_char == 0) /* Previously a blank reached */
@@ -505,7 +502,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                         buf[i] = buf[len - i - 1];
                         buf[len - i - 1] = temp;
                     }
-                    redir_lastnode->in.fd = atoi(buf);
+                    redir_lastnode->lhs.fd = atoi(buf);
                 }
                 switch (buffer[cnt_buffer + 1])
                 {

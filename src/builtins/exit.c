@@ -35,7 +35,7 @@ int builtin_exit(int argc, char **argv, psh_state *state)
         exit_psh(state, psh_vf_getint(state, "?"));
     else
     {
-        int i = atoi(argv[1]);
+        int i = (int)strtol(argv[1], NULL, 10);
         exit_psh(state, i);
     }
     return 1; /* Noreturn */

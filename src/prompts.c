@@ -52,6 +52,7 @@
 #endif
 
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -459,7 +460,7 @@ char *ps_expander(psh_state *state, const char *prompt)
                         int ch;
                         /* Manually mark an end to the string */
                         *(cur + 1) = 0;
-                        sscanf(cur - num_level + 1, "%o", &ch);
+                        ch = (int)strtol(cur - num_level + 1, NULL, 8);
                         /* Restore the old character (possibly NUL) */
                         *(cur + 1) = save;
                         /* Replace '\\' with the new char */

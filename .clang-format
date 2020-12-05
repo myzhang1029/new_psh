@@ -54,8 +54,6 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeCategories:
   - Regex:       '^".+"'
-    Priority:    3
-  - Regex:       '^<.+\/.+>'
     Priority:    2
   - Regex:       '^<.+>'
     Priority:    1

@@ -58,7 +58,7 @@ Variables:
 static inline void clear_single_var(psh_state *state,
                                     struct _psh_vfa_container *var)
 {
-    int attributes = var->attributes;
+    unsigned int attributes = var->attributes;
     if (attributes & PSH_VFA_PARSED)
         free_command(var->payload.code);
     else if (attributes & PSH_VFA_ASSOC_ARRAY ||
@@ -105,7 +105,7 @@ static inline void free_vf_table(psh_state *state, psh_hash *vfa_table)
  * @param payload Variable value.
  * @param varname Variable name.
  */
-static inline void put_to_environ(int attrib,
+static inline void put_to_environ(unsigned int attrib,
                                   const union _psh_vfa_value payload,
                                   const char *varname)
 {
@@ -159,7 +159,7 @@ void psh_vfa_new_context(psh_state *state)
  * otherwise, it is set in the outmost context frame or updated in the innermost
  * frame in which this variable is found.
  */
-int psh_vf_set(psh_state *state, const char *varname, int attrib,
+int psh_vf_set(psh_state *state, const char *varname, unsigned int attrib,
                const union _psh_vfa_value payload, size_t array_size,
                int is_local, int is_func)
 {
@@ -185,7 +185,7 @@ int psh_vf_set(psh_state *state, const char *varname, int attrib,
 }
 
 /* Add a variable, not used for updating. */
-int psh_vf_add_raw(psh_state *state, const char *varname, int attrib,
+int psh_vf_add_raw(psh_state *state, const char *varname, unsigned int attrib,
                    const union _psh_vfa_value payload, size_t array_size,
                    int is_local, int is_func)
 {
@@ -202,10 +202,9 @@ int psh_vf_add_raw(psh_state *state, const char *varname, int attrib,
             (is_func ? state->contexts[state->context_idx].function_table
                      : state->contexts[state->context_idx].variable_table),
             varname, container, 1);
-    else
-        return psh_hash_add((is_func ? state->contexts[0].function_table
-                                     : state->contexts[0].variable_table),
-                            varname, container, 1);
+    return psh_hash_add((is_func ? state->contexts[0].function_table
+                                 : state->contexts[0].variable_table),
+                        varname, container, 1);
 }
 
 /* Get the reference to a variable or a function. Returned value should never be
@@ -276,8 +275,10 @@ int psh_vf_unset(psh_state *state, const char *varname, int is_func)
                          : state->contexts[ctx_idx_searching].variable_table),
                     varname);
             }
+            return 0;
         }
     } while (ctx_idx_searching);
+    return 1;
 }
 
 /* Called upon shell exit, destroy the whole variable database */

@@ -207,7 +207,8 @@ int main(int argc, char **argv)
 int builtin_cd(int argc, char **argv, psh_state *state)
 {
     char *destination, *path = NULL;
-    int current_arg, flags = 0;
+    size_t current_arg;
+    unsigned int flags = 0;
 
     /* Parse args. Ignore any args after path */
     /* skip argv[0] */
@@ -282,16 +283,11 @@ int builtin_cd(int argc, char **argv, psh_state *state)
         xfree(destination);
         return 1;
     }
-    else
-    {
-        union _psh_vfa_value payload = {
-            psh_strdup(psh_vf_getstr(state, "PWD"))};
-        psh_vf_set(state, "OLDPWD", PSH_VFA_STRING,
-                   (const union _psh_vfa_value)payload, 0, 0, 0);
-        payload.string = destination;
-        psh_vf_set(state, "PWD", 0, (const union _psh_vfa_value)payload, 0, 0,
-                   0);
-        /* Destination not free()d */
-        return 0;
-    }
+    union _psh_vfa_value payload = {psh_strdup(psh_vf_getstr(state, "PWD"))};
+    psh_vf_set(state, "OLDPWD", PSH_VFA_STRING,
+               (const union _psh_vfa_value)payload, 0, 0, 0);
+    payload.string = destination;
+    psh_vf_set(state, "PWD", 0, (const union _psh_vfa_value)payload, 0, 0, 0);
+    /* Destination not free()d */
+    return 0;
 }
