@@ -23,11 +23,15 @@
 
 #include <stdint.h>
 
+#include "libpsh/hash.h"
+
 /** @brief Attributes of variables, functions, and aliases. */
 enum _psh_vfa_attributes
 {
+    /* ---- Meta attribute */
     /** No update */
     PSH_VFA_NO_UPDATE = 0x0,
+    /* ---- Variable types */
     /** Indexed arrays. */
     PSH_VFA_INDEX_ARRAY = 0x001,
     /** Associative arrays. */
@@ -36,6 +40,7 @@ enum _psh_vfa_attributes
     PSH_VFA_INTEGER = 0x004,
     /** Reference to the variable by its value. */
     PSH_VFA_REFERENCE = 0x008,
+    /* ---- Write-time constrains */
     /** Readonly. */
     PSH_VFA_READONLY = 0x010,
     /** Trace. */
@@ -48,6 +53,7 @@ enum _psh_vfa_attributes
     PSH_VFA_LOWER = 0x100,
     /** First-letter-capitalized on assignment. */
     PSH_VFA_CAPI = 0x200,
+    /* ---- Other types */
     /** Resolved to code piece. */
     PSH_VFA_PARSED = 0x400,
     /** Together with a local scope, this marks a variable as
@@ -67,6 +73,8 @@ union _psh_vfa_value
     intmax_t *int_array;
     /** String array. */
     char **string_array;
+    /** Associative array. */
+    psh_hash *assoc_array;
     /** Integer. */
     intmax_t integer;
 };
@@ -127,9 +135,19 @@ int psh_vf_add_raw(psh_state *state, const char *varname, unsigned int attrib,
  * @param is_func Whether this is a function.
  * @return the variable container, NULL if not found.
  */
-
 struct _psh_vfa_container *psh_vf_get(psh_state *state, const char *varname,
                                       int force_local, int is_func);
+
+/** Convert variables of various types to a string.
+ *
+ * @param state Psh internal state.
+ * @param variable Reference to the variable.
+ * @return String representation of the value of the variable. Needs to be
+ * free()d.
+ */
+char *psh_vf_stringify(psh_state *state,
+                       const struct _psh_vfa_container *variable);
+
 /** Clear all variables and functions local to the current context frame.
  *
  * @param state Psh internal state.
@@ -177,4 +195,19 @@ static inline intmax_t psh_vf_getint(psh_state *state, char *name)
     return container ? container->payload.integer : 0;
 }
 
+/** Get a string representation of a variable or function.
+ *
+ * @param state Psh internal state.
+ * @param varname Name of the variable or function.
+ * @param force_local Whether to get only local variables.
+ * @return String representation of the value of the variable. Needs to be
+ * free()d.
+ */
+static inline char *psh_vf_get_stringified(psh_state *state,
+                                           const char *varname, int force_local)
+{
+    const struct _psh_vfa_container *variable =
+        psh_vf_get(state, varname, force_local, 0);
+    return variable ? psh_vf_stringify(state, variable) : NULL;
+}
 #endif

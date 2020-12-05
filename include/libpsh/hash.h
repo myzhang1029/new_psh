@@ -143,4 +143,17 @@ void psh_hash_free(psh_hash *table);
  * @return The value.
  */
 size_t hasher(const char *s);
+
+/** Get a random value from the hash table. */
+static inline void *psh_hash_get_random(psh_hash *table)
+{
+    struct _psh_hash_internal *using = table->table;
+    while ((using - table->table) < table->len)
+    {
+        if (using->used)
+            return using->head->value;
+        ++using;
+    }
+    return NULL;
+}
 #endif

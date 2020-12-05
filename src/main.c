@@ -89,7 +89,7 @@ int main(int argc, char **argv)
     }
 #endif
     state->command_table = psh_hash_create(32);
-    /* TODO: Store this as shell arguments */
+    state->argv = argv;
     state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
 

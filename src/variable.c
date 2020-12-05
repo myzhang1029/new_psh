@@ -61,8 +61,9 @@ static inline void clear_single_var(psh_state *state,
     unsigned int attributes = var->attributes;
     if (attributes & PSH_VFA_PARSED)
         free_command(var->payload.code);
-    else if (attributes & PSH_VFA_ASSOC_ARRAY ||
-             attributes & PSH_VFA_INDEX_ARRAY)
+    else if (attributes & PSH_VFA_ASSOC_ARRAY)
+        psh_hash_free(var->payload.assoc_array);
+    else if (attributes & PSH_VFA_INDEX_ARRAY)
     {
         /* Recursively free an array */
         if (attributes & PSH_VFA_INTEGER)
@@ -99,8 +100,31 @@ static inline void free_vf_table(psh_state *state, psh_hash *vfa_table)
     psh_hash_free(vfa_table);
 }
 
+/** Convert a intmax_t to a dynamically allocated string.
+ *
+ * @param integer The integer to convert.
+ * @return String representation of the integer, needs to be free()d.
+ */
+static inline char *itoa_dm(intmax_t integer)
+{
+    int negative = integer < 0;
+    intmax_t a = negative ? -integer : integer;
+    size_t length = negative ? 3 : 2; /* With '\0' and negative sign */
+    char *str;
+
+    while ((a /= 10) != 0)
+        length += 1;
+    str = xmalloc(length);
+    snprintf(str, length, "%" PRIdMAX, integer);
+    return str;
+}
+
 /** Put a variable to the environment.
  *
+ * This function does not use psh_vf_stringify, because doing so will cause two
+ * different behavior from bash's. One is when an array is exported, the first
+ * element is used, while in bash, nothing happens. The other is when exporting
+ * references, bash does nothing as well.
  * @param attrib Variable attributes.
  * @param payload Variable value.
  * @param varname Variable name.
@@ -111,14 +135,7 @@ static inline void put_to_environ(unsigned int attrib,
 {
     if (attrib & PSH_VFA_INTEGER)
     {
-        int negative = payload.integer < 0;
-        intmax_t a = negative ? -payload.integer : payload.integer;
-        size_t length = negative ? 3 : 2; /* With '\0' and negative sign */
-        char *str;
-        while ((a /= 10) != 0)
-            length += 1;
-        str = xmalloc(length);
-        snprintf(str, length, "%" PRIdMAX, payload.integer);
+        char *str = itoa_dm(payload.integer);
         psh_backend_setenv(varname, str, 1);
         xfree(str);
     }
@@ -293,4 +310,36 @@ void psh_vfa_free(psh_state *state)
 }
 
 /* Convert variables of various types to a string, need to be free()d. */
-char *psh_vf_stringify(const struct _psh_vfa_container *variable) {}
+char *psh_vf_stringify(psh_state *state,
+                       const struct _psh_vfa_container *variable)
+{
+    if (variable->attributes & 0xc00)
+        /* PARSED or UNSET */
+        return psh_strdup("");
+    if (variable->attributes & PSH_VFA_INDEX_ARRAY)
+    {
+        if (variable->attributes & PSH_VFA_INTEGER)
+            return itoa_dm(variable->payload.int_array[0]);
+        if (variable->attributes & PSH_VFA_STRING)
+            return psh_strdup(variable->payload.string_array[0]);
+        psh_code_fault(state, __FILE__, __LINE__);
+    }
+    if (variable->attributes & PSH_VFA_ASSOC_ARRAY)
+    {
+        union _psh_vfa_value *value =
+            psh_hash_get_random(variable->payload.assoc_array);
+        if (variable->attributes & PSH_VFA_INTEGER)
+            return itoa_dm(value->integer);
+        if (variable->attributes & PSH_VFA_STRING)
+            return psh_strdup(value->string);
+        psh_code_fault(state, __FILE__, __LINE__);
+    }
+    if (variable->attributes & PSH_VFA_REFERENCE) /* TODO: Circular reference */
+        return psh_vf_stringify(
+            state, psh_vf_get(state, variable->payload.string, 0, 0));
+    if (variable->attributes & PSH_VFA_INTEGER)
+        return itoa_dm(variable->payload.integer);
+    if (variable->attributes & PSH_VFA_INTEGER)
+        return psh_strdup(variable->payload.string);
+    psh_code_fault(state, __FILE__, __LINE__);
+}

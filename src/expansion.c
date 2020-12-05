@@ -289,6 +289,33 @@ int main(void)
 }
 #endif
 
+/** Expand variables of the form $xxx */
+static char *expand_variable_simple(psh_state *state, const char *start_point,
+                                    const char **last_char)
+{
+    char *name;
+    const char *cur_char = ++start_point; /* Jump over $ */
+    /* Special variables, forcing a length of 1 */
+    if (strchr("?@*-!$#", *start_point))
+    {
+        name = xmalloc(2 * P_CS);
+        name[0] = *start_point;
+        name[1] = '\0';
+    }
+    else
+    {
+        /* Find the first non-identifier character */
+        while (*++cur_char)
+            if (!isalnum(*cur_char) && *cur_char != '_')
+                break;
+        if (last_char)
+            *last_char = cur_char - 1;
+        name = xmalloc((cur_char - start_point) * P_CS);
+        psh_strncpy(name, start_point, cur_char - start_point);
+    }
+    return psh_vf_get_stringified(state, name, 0);
+}
+
 /** Expand dollar signs. The caller is responsible of supplying a good pattern,
  * or an error will be emitted.
  *
@@ -303,6 +330,12 @@ static char *expand_dollar(psh_state *state, const char *start_point,
 {
     if (start_point[1] == '\'')
         return expand_ansi_quote(state, start_point, last_char);
+    if (start_point[1] == '"')
+        return expand_translation(state, start_point, last_char);
+    if (strchr("?@_*-!$#", start_point[1]) || isalnum(start_point[1]))
+        return expand_variable_simple(state, start_point, last_char);
+    if (start_point[1] == '(')
+        ; /* TODO */
     if (start_point[1] == '{')
     {
         const char *base_name_start = (start_point += 2);
@@ -337,11 +370,6 @@ static char *expand_dollar(psh_state *state, const char *start_point,
             }
         }
     }
-    if (start_point[1] == '"')
-        return expand_translation(state, start_point, last_char);
-
-    if (start_point[1] == '(')
-        ; /* TODO */
 }
 /* Parameter, command, and arithmetic expansion */
 char *psh_expand_parameter(psh_state *state, const char *oldstring)

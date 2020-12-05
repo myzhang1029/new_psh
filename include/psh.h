@@ -57,8 +57,10 @@ typedef struct _psh_state
     psh_hash *alias_table;
     /** Command hash table */
     psh_hash *command_table;
-    /** Shell argv[0]. */
+    /** Shell basename */
     char *argv0;
+    /** Shell arguments. */
+    char **argv;
     /** Verbose flag. */
     unsigned int verbose : 1;
     /** Interactive flag. */
