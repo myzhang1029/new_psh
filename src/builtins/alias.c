@@ -49,7 +49,8 @@ void add_alias(psh_hash *table, char *alias, char *value)
     list_of_aliases[amount_of_aliases] = alias;
     amount_of_aliases++;
 
-    /* This list mainly exists for the alias command to be able to display all alises */
+    /* This list mainly exists for the alias command to be able to display all alises
+     * and for unalias -a to be able to remove all aliases */
 
 }
 
@@ -191,7 +192,7 @@ char *expand_alias(psh_hash *table, char *buffer)
     char *bufferv0;
     int i;
 
-    /* Check if the command contains a space */
+    /* Check if the command contains a whitespace */
     if (strstr(buffer, " "))
     {
         /* Find the position of the space */
@@ -209,7 +210,7 @@ char *expand_alias(psh_hash *table, char *buffer)
         }
     } else
     {
-        /* If no space is in the command */
+        /* If no whitespace is in the command */
         bufferv0 = strdup(buffer);
     }
 
@@ -221,10 +222,10 @@ char *expand_alias(psh_hash *table, char *buffer)
         alias = bufferv0;
 
     /* Join the command and its arguments again */
-    char *ret = xmalloc(strlen(alias) + strlen(after_argv0) + 2);
-    sprintf(ret, "%s %s", alias, after_argv0);
+    buffer = xrealloc(buffer, strlen(alias) + strlen(after_argv0) + 2);
+    sprintf(buffer, "%s %s", alias, after_argv0);
 
-    /* Determine a space in the alias */
+    /* Determine a whitespace in the alias */
     /* This is done to prepare for a possible upcomming recusion */
     for (i = 0; i < strlen(alias); i++)
     {
@@ -235,13 +236,13 @@ char *expand_alias(psh_hash *table, char *buffer)
     /* Recusion if alias value is an alias itself */
     if (check_for_alias(table, alias) != NULL)
     {
-        return expand_alias(table, ret);
+        xfree(bufferv0);
+        return expand_alias(table, buffer);
     }else
     {
-        free(bufferv0);
-        return ret;
+        xfree(bufferv0);
+        return buffer;
 
     }
-
 
 }
