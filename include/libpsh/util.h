@@ -47,7 +47,7 @@ char *psh_fgets(char *prompt, FILE *fp);
 char *psh_gets(char *prompt);
 
 /** Reliable strncpy by which a full copy occurs when @p size is
- * strlen(@p src)
+ * strlen(@p src). i.e. The size of @p dst should be at least @p size + 1
  *
  * @param dst Pointer to a memory block.
  * @param src Pointer to the string to be copied.
