@@ -1,6 +1,7 @@
 /*
-    psh/builtins/alias.c - process-related posix backend
+    psh/builtins/alias.c - builtin alias
     Copyright 2020 Manuel Bertele
+    Copyright 2020 Zhang Maiyun
 
     This file is part of Psh, P shell.
 
@@ -18,231 +19,120 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "backend.h"
-#include "builtin.h"
-#include "command.h"
-#include "libpsh/util.h"
-#include "libpsh/xmalloc.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-char **list_of_aliases = NULL;
-unsigned int amount_of_aliases = 0;
-
-void add_alias(psh_hash *table, char *alias, char *value)
-{
-    /* Add alias with is value to a hash table */
-    psh_hash_add_chk(table, alias, value, 0);
-
-    /* If the list of aliases is enpty create one */
-    if (list_of_aliases == NULL)
-    {
-        list_of_aliases = malloc(sizeof(char *));
-    }else
-    {
-        /* If it exists then reallocate it to fit another alias in */
-        list_of_aliases = realloc(list_of_aliases, (amount_of_aliases + 1) * sizeof(char *));
-    }
-    /* Set a pointer to a new alias and increase the amount of aliases */
-    list_of_aliases[amount_of_aliases] = alias;
-    amount_of_aliases++;
-
-    /* This list mainly exists for the alias command to be able to display all alises
-     * and for unalias -a to be able to remove all aliases */
-
-}
-
-char *check_for_alias(psh_hash *table, char *alias)
-{
-    return psh_hash_get(table, alias);
-}
-
-
+#include "builtin.h"
+#include "libpsh/util.h"
+#include "libpsh/xmalloc.h"
 
 int builtin_alias(int argc, char **argv, psh_state *state)
 {
-    int i;
+    int i, return_value = 0;
 
-    if (argc < 2)
+    /* No arguments provided, print. */
+    if (argc < 2 || argc == 2 && strstr(argv[1], "-p") == argv[1])
     {
-        for (i = 0; i < amount_of_aliases; i++)
-        {
-            if (list_of_aliases[i] != NULL)
-                printf("%s='%s'\n", list_of_aliases[i], check_for_alias(state->alias_table, list_of_aliases[i]));
-        }
-
+        ITER_TABLE(state->alias_table, {
+            printf("alias %s='%s'\n", this->key, (char *)this->value);
+        });
     }
 
     /* Iterate over every argument */
-    for (i = 1; i < argc; i++)
+    for (i = 1; i < argc; ++i)
     {
-        if (strstr(argv[i], "=") == NULL)
-        {
-            OUT2E("Alias missing a value\n");
-            return -1;
-        }
-
-        char *alias;
+        char *equal = strchr(argv[i], '=');
+        char *alias_name = argv[i];
         char *value;
 
-        /* Set alias pointer to beginning of argument */
-        alias = argv[i];
-
-        int j;
-        /* Iterate over every char of argument */
-        for (j = 0; j < strlen(argv[i]); j++)
+        if (!equal || equal == argv[i] /* '=' is the first char */)
         {
-            /* Replace char = with \0 */
-            if (argv[i][j] == '=')
+            /* Print its value if not setting. */
+            char *value = psh_hash_get(state->alias_table, argv[i]);
+            if (!value)
             {
-                /* Replace = with \0 to end alias pointer */
-                argv[i][j] = '\0';
-                /* Set value to char after \0 */
-                value = &argv[i][j] + 1;
-                /* values null terminator is the end of the argument */
-                break;
+                OUT2E("%s: %s: %s: not found\n", state->argv0, argv[0],
+                      argv[i]);
+                return_value = 1;
             }
-
+            else
+                printf("alias %s='%s'\n", argv[i], value);
         }
-
-        char *key = strdup(alias);
-        char *val = strdup(value);
-
-
-        /* If  alias is already set print error otherwise add it */
-        if (check_for_alias(state->alias_table, alias) == NULL)
+        else
         {
-            add_alias(state->alias_table, key, val);
-
-        } else
-        {
-            OUT2E("The alias: %s already exists with %s\n", key, check_for_alias(state->alias_table, key));
+            /* End `alias_name */
+            *equal = '\0';
+            value = psh_strdup(equal + 1);
+            psh_hash_add_chk(state->alias_table, alias_name, value, 1);
         }
-
     }
-
-
-    return 0;
-
+    return return_value;
 }
-
-int remove_alias(psh_state *state, char *alias)
-{
-
-        /* Remove alias from hash table */
-        psh_hash_rm(state->alias_table, alias);
-
-        int j;
-        for (j = 0; j < amount_of_aliases; j++)
-        {
-            if (list_of_aliases[j] != NULL)
-            {
-                /* If alias to remove is in the list if all aliases */
-                if (!strcmp(alias, list_of_aliases[j]))
-                {
-                    /* Remove alias from list_of_aliases */
-                    xfree(list_of_aliases[j]);
-                    list_of_aliases[j] = NULL;
-                    break;
-                }
-            }
-        }
-
-        return 0;
-}
-
 
 int builtin_unalias(int argc, char **argv, psh_state *state)
 {
+    int i;
+
     if (argc < 2)
     {
-        OUT2E("Not enough arguments\n");
-        return -1;
+        OUT2E("%s: usage: unalias [-a] name [name ...]\n", argv[0]);
+        return 2;
     }
 
-    int i;
-    /* Remove all aliases */
-    if (!strcmp(argv[1], "-a"))
+    if (strcmp(argv[1], "-a") == 0)
     {
-
-        for (i = 0; i < amount_of_aliases; i++)
-        {
-            remove_alias(state, list_of_aliases[i]);
-        }
-       
-    } else
+        /* Remove all aliases */
+        size_t old_len = state->alias_table->len;
+        psh_hash_free(state->alias_table);
+        state->alias_table = psh_hash_create(old_len);
+    }
+    else
     {
         /* Remove given aliases */
-
-        for (i = 1; i < argc; i++)
-        {
-            remove_alias(state, argv[i]);
-        }
+        for (i = 1; i < argc; + i)
+            psh_hash_rm(state->alias_table, argv[i]);
     }
     return 0;
 }
 
-
-char *expand_alias(psh_hash *table, char *buffer)
+/* Recursively expand aliases and create a new line with the result. */
+char *expand_alias(psh_state *state, const char *oldbuffer)
 {
+    size_t len_remainder = 0;
+    char *first_word;
+    char *newresult, *result = psh_strdup(oldbuffer);
 
-    char *after_argv0 = "";
-    char *bufferv0;
-    int i;
-
-    /* Check if the command contains a whitespace */
-    if (strstr(buffer, " "))
+    while (1) /* TODO: Break circular expansion */
     {
-        /* Find the position of the space */
-        for (i = 0; i < strlen(buffer); i++)
+        size_t expansion_length, other_word_length;
+        /* Find the first word in result */
+        const char *end_word1 = strpbrk(result, " \t\r\n;|&)");
+        char *lookup_result;
+        if (end_word1)
         {
-            if(buffer[i] == ' ')
-            {
-                /* Split the string into the command and its arguments */
-                buffer[i] = '\0';
-                after_argv0 = strdup(&buffer[i + 1]);
-                bufferv0 = strdup(buffer);
-                break;
-            }
-
+            /* Multi-word buffer */
+            first_word = xmalloc((end_word1 - result + 1) * P_CS);
+            psh_strncpy(first_word, result, end_word1 - result);
+            lookup_result = psh_hash_get(state->alias_table, first_word);
+            xfree(first_word);
+            other_word_length = strlen(end_word1);
         }
-    } else
-    {
-        /* If no whitespace is in the command */
-        bufferv0 = strdup(buffer);
+        else
+        {
+            /* The whole buffer is a word */
+            lookup_result = psh_hash_get(state->alias_table, result);
+            other_word_length = 0;
+        }
+        if (!lookup_result)
+            /* The first word in result is not an alias */
+            break;
+        expansion_length = strlen(lookup_result);
+        newresult = xmalloc((expansion_length + other_word_length + 1) * P_CS);
+        memcpy(newresult, lookup_result, expansion_length);
+        psh_strncpy(newresult + expansion_length, end_word1, other_word_length);
+        xfree(result);
+        result = newresult;
     }
-
-    /* Find the value of the command */
-    char *alias = check_for_alias(table, bufferv0);
-
-    /* If command is no alias then point to the original command */
-    if (alias == NULL)
-        alias = bufferv0;
-
-    /* Join the command and its arguments again */
-    buffer = xrealloc(buffer, strlen(alias) + strlen(after_argv0) + 2);
-    sprintf(buffer, "%s %s", alias, after_argv0);
-
-    /* Determine a whitespace in the alias */
-    /* This is done to prepare for a possible upcomming recusion */
-    for (i = 0; i < strlen(alias); i++)
-    {
-        if (alias[i] == ' ')
-            alias[i] = '\0';
-    }
-
-    /* Recusion if alias value is an alias itself */
-    if (check_for_alias(table, alias) != NULL)
-    {
-        xfree(bufferv0);
-        return expand_alias(table, buffer);
-    }else
-    {
-        xfree(bufferv0);
-        return buffer;
-
-    }
-
+    return result;
 }

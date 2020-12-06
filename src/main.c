@@ -66,7 +66,6 @@ static void load_shell_vars(psh_state *state)
 
 int main(int argc, char **argv)
 {
-
     builtin_function bltin;
     psh_state *state;
     int stat;
@@ -94,7 +93,6 @@ int main(int argc, char **argv)
     /* TODO: Store this as shell arguments */
     state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
-
     parse_shell_args(state, argc, argv);
 
     if (psh_backend_prepare(state) != 0)
@@ -116,8 +114,8 @@ int main(int argc, char **argv)
         if (stat < 0)
             continue;
         cmd = new_command();
-        buffer = expand_alias(state->alias_table, buffer);
-        stat = filpinfo(state, buffer, cmd);
+        stat = filpinfo(state, expand_alias(state, buffer), cmd);
+        xfree(buffer);
         if (stat < 0)
         {
             free_command(cmd);
