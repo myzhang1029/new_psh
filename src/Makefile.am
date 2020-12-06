@@ -9,7 +9,7 @@ psh_CFLAGS = -I$(top_srcdir)/include
 noinst_HEADERS = $(top_srcdir)/include/backend.h $(top_srcdir)/include/builtin.h \
 				 $(top_srcdir)/include/command.h $(top_srcdir)/include/filpinfo.h \
 				 $(top_srcdir)/include/input.h $(top_srcdir)/include/prompts.h \
-				 $(top_srcdir)/include/psh.h $(top_srcdir)/include/token.h \
+				 $(top_srcdir)/include/psh.h $(top_srcdir)/include/parser.h \
 				 $(top_srcdir)/include/util.h $(top_srcdir)/include/variable.h \
 				 $(top_srcdir)/include/expansion.h
 psh_LDADD = ../lib/libpsh.a
