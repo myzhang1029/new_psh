@@ -88,6 +88,10 @@ char *psh_gets(char *prompt) { return psh_fgets(prompt, stdin); }
 /* Copy string of length SIZE from SRC to DST */
 size_t psh_strncpy(char *dst, const char *src, size_t size)
 {
+    strncpy(dst, src, size);
+    dst[size] = '\0';
+    return size;
+#if 0
     register char *d = dst;
     register const char *s = src;
     register size_t n = ++size;
@@ -110,6 +114,7 @@ size_t psh_strncpy(char *dst, const char *src, size_t size)
     }
 
     return (s - src - 1);
+#endif
 }
 
 /* Compare the string str1 to a string as were produced by strcat(str2_1,

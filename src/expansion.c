@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "expansion.h"
 #include "libpsh/stringbuilder.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
@@ -371,6 +372,7 @@ static char *expand_dollar(psh_state *state, const char *start_point,
         }
     }
 }
+
 /* Parameter, command, and arithmetic expansion */
 char *psh_expand_parameter(psh_state *state, const char *oldstring)
 {
@@ -397,4 +399,45 @@ char *psh_expand_parameter(psh_state *state, const char *oldstring)
             ;
         ++oldstring;
     }
+}
+
+/* Recursively expand aliases and create a new line with the result. */
+char *expand_alias(psh_state *state, const char *oldbuffer)
+{
+    size_t len_remainder = 0;
+    char *first_word;
+    char *newresult, *result = psh_strdup(oldbuffer);
+
+    while (1) /* TODO: Break circular expansion */
+    {
+        size_t expansion_length, other_word_length;
+        /* Find the first word in result */
+        const char *end_word1 = strpbrk(result, " \t\r\n;|&)");
+        char *lookup_result;
+        if (end_word1)
+        {
+            /* Multi-word buffer */
+            first_word = xmalloc((end_word1 - result + 1) * P_CS);
+            psh_strncpy(first_word, result, end_word1 - result);
+            lookup_result = psh_hash_get(state->alias_table, first_word);
+            xfree(first_word);
+            other_word_length = strlen(end_word1);
+        }
+        else
+        {
+            /* The whole buffer is a word */
+            lookup_result = psh_hash_get(state->alias_table, result);
+            other_word_length = 0;
+        }
+        if (!lookup_result)
+            /* The first word in result is not an alias */
+            break;
+        expansion_length = strlen(lookup_result);
+        newresult = xmalloc((expansion_length + other_word_length + 1) * P_CS);
+        memcpy(newresult, lookup_result, expansion_length);
+        psh_strncpy(newresult + expansion_length, end_word1, other_word_length);
+        xfree(result);
+        result = newresult;
+    }
+    return result;
 }

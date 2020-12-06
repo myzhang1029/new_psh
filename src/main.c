@@ -34,6 +34,7 @@
 #include "backend.h"
 #include "builtin.h"
 #include "command.h"
+#include "expansion.h"
 #include "filpinfo.h"
 #include "input.h"
 #include "libpsh/hash.h"
@@ -92,7 +93,6 @@ int main(int argc, char **argv)
     state->argv = argv;
     state->argv0 = psh_strdup(
         (strrchr(argv[0], '/') == NULL ? argv[0] : strrchr(argv[0], '/') + 1));
-
     parse_shell_args(state, argc, argv);
 
     if (psh_backend_prepare(state) != 0)
@@ -114,7 +114,8 @@ int main(int argc, char **argv)
         if (stat < 0)
             continue;
         cmd = new_command();
-        stat = filpinfo(state, buffer, cmd);
+        stat = filpinfo(state, expand_alias(state, buffer), cmd);
+        xfree(buffer);
         if (stat < 0)
         {
             free_command(cmd);

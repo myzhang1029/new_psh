@@ -33,6 +33,10 @@ struct builtin
     builtin_function proc;
 };
 
+/** Builtin alias*/
+int builtin_alias(int argc, char **argv, psh_state *state);
+/** Builtin unalias*/
+int builtin_unalias(int argc, char **argv, psh_state *state);
 /** Builtin exec */
 int builtin_exec(int argc, char **argv, psh_state *state);
 /** Builtin echo */
