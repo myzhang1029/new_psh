@@ -90,7 +90,7 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
     else
     {
         /* Remove given aliases */
-        for (i = 1; i < argc; + i)
+        for (i = 1; i < argc; ++i)
             psh_hash_rm(state->alias_table, argv[i]);
     }
     return 0;
