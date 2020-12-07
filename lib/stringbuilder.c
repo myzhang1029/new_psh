@@ -42,8 +42,9 @@ psh_stringbuilder *psh_stringbuilder_create()
 
 /* Append a string starting at *STRING with a length of LENGTH to the builder.
    STRING gets free()d if IF_FREE is 1 */
-char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
-                                   size_t length, int if_free)
+const char *psh_stringbuilder_add_length(psh_stringbuilder *builder,
+                                         const char *string, size_t length,
+                                         int if_free)
 {
     struct _psh_sb_item *previous;
     /* Don't waste memory here */
@@ -85,8 +86,8 @@ char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
 }
 
 /* Append STRING to the builder */
-char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string,
-                            int if_free)
+const char *psh_stringbuilder_add(psh_stringbuilder *builder,
+                                  const char *string, int if_free)
 {
     size_t length = strlen(string);
     return psh_stringbuilder_add_length(builder, string, length, if_free);

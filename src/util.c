@@ -34,8 +34,7 @@
 #include "variable.h"
 
 /* Some unexpected things happened */
-__attribute__((noreturn)) void code_fault(psh_state *state, char *file,
-                                          int line)
+ATTRIB_NORETURN void code_fault(psh_state *state, char *file, int line)
 {
     OUT2E("%s: Programming error at %s: %d\n", state->argv0, file, line);
     OUT2E("Shell version: %s\n", PSH_VERSION);

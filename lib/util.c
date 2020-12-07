@@ -38,7 +38,7 @@ char *readline(char *);
  * The memory is allocated automatically.
  * Returns the content when an EOF or \n is read,
  * not including the trailing EOF or \n. */
-char *psh_fgets(char *prompt, FILE *fp)
+char *psh_fgets(const char *prompt, FILE *fp)
 {
 #ifdef HAVE_READLINE
     if (fp == stdin)
@@ -83,7 +83,7 @@ char *psh_fgets(char *prompt, FILE *fp)
     }
 }
 
-char *psh_gets(char *prompt) { return psh_fgets(prompt, stdin); }
+char *psh_gets(const char *prompt) { return psh_fgets(prompt, stdin); }
 
 /* Copy string of length SIZE from SRC to DST */
 size_t psh_strncpy(char *dst, const char *src, size_t size)
@@ -91,30 +91,6 @@ size_t psh_strncpy(char *dst, const char *src, size_t size)
     strncpy(dst, src, size);
     dst[size] = '\0';
     return size;
-#if 0
-    register char *d = dst;
-    register const char *s = src;
-    register size_t n = ++size;
-
-    if (n != 0 && --n != 0)
-    {
-        do
-        {
-            if ((*d++ = *s++) == 0)
-                break;
-        } while (--n != 0);
-    }
-
-    if (n == 0)
-    {
-        if (size != 0)
-            *d = '\0';
-        while (*s++)
-            ;
-    }
-
-    return (s - src - 1);
-#endif
 }
 
 /* Compare the string str1 to a string as were produced by strcat(str2_1,

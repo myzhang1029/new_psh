@@ -27,7 +27,8 @@
 #include "builtin.h"
 #include "psh.h"
 
-int builtin_echo(int argc, char **argv, psh_state *state)
+int builtin_echo(ATTRIB_UNUSED int argc, ATTRIB_UNUSED char **argv,
+                 ATTRIB_UNUSED psh_state *state)
 {
     int cnt;
     if (argv[1] == NULL)

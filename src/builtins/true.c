@@ -25,6 +25,14 @@
 #include "builtin.h"
 #include "psh.h"
 
-int builtin_true(int argc, char **argv, psh_state *state) { return 0; }
+int builtin_true(ATTRIB_UNUSED int argc, ATTRIB_UNUSED char **argv,
+                 ATTRIB_UNUSED psh_state *state)
+{
+    return 0;
+}
 
-int builtin_false(int argc, char **argv, psh_state *state) { return 1; }
+int builtin_false(ATTRIB_UNUSED int argc, ATTRIB_UNUSED char **argv,
+                  ATTRIB_UNUSED psh_state *state)
+{
+    return 1;
+}

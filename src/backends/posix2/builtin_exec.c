@@ -29,9 +29,10 @@
 #include "backend.h"
 #include "builtin.h"
 #include "libpsh/util.h"
+#include "psh.h"
 
 /* Builtin exec */
-int builtin_exec(int argc, char **argv, psh_state *state)
+int builtin_exec(int argc, char **argv, ATTRIB_UNUSED psh_state *state)
 {
     if (argc < 2)
         return 0; /* Do nothing */

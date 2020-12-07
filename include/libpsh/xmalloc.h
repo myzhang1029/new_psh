@@ -27,22 +27,13 @@
 
 #include <stddef.h>
 
-/** Generic pointer type. */
-#ifndef PTR_T
-#if defined(__STDC__)
-#define PTR_T void *
-#else
-#define PTR_T char *
-#endif
-#endif /* PTR_T */
-
 /** Allocate a block of free()able memory. If that failed, print an error
  * message and abort.
  *
  * @param bytes Number of bytes to allocate.
  * @return Pointer to the allocated memory block.
  */
-PTR_T xmalloc(size_t bytes);
+void *xmalloc(size_t bytes);
 
 /** Allocate and zero-initialize a block of free()able memory. If that failed,
  * print an error message and abort.
@@ -51,7 +42,7 @@ PTR_T xmalloc(size_t bytes);
  * @param bytes Number of bytes to allocate for each element.
  * @return Pointer to the allocated memory block.
  */
-PTR_T xcalloc(size_t nelem, size_t bytes);
+void *xcalloc(size_t nelem, size_t bytes);
 
 /** Resize a block of malloc()ed memory. If that failed, print an error
  * message and abort.
@@ -60,12 +51,12 @@ PTR_T xcalloc(size_t nelem, size_t bytes);
  * @param bytes Number of bytes to resize to.
  * @return Pointer to the resized (possibly new) memory block.
  */
-PTR_T xrealloc(PTR_T pointer, size_t bytes);
+void *xrealloc(void *pointer, size_t bytes);
 
 /** Deallocate a block of malloc()ed memory.
  *
  * @param pointer Pointer to the memory block to be deallocated.
  */
-void xfree(PTR_T pointer);
+void xfree(const void *pointer);
 
 #endif /* _LIBPSH_XMALLOC_H */

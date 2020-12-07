@@ -45,7 +45,7 @@ int nref = 0;
 /*								    */
 /* **************************************************************** */
 
-static void memory_error_and_abort(fname) char *fname;
+static void memory_error_and_abort(char *fname)
 {
     fprintf(stderr, "%s: out of virtual memory\n", fname);
     exit(2);
@@ -54,10 +54,9 @@ static void memory_error_and_abort(fname) char *fname;
 /* Return a pointer to free()able block of memory large enough
    to hold BYTES number of bytes.  If the memory cannot be allocated,
    print an error message and abort. */
-PTR_T
-xmalloc(bytes) size_t bytes;
+void *xmalloc(size_t bytes)
 {
-    PTR_T temp;
+    void *temp;
 
     temp = malloc(bytes);
 #ifdef DEBUG
@@ -68,10 +67,9 @@ xmalloc(bytes) size_t bytes;
     return (temp);
 }
 
-PTR_T
-xcalloc(nelem, bytes) size_t nelem, bytes;
+void *xcalloc(size_t nelem, size_t bytes)
 {
-    PTR_T temp;
+    void *temp;
 
     temp = calloc(nelem, bytes);
 #ifdef DEBUG
@@ -82,11 +80,9 @@ xcalloc(nelem, bytes) size_t nelem, bytes;
     return (temp);
 }
 
-PTR_T
-xrealloc(pointer, bytes) PTR_T pointer;
-size_t bytes;
+void *xrealloc(void *pointer, size_t bytes)
 {
-    PTR_T temp;
+    void *temp;
 
     temp = pointer ? realloc(pointer, bytes) : malloc(bytes);
 #ifdef DEBUG
@@ -99,12 +95,11 @@ size_t bytes;
     return (temp);
 }
 
-void xfree(string) PTR_T string;
+void xfree(const void *string)
 {
 #if DEBUG
     if (string)
         fprintf(stderr, "[xmalloc] %p(free %d)\n", string, nref--);
 #endif
-    if (string)
-        free(string);
+    free((void *)string);
 }

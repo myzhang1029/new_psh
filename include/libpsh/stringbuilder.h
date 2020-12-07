@@ -28,7 +28,7 @@
 struct _psh_sb_item
 {
     /** Pointer to the start of the string. */
-    char *string;
+    const char *string;
     /** Number of characters to be included. */
     size_t length;
     /** Whether @ref string should be free()d upon deallocation. */
@@ -59,23 +59,26 @@ psh_stringbuilder *psh_stringbuilder_create();
 /** Add a string to the builder.
  *
  * @param builder The string bulider to use.
- * @param string The string to be added.
+ * @param string The string to be added, it is declared as const because it is
+ * not modified, but if @p if_free is true, it is still passed to free().
  * @param length Number of characters to include.
  * @param if_free Whether @p string should be free()d upon deallocation.
  * @return @p string.
  */
-char *psh_stringbuilder_add_length(psh_stringbuilder *builder, char *string,
-                                   size_t length, int if_free);
+const char *psh_stringbuilder_add_length(psh_stringbuilder *builder,
+                                         const char *string, size_t length,
+                                         int if_free);
 
 /** Add a string to the builder.
  *
  * @param builder The string bulider to use.
- * @param string The string to be added.
+ * @param string The string to be added, it is declared as const because it is
+ * not modified, but if @p if_free is true, it is still passed to free().
  * @param if_free Whether @p string should be free()d upon deallocation.
  * @return @p string.
  */
-char *psh_stringbuilder_add(psh_stringbuilder *builder, char *string,
-                            int if_free);
+const char *psh_stringbuilder_add(psh_stringbuilder *builder,
+                                  const char *string, int if_free);
 
 /** Remove the last string from the builder.
  *

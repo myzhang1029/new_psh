@@ -594,7 +594,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                 /* TODO: Write command substitute code here */
                 if (stat_in_squote || escape)
                     write_current();
-
+                /* fall through */
             case '$':
                 /* TODO: Write variable, variable cut,
                  * ANSI-C style escape, command substitute,
@@ -604,6 +604,7 @@ int filpinfo(psh_state *state, char *buffer, struct _psh_command *info)
                 switch (buffer[cnt_buffer + 1])
                 {
                 }
+                /* fall through */
             case '(':
             case ')':
             /* TODO: Write command sequence code here */

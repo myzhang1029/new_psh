@@ -32,7 +32,7 @@ int builtin_alias(int argc, char **argv, psh_state *state)
     int i, return_value = 0;
 
     /* No arguments provided, print. */
-    if (argc < 2 || argc == 2 && strstr(argv[1], "-p") == argv[1])
+    if (argc < 2 || (argc == 2 && strstr(argv[1], "-p") == argv[1]))
     {
         ITER_TABLE(state->alias_table, {
             printf("alias %s='%s'\n", this->key, (char *)this->value);
@@ -99,7 +99,6 @@ int builtin_unalias(int argc, char **argv, psh_state *state)
 /* Recursively expand aliases and create a new line with the result. */
 char *expand_alias(psh_state *state, const char *oldbuffer)
 {
-    size_t len_remainder = 0;
     char *first_word;
     char *newresult, *result = psh_strdup(oldbuffer);
 
