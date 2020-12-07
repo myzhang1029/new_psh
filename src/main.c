@@ -66,7 +66,6 @@ static void load_shell_vars(psh_state *state)
 
 int main(int argc, char **argv)
 {
-    builtin_function bltin;
     psh_state *state;
     int stat;
     struct _psh_command *cmd = NULL;

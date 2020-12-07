@@ -20,9 +20,15 @@
 
 #ifndef _PSH_H
 #define _PSH_H
-#ifndef __GNUC__
-/** GNU attribute macro */
-#define __attribute__(x)
+#if defined(__GNUC__) || defined(__TINYC__)
+#define ATTRIB_NORETURN __attribute__((noreturn))
+#define ATTRIB_UNUSED __attribute__((unused))
+#elif defined(_MSC_VER)
+#define ATTRIB_NORETURN __declspec(noreturn)
+#define ATTRIB_UNUSED __declspec(unused)
+#else
+#define ATTRIB_NORETURN
+#define ATTRIB_UNUSED
 #endif
 /** Version of psh. */
 #define PSH_VERSION "0.19.0"

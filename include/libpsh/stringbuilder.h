@@ -59,7 +59,8 @@ psh_stringbuilder *psh_stringbuilder_create();
 /** Add a string to the builder.
  *
  * @param builder The string bulider to use.
- * @param string The string to be added.
+ * @param string The string to be added, it is declared as const because it is
+ * not modified, but if @p if_free is true, it is still passed to free().
  * @param length Number of characters to include.
  * @param if_free Whether @p string should be free()d upon deallocation.
  * @return @p string.
@@ -71,7 +72,8 @@ const char *psh_stringbuilder_add_length(psh_stringbuilder *builder,
 /** Add a string to the builder.
  *
  * @param builder The string bulider to use.
- * @param string The string to be added.
+ * @param string The string to be added, it is declared as const because it is
+ * not modified, but if @p if_free is true, it is still passed to free().
  * @param if_free Whether @p string should be free()d upon deallocation.
  * @return @p string.
  */

@@ -148,7 +148,7 @@ size_t hasher(const char *s);
 static inline void *psh_hash_get_random(psh_hash *table)
 {
     struct _psh_hash_internal *using = table->table;
-    while ((using - table->table) < table->len)
+    while (using < table->table + table->len)
     {
         if (using->used)
             return using->head->value;

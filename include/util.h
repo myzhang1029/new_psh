@@ -21,7 +21,7 @@
 #ifndef _PSH_UTIL_H
 #define _PSH_UTIL_H
 
-#include "psh.h" /* For psh_state and __attribute__ */
+#include "psh.h"
 
 /** Search a command in the command hash table for its path on disk.
  *  If not found, search against $PATH and add the result to the hash table.
@@ -37,13 +37,12 @@ char *psh_get_cmd_realpath(psh_state *state, char *cmd);
  * @param file __FILE__
  * @param line __LINE__
  */
-void psh_code_fault(psh_state *state, char *file, int line)
-    __attribute__((noreturn));
+void psh_code_fault(psh_state *state, const char *file, int line) ATTRIB_NORETURN;
 
 /** Exit after cleaning up.
  *
  * @param state Internal state.
  * @param status Exit status.
  */
-void psh_exit(psh_state *state, int status) __attribute__((noreturn));
+void psh_exit(psh_state *state, int status) ATTRIB_NORETURN;
 #endif

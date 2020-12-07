@@ -109,13 +109,16 @@ int get_argc(char **argv)
     return argc;
 }
 
-static int builtin_unsupported(int argc, char **argv, psh_state *state)
+static int builtin_unsupported(ATTRIB_UNUSED int argc,
+                               ATTRIB_UNUSED char **argv,
+                               ATTRIB_UNUSED psh_state *state)
 {
     OUT2E("%s: %s: Not supported, coming soon\n", state->argv0, argv[0]);
     return 127;
 }
 
-static int builtin_getstat_handler(int argc, char **argv, psh_state *state)
+static int builtin_getstat_handler(ATTRIB_UNUSED int argc,
+                                   ATTRIB_UNUSED char **argv, psh_state *state)
 {
     printf("%" PRIdMAX "\n", psh_vf_getint(state, "?"));
     return 0;

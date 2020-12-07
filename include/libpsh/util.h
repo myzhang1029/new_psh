@@ -35,7 +35,7 @@
  * @param fp FILE to get string from.
  * @return The line read excluding EOF or newline, needs to be free()d.
  */
-char *psh_fgets(char *prompt, FILE *fp);
+char *psh_fgets(const char *prompt, FILE *fp);
 
 /** Print prompt and get a line from stdin.
  * @details This function always reads a whole line, stops when EOF or '\n' is
@@ -44,7 +44,7 @@ char *psh_fgets(char *prompt, FILE *fp);
  * @param prompt Prompt to be printed to stdout if @p fp is stdin.
  * @return The line read excluding EOF or newline, needs to be free()d.
  */
-char *psh_gets(char *prompt);
+char *psh_gets(const char *prompt);
 
 /** Reliable strncpy by which a full copy occurs when @p size is
  * strlen(@p src). i.e. The size of @p dst should be at least @p size + 1

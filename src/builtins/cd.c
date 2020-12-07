@@ -207,8 +207,10 @@ int main(int argc, char **argv)
 int builtin_cd(int argc, char **argv, psh_state *state)
 {
     char *destination, *path = NULL;
-    size_t current_arg;
+    int current_arg;
     unsigned int flags = 0;
+    struct _psh_vfa_container *pwd = psh_vf_get(state, "PWD", 0, 0);
+    struct _psh_vfa_container *oldpwd = psh_vf_get(state, "OLDPWD", 0, 0);
 
     /* Parse args. Ignore any args after path */
     /* skip argv[0] */
@@ -267,7 +269,7 @@ int builtin_cd(int argc, char **argv, psh_state *state)
         return 1;
     }
     if (strcmp(path, "-") == 0)
-        path = (char *)psh_vf_getstr(state, "OLDPWD");
+        path = oldpwd->payload.string;
     if (!path)
     {
         OUT2E("%s: %s: OLDPWD not set\n", state->argv0, argv[0]);
@@ -283,11 +285,9 @@ int builtin_cd(int argc, char **argv, psh_state *state)
         xfree(destination);
         return 1;
     }
-    union _psh_vfa_value payload = {psh_strdup(psh_vf_getstr(state, "PWD"))};
-    psh_vf_set(state, "OLDPWD", PSH_VFA_STRING,
-               (const union _psh_vfa_value)payload, 0, 0, 0);
-    payload.string = destination;
-    psh_vf_set(state, "PWD", 0, (const union _psh_vfa_value)payload, 0, 0, 0);
-    /* Destination not free()d */
+    xfree(oldpwd->payload.string);
+    oldpwd->payload.string = pwd->payload.string;
+    pwd->payload.string = destination;
+    /* Destination not free()d, this is intended */
     return 0;
 }
