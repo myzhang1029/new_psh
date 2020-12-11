@@ -19,11 +19,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "alias.h"
 #include "backend.h"
 #include "filpinfo.h"
 #include "libpsh/util.h"
-#include "libpsh/xmalloc.h"
 #include "psh.h"
 #include "util.h"
 
