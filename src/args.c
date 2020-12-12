@@ -20,9 +20,11 @@
 */
 
 #include "backend.h"
+#include "filpinfo.h"
 #include "libpsh/util.h"
 #include "psh.h"
 #include "util.h"
+#include "variable.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +33,7 @@ static void print_help_info();
 static void print_version_exit();
 
 extern int optopt;
+extern char *optarg;
 
 void parse_shell_args(psh_state *state, int argc, char **argv)
 {
@@ -67,7 +70,7 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
     }
 
     int arg;
-    const char *optstring = ":vi";
+    const char *optstring = ":vic:";
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
@@ -78,12 +81,26 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
             case 'i':
                 state->interactive = 1;
                 break;
+            /* -c flag */
+            case 'c':
+            {
+                struct _psh_command *cmd = new_command();
+                if (filpinfo(state, psh_strdup(optarg), cmd) < 0)
+                {
+                    free_command(cmd);
+                    exit_psh(state, 1);
+                }
+                psh_backend_do_run(state, cmd);
+                free_command(cmd);
+                exit_psh(state, (int)psh_vf_getint(state, "?"));
+                break;
+            }
             /* Verbose flag */
             case 'v':
                 state->verbose = 1;
                 break;
             case ':':
-                OUT2E("%s: option requires an argument\n", state->argv0);
+                OUT2E("%s: option -%c requires an argument\n", state->argv0, optopt);
                 exit_psh(state, 1);
             case '?':
             default:
