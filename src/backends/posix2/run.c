@@ -337,7 +337,7 @@ static int execute_one_job(psh_state *state, struct _psh_job *job)
     struct _psh_command *cmd = job->commands;
 
     job->status = PSH_JOB_RUNNING;
-    if (job->type == PSH_CMD_BACKGROUND)
+    if (job->type == PSH_JOB_BACKGROUND)
     {
         /* Fork a subshell */
         pid_t pid = fork();
@@ -464,7 +464,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_job *jobs)
     int i;
     while (jobs)
     {
-        if (jobs->type == PSH_CMD_BACKGROUND)
+        if (jobs->type == PSH_JOB_BACKGROUND)
             psh_job_add_bg(state, jobs);
         else
         {
@@ -479,7 +479,7 @@ int psh_backend_do_run(psh_state *state, struct _psh_job *jobs)
                   state->argv0);
             return 1;
         }
-        if (jobs->type == PSH_CMD_FOREGROUND)
+        if (jobs->type == PSH_JOB_FOREGROUND)
         {
             free_command(state->fg_job->commands);
             state->fg_job->commands = NULL;

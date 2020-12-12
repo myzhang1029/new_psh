@@ -37,7 +37,8 @@ char *psh_get_cmd_realpath(psh_state *state, char *cmd);
  * @param file __FILE__
  * @param line __LINE__
  */
-void psh_code_fault(psh_state *state, const char *file, int line) ATTRIB_NORETURN;
+void psh_code_fault(psh_state *state, const char *file,
+                    int line) ATTRIB_NORETURN;
 
 /** Exit after cleaning up.
  *

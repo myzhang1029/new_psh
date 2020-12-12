@@ -35,11 +35,11 @@
 #include "builtin.h"
 #include "command.h"
 #include "expansion.h"
-#include "filpinfo.h"
 #include "input.h"
 #include "libpsh/hash.h"
 #include "libpsh/util.h"
 #include "libpsh/xmalloc.h"
+#include "parser.h"
 #include "prompts.h"
 #include "psh.h"
 #include "util.h"
@@ -67,9 +67,6 @@ static void load_shell_vars(psh_state *state)
 int main(int argc, char **argv)
 {
     psh_state *state;
-    int stat;
-    struct _psh_command *cmd = NULL;
-    char *expanded_ps1, *buffer;
 
     /* Initiate the internal state */
     state = xcalloc(1, sizeof(psh_state));
@@ -102,26 +99,34 @@ int main(int argc, char **argv)
 #endif
     while (1)
     {
-        expanded_ps1 = ps_expander(state, psh_vf_getstr(state, "PS1"));
-        stat = read_cmdline(state, expanded_ps1, &buffer);
-        xfree(expanded_ps1);
-        if (stat == 1)
+        struct _psh_parser_state *parser_state;
+        char *expanded_ps, buffer;
+        int stat;
+
+        expanded_ps = ps_expander(state, psh_vf_getstr(state, "PS1"));
+        /* This loop ensures the line is complete */
+        do
         {
-            puts("");
-            psh_exit(state, psh_vf_getint(state, "?"));
-        }
+            stat = read_cmdline(state, expanded_ps, &buffer);
+            xfree(expanded_ps);
+            if (stat == 1)
+            {
+                puts("");
+                psh_exit(state, psh_vf_getint(state, "?"));
+            }
+            if (stat < 0)
+                break;
+            expand_alias(state, buffer);
+            if (expand_and_parse(state, buffer, &parser_state))
+            {
+                expanded_ps = ps_expander(state, psh_vf_getstr(state, "PS2"));
+                continue;
+            }
+            xfree(buffer);
+        } while (0);
         if (stat < 0)
             continue;
-        cmd = new_command();
-        stat = filpinfo(state, expand_alias(state, buffer), cmd);
-        xfree(buffer);
-        if (stat < 0)
-        {
-            free_command(cmd);
-            continue;
-        }
-        psh_backend_do_run(state, cmd);
-        free_command(cmd);
+        psh_backend_do_run(state, parser_state->result);
     }
     return 0;
 }

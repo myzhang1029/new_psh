@@ -28,33 +28,68 @@
 #include "command.h"
 #include "libpsh/xmalloc.h"
 #include "psh.h"
+#include "util.h"
 
 /* Add one background job, keeping the linked-list sorted by id. */
 void psh_job_add_bg(psh_state *state, struct _psh_job *job)
 {
     int last = 0;
-    struct _psh_job *add_before = state->bg_jobs, *add_after;
+    struct _psh_job *add_before = state->bg_jobs, *add_after = NULL;
     if (job->id)
     {
         /* job already has an id, probably `bg` was called. */
-        while (add_before->id < job->id)
-            add_after = add_before;
-        add_after->next = job;
-        job->next = add_before;
+        /* Insert the job while keeping the list sorted */
+        if (add_before->id == job->id)
+            /* No duplicate ids should ever be introduced */
+            psh_code_fault(state, __FILE__, __LINE__);
+        if (!add_before || add_before->id > job->id)
+        {
+            /* Either an empty job queue or adding the first job, prepend the
+             * job */
+            state->bg_jobs = job;
+        }
+        else
+        {
+            while (add_before && add_before->id < job->id)
+                /* If add_before is NULL, add_after is the last one with value
+                 */
+                add_after = add_before;
+            if (!add_after)
+                /* Logically, this line should never be encountered, but some
+                 * static analyzers doesn't agree */
+                psh_code_fault(state, __FILE__, __LINE__);
+            add_after->next = job;
+        }
     }
     else
     {
-        /* Allocate a new minimal id. */
-        while (add_before->id - last == 1)
+        /* No job id exists */
+        if (!add_before || add_before->id > 1)
         {
-            last = add_before->id;
-            add_after = add_before;
-            add_before = add_before->next;
+            /* Adding the first job, prepend the job */
+            state->bg_jobs = job;
+            job->id = 1;
         }
-        job->id = add_before->id - 1;
-        add_after->next = job;
-        job->next = add_before;
+        else
+        {
+            while (add_before && add_before->id - last == 1)
+            {
+                last = add_before->id;
+                /* Here add_after should at least be valid since the last if
+                 * handled empty add_before */
+                add_after = add_before;
+                add_before = add_before->next;
+            }
+            if (!add_after)
+                /* Logically, this line should never be encountered, but some
+                 * static analyzers doesn't agree */
+                psh_code_fault(state, __FILE__, __LINE__);
+            job->id = add_after->id + 1;
+            add_after->next = job;
+        }
     }
+    /* No matter what add_before is */
+    job->next = add_before;
 }
 
 void free_redirect(struct _psh_redirect *redir)
@@ -67,21 +102,6 @@ void free_redirect(struct _psh_redirect *redir)
         xfree(temp);
         temp = NULL;
     }
-}
-
-/* Malloc a command, enNULL all elements, malloc the first element in argv[] and
- * a struct _psh_redirect */
-struct _psh_command *new_command()
-{
-    /* TODO: Remove MAXARG, MAXEACHARG */
-    struct _psh_command *cmd;
-    cmd = xcalloc(1, sizeof(struct _psh_command));
-    /* Setting to '\0' will be used to detect
-                           whether an element is used */
-    cmd->argv = xcalloc(MAXARG, P_CS);
-    cmd->argv[0] = xcalloc(MAXEACHARG, P_CS);
-    cmd->rlist = xcalloc(1, sizeof(struct _psh_redirect));
-    return cmd;
 }
 
 /** Free the argv field of a command struct.

@@ -52,7 +52,7 @@ struct _psh_redirect
         PSH_REDIR_NONE = 0,
         /** Duplicate a file discripter. \n
          * @ref redirect::lhs::fd -> @ref redirect::rhs::fd \n
-         * forms: [n] > &n or [n] < &n
+
          * @sa section 2.7.5, 2.7.6
          */
         PSH_REDIR_FD2FD = 1,
@@ -119,7 +119,7 @@ struct _psh_redirect
     struct _psh_redirect *next;
 };
 
-/** @brief The type of commands and jobs. */
+/** @brief The type of commands. */
 enum _psh_cmd_type
 {
     /** Simple command. \n
@@ -137,17 +137,24 @@ enum _psh_cmd_type
     /** OR list. \n
      * @sa section 2.9.3
      */
-    PSH_CMD_RUN_OR,
+    PSH_CMD_RUN_OR
+};
+
+/** @brief The type of jobs. */
+enum _psh_job_type
+{
+    /** Blank state. */
+    PSH_JOB_BLANK = 0,
     /** Asynchronous list. \n
      * @note Only used when parsing and executing, not useful in scheduling.
      * @sa section 2.9.3
      */
-    PSH_CMD_BACKGROUND,
+    PSH_JOB_BACKGROUND,
     /** Sequential list. \n
      * @note Only used when parsing and executing, not useful in scheduling.
      * @sa section 2.9.3
      */
-    PSH_CMD_FOREGROUND
+    PSH_JOB_FOREGROUND
 };
 
 /** @brief Everything about a command. */
@@ -183,7 +190,7 @@ enum _psh_job_status
 struct _psh_job
 {
     /** The type of this job. */
-    enum _psh_cmd_type type;
+    enum _psh_job_type type;
     /** Commands in this job. */
     struct _psh_command *commands;
     /** Job status. */
@@ -210,12 +217,6 @@ void psh_job_add_bg(psh_state *state, struct _psh_job *job);
  * @param redir Pointer to the redirect struct.
  */
 void free_redirect(struct _psh_redirect *redir);
-
-/** Allocate a command.
- *
- * @return Pointer to the allocated struct.
- */
-struct _psh_command *new_command();
 
 /** Deallocate a command.
  *

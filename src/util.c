@@ -77,7 +77,8 @@ char *psh_get_cmd_realpath(psh_state *state, char *cmd)
 }
 
 /* Some unexpected things happened */
-ATTRIB_NORETURN void psh_code_fault(psh_state *state, const char *file, int line)
+ATTRIB_NORETURN void psh_code_fault(psh_state *state, const char *file,
+                                    int line)
 {
     OUT2E("%s: Programming error at %s:%d\n", state->argv0, file, line);
     OUT2E("Shell version: %s\n", PSH_VERSION);

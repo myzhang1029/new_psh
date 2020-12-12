@@ -339,7 +339,7 @@ char *psh_vf_stringify(psh_state *state,
             state, psh_vf_get(state, variable->payload.string, 0, 0));
     if (variable->attributes & PSH_VFA_INTEGER)
         return itoa_dm(variable->payload.integer);
-    if (variable->attributes & PSH_VFA_INTEGER)
+    if (variable->attributes & PSH_VFA_STRING)
         return psh_strdup(variable->payload.string);
     psh_code_fault(state, __FILE__, __LINE__);
 }

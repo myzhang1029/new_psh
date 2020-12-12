@@ -29,18 +29,34 @@
 #include "parser.h"
 #include "psh.h"
 
-psh_token *parse(char *token) { return NULL; }
-char **expand_and_tokenize(psh_state *state, const char *buffer,
-                           struct _psh_tokenize_state **ptokenize_state)
+int expand_and_parse(psh_state *state, const char *buffer,
+                     struct _psh_parser_state **pstate)
 {
-    struct _psh_tokenize_state *tokenize_state;
-    if (!*ptokenize_state)
+    struct _psh_parser_state *parser_state;
+    if (!*pstate)
     {
-        tokenize_state = *ptokenize_state =
-            xmalloc(sizeof(struct _psh_tokenize_state));
-        tokenize_state->result;
-        /* TODO: init result */
+        parser_state = xmalloc(sizeof(struct _psh_parser_state));
+        parser_state->result = xcalloc(1, sizeof(struct _psh_job));
+        *pstate = parser_state;
     }
     /* TODO: tokenize, if not quoted to double-quoted, expand parameter, if not
      * quoted, re-split words. */
+    while (*buffer)
+    {
+        switch (*buffer)
+        {
+            case ' ':
+            case '\t':
+            case '$':
+            case '"':
+            case '\'':
+            case 'w':
+            case 'c':
+            case 'f':
+            case 'i':
+            default:
+                break;
+        }
+    }
+    return parser_state->need_input;
 }

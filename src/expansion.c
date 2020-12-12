@@ -290,11 +290,12 @@ int main(void)
 }
 #endif
 
+/* Tested */
 /** Expand variables of the form $xxx */
 static char *expand_variable_simple(psh_state *state, const char *start_point,
                                     const char **last_char)
 {
-    char *name;
+    char *name, *value;
     const char *cur_char = ++start_point; /* Jump over $ */
     /* Special variables, forcing a length of 1 */
     if (strchr("?@*-!$#", *start_point))
@@ -311,12 +312,75 @@ static char *expand_variable_simple(psh_state *state, const char *start_point,
                 break;
         if (last_char)
             *last_char = cur_char - 1;
-        name = xmalloc((cur_char - start_point) * P_CS);
+        name = xmalloc((cur_char - start_point + 1) * P_CS);
         psh_strncpy(name, start_point, cur_char - start_point);
     }
-    return psh_vf_get_stringified(state, name, 0);
+    value = psh_vf_get_stringified(state, name, 0);
+    xfree(name);
+    return value;
 }
 
+#if defined(DEBUG) && defined(TESTING_EXPAND_VARIABLE_SIMPLE)
+#include "backend.h"
+int main(void)
+{
+    psh_state state;
+    char *val;
+    union _psh_vfa_value payload;
+    payload.integer = 100;
+    memset(&state, 0, sizeof(psh_state));
+    state.argv0 = "test";
+    psh_vfa_new_context(&state);
+    payload.integer = 100;
+    psh_vf_set(&state, "VAR", PSH_VFA_INTEGER, payload, 0, 0, 0);
+    val = expand_variable_simple(&state, "$VAR", NULL);
+    puts(val); /* should yield "100" */
+    xfree(val);
+    payload.string = psh_strdup("abc");
+    psh_vf_set(&state, "VAR", PSH_VFA_STRING, payload, 0, 0, 0);
+    val = expand_variable_simple(&state, "$VAR", NULL);
+    puts(val); /* should yield "abc" */
+    xfree(val);
+    psh_vfa_free(&state);
+    return 0;
+}
+#endif
+
+/** Expand parameters */
+static char *expand_paramaters(psh_state *state, const char *start_point,
+                               const char **last_char)
+{
+    const char *base_name_start = (start_point += 2);
+    char *base_name;
+    struct _psh_vfa_container *value;
+    while (*start_point)
+    {
+        switch (*start_point)
+        {
+            case ':':
+                if (start_point == base_name_start)
+                {
+                    OUT2E("%s: %s: bad substitution\n", state->argv0,
+                          start_point);
+                    return NULL;
+                }
+                base_name = xmalloc((start_point - base_name_start + 1) * P_CS);
+                psh_strncpy(base_name, base_name_start,
+                            start_point - base_name_start);
+                value = psh_vf_get(state, base_name, 0, 0);
+                if (start_point[1] == '-')
+                    if (value)
+                        ;
+            case '/':
+            case '#':
+            case '%':
+            case '^':
+            case '@':
+            default:
+                ++start_point;
+        }
+    }
+}
 /** Expand dollar signs. The caller is responsible of supplying a good pattern,
  * or an error will be emitted.
  *
@@ -338,39 +402,7 @@ static char *expand_dollar(psh_state *state, const char *start_point,
     if (start_point[1] == '(')
         ; /* TODO */
     if (start_point[1] == '{')
-    {
-        const char *base_name_start = (start_point += 2);
-        char *base_name;
-        struct _psh_vfa_container *value;
-        while (*start_point)
-        {
-            switch (*start_point)
-            {
-                case ':':
-                    if (start_point == base_name)
-                    {
-                        OUT2E("%s: %s: bad substitution\n", state->argv0,
-                              start_point);
-                        return NULL;
-                    }
-                    base_name =
-                        xmalloc((start_point - base_name_start + 1) * P_CS);
-                    psh_strncpy(base_name, base_name_start,
-                                start_point - base_name_start);
-                    value = psh_vf_get(state, base_name, 0, 0);
-                    if (start_point[1] == '-')
-                        if (value)
-                            ;
-                case '/':
-                case '#':
-                case '%':
-                case '^':
-                case '@':
-                default:
-                    ++start_point;
-            }
-        }
-    }
+        return expand_paramaters(state, start_point, last_char);
 }
 
 /* Parameter, command, and arithmetic expansion */

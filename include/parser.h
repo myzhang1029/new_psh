@@ -63,26 +63,22 @@ enum _psh_tokens
     BAR_AND,             /* -& */
 };
 
-/** Token stream. */
-typedef struct _psh_token_and_data
+/** State of the parser. */
+struct _psh_parser_state
 {
-    /** Type of this token */
-    enum _psh_tokens the_token;
-    /** Additional arguments */
-    char *arg;
-} psh_token;
-
-/** State of the tokenizer. */
-struct _psh_tokenize_state
-{
-    /** Index of the next word to write. */
-    size_t idx;
-    /** Allocated size. */
-    size_t have_size;
-    /** Allocated array. */
-    char **result;
+    /** Result. */
+    struct _psh_job *result;
+    /** The job we are operating on. */
+    struct _psh_job *current_job;
+    /** The command we are operating on. */
+    struct _psh_cmd *current_cm;
     /** Whether more input is required. */
     int need_input;
-    /** If requiring more input, the incomplete token. */
-    char *incomplete_token;
+    /** If requiring more input, the token that is asking for more tokens. */
+    enum _psh_tokens incomplete_token;
+    /** If requiring more input, the faulty token as a string literal. */
+    char *faulty_token;
 };
+
+int expand_and_parse(psh_state *state, const char *buffer,
+                     struct _psh_parser_state **pstate);
