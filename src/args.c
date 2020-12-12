@@ -24,6 +24,7 @@
 #include "libpsh/util.h"
 #include "psh.h"
 #include "util.h"
+#include "variable.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -70,8 +71,6 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
 
     int arg;
     const char *optstring = ":vic:";
-    struct _psh_command *cmd;
-    char *option_argument;
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
@@ -84,18 +83,18 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
                 break;
             /* -c flag */
             case 'c':
-                cmd = new_command();
-                option_argument = psh_strdup(optarg);
-                if (filpinfo(state, option_argument, cmd) < 0)
+            {
+                struct _psh_command *cmd = new_command();
+                if (filpinfo(state, psh_strdup(optarg), cmd) < 0)
                 {
                     free_command(cmd);
-                    exit_psh(state, -1);
+                    exit_psh(state, 1);
                 }
                 psh_backend_do_run(state, cmd);
                 free_command(cmd);
-                exit_psh(state, 0);
+                exit_psh(state, (int)psh_vf_getint(state, "?"));
                 break;
-
+            }
             /* Verbose flag */
             case 'v':
                 state->verbose = 1;
