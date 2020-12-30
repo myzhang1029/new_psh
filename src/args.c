@@ -95,7 +95,8 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
                     exit_psh(state, 1);
                 }
                 if (state->trace == 1)
-                    printf("+ %s", optarg);
+                    printf("+ %s\n", optarg);
+                fflush(stdout);
                 psh_backend_do_run(state, cmd);
                 free_command(cmd);
                 exit_psh(state, (int)psh_vf_getint(state, "?"));
