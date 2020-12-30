@@ -113,7 +113,10 @@ int main(int argc, char **argv)
         if (stat < 0)
             continue;
         cmd = new_command();
-        stat = filpinfo(state, expand_alias(state, buffer), cmd);
+        char *expanded_aliases = expand_alias(state, buffer);
+        if (state->trace == 1)
+            printf("+ %s\n", expanded_aliases);
+        stat = filpinfo(state, expanded_aliases, cmd);
         xfree(buffer);
         if (stat < 0)
         {
