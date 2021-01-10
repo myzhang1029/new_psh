@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     while (1)
     {
         struct _psh_parser_state *parser_state;
-        char *expanded_ps, buffer;
+        char *expanded_ps, *buffer;
         int stat;
 
         expanded_ps = ps_expander(state, psh_vf_getstr(state, "PS1"));
