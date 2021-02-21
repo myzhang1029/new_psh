@@ -70,7 +70,7 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
     }
 
     int arg;
-    const char *optstring = ":vic:";
+    const char *optstring = ":vixc:";
 
     /* Parse shell options */
     while ((arg = psh_backend_getopt(argc, argv, optstring)) != -1)
@@ -81,6 +81,10 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
             case 'i':
                 state->interactive = 1;
                 break;
+            /* -x flag */
+            case 'x':
+                state->trace = 1;
+                break;
             /* -c flag */
             case 'c':
             {
@@ -90,6 +94,9 @@ void parse_shell_args(psh_state *state, int argc, char **argv)
                     free_command(cmd);
                     exit_psh(state, 1);
                 }
+                if (state->trace == 1)
+                    printf("+ %s\n", optarg);
+                fflush(stdout);
                 psh_backend_do_run(state, cmd);
                 free_command(cmd);
                 exit_psh(state, (int)psh_vf_getint(state, "?"));

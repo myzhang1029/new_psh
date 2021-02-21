@@ -67,5 +67,7 @@ typedef struct _psh_state
     unsigned int verbose : 1;
     /** Interactive flag. */
     unsigned int interactive : 1;
+    /** -x flag */
+    unsigned int trace : 1;
 } psh_state;
 #endif
